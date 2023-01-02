@@ -1,0 +1,32 @@
+cmake_minimum_required(VERSION 3.23)
+project(Chista_Asabru)
+
+set(CMAKE_CXX_STANDARD 17)
+
+#add_subdirectory(lib)
+#include_directories(lib/tinyxml2)
+
+add_executable(Chista_Asabru
+        first.cpp
+        config/config.h
+        config/config.cpp
+        config/config_types.h
+        config/IConfigEngine.h
+
+        engine/socket/ServerSocket.h
+        engine/socket/ServerSocket.cpp
+        engine/socket/ClientSocket.h
+        engine/socket/ClientSocket.cpp
+
+        engine/decoder/ClickHouse_Wire.h
+        engine/decoder/ClickHouse_Wire.cpp
+
+        common/Utils.cpp common/Utils.h
+        common/Utils.cpp
+
+        handlers/CProtocolServer.h
+        handlers/CProtocolServer.cpp
+
+        test/ProxyInfo.h test/ProxyInfo.cpp)
+
+target_link_libraries(Chista_Asabru tinyxml2)

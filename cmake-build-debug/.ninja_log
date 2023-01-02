@@ -1,0 +1,11 @@
+# ninja log v5
+1	370	1672637417678855411	CMakeFiles/Chista_Asabru.dir/engine/socket/ClientSocket.cpp.o	3f590013d6a61171
+3	221	1672640089909588110	CMakeFiles/Chista_Asabru.dir/engine/decoder/ClickHouse_Wire.cpp.o	68345fde3faf4d98
+1	344	1672637417652250817	CMakeFiles/Chista_Asabru.dir/engine/socket/ServerSocket.cpp.o	8f3b21e22c21e345
+2	366	1672640139641533373	CMakeFiles/Chista_Asabru.dir/config/config.cpp.o	10c0a36c0a74b894
+2	456	1672637417762765703	CMakeFiles/Chista_Asabru.dir/test/ProxyInfo.cpp.o	998d754451bb8a6
+0	339	1672637417647366598	CMakeFiles/Chista_Asabru.dir/main.cpp.o	718e15dc052bfd95
+1	363	1672637417671432646	CMakeFiles/Chista_Asabru.dir/common/Utils.cpp.o	e48255e34ef4632d
+1	485	1672637417793103055	CMakeFiles/Chista_Asabru.dir/handlers/CProtocolServer.cpp.o	64708ad0eb9fc41c
+221	255	1672640089945756561	Chista_Asabru	7e89e13c8e0db6c0
+2	442	1672637774872207852	CMakeFiles/Chista_Asabru.dir/first.cpp.o	904154a93fe97b7d
