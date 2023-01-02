@@ -3,8 +3,8 @@ project(Chista_Asabru)
 
 set(CMAKE_CXX_STANDARD 17)
 
-#add_subdirectory(lib)
-#include_directories(lib/tinyxml2)
+add_subdirectory(lib)
+include_directories(lib/tinyxml2)
 
 add_executable(Chista_Asabru
         first.cpp
