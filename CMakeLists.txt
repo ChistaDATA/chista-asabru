@@ -27,6 +27,11 @@ add_executable(Chista_Asabru
         handlers/CProtocolServer.h
         handlers/CProtocolServer.cpp
 
-        test/ProxyInfo.h test/ProxyInfo.cpp pipelines/ClickHousePipeline.cpp pipelines/PostgreSQLPipeline.cpp pipelines/MySQLPipeline.cpp)
+        test/ProxyInfo.h test/ProxyInfo.cpp
+
+        pipelines/ClickHousePipeline.cpp
+        pipelines/PostgreSQLPipeline.cpp
+        pipelines/MySQLPipeline.cpp
+        pipelines/PassthroughPipeline.cpp)
 
 target_link_libraries(Chista_Asabru tinyxml2)
