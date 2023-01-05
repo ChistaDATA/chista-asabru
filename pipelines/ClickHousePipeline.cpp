@@ -2,6 +2,10 @@
 #include "../handlers/CProtocolServer.h"
 #include "../test/ProxyInfo.h"
 #include "../engine/socket/ClientSocket.h"
+#include "../config/config_types.h"
+#include "../config/ConfigSingleton.h"
+
+ConfigSingleton& configSingleton=ConfigSingleton::getInstance();
 
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr) {
 
@@ -9,6 +13,10 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr) {
     memcpy(&CData, lptr, sizeof(CLIENT_DATA));
     char bfr[32000];
     int RetVal;
+
+    RESOLVE_CONFIG resolveConfig = {"cluster1","node-name1","service-name1-1"};
+    auto serviceConfig = configSingleton.Resolve(resolveConfig);
+
 
     END_POINT *ep = new END_POINT{"127.0.0.1", 9000, 1, "", 0,
                                   "  "}; // Resolve("firstcluster", "127.0.0.1" , 9000, pd );

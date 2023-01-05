@@ -103,10 +103,10 @@ void *ClientThreadProc(void *lpParam);
 #define SOCKET_ERROR (-1)
 
 #if defined(__APPLE__)
-/* This is the critical section object (statically allocated). */
-static pthread_mutex_t cs_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
+    /* This is the critical section object (statically allocated). */
+    static pthread_mutex_t cs_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
 #else
-static pthread_mutex_t cs_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+    static pthread_mutex_t cs_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 #endif
 
 void InitializeLock() {}

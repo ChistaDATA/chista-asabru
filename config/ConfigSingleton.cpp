@@ -1,30 +1,6 @@
+#include "ConfigSingleton.h"
 
-#include <string>
-#include <vector>
-
-#include "../lib/tinyxml2/tinyxml2.h"
-
-
-#include "config.h"
-
-using std::pair;
-using std::string;
-using std::vector;
-
-using namespace tinyxml2;
-
-Config::Config()
-{
-}
-
-
-PROXY_CONFIG Config::GetProxyConfig()
-{
-    return m_ProxyConfig;
-}
-
-
-XMLError Config::LoadProxyConfigurations(std::string filePath)
+XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
 {
     XMLDocument xmlDoc;
     XMLError eResult = xmlDoc.LoadFile(filePath.c_str());
@@ -194,7 +170,7 @@ XMLError Config::LoadProxyConfigurations(std::string filePath)
 }
 
 
-SERVICE Config::Resolve(RESOLVE_CONFIG config)
+SERVICE ConfigSingleton::Resolve(RESOLVE_CONFIG config)
 {
     //PROXY_CONFIG tempProxyConfig;
     CLUSTER cluster;

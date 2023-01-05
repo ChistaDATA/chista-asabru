@@ -14,6 +14,9 @@
 using namespace std;
 
 #include "handlers/CProtocolServer.h"
+#include "handlers/CHttpHandler.h"
+#include "config/config.h"
+#include "config/ConfigSingleton.h"
 
 //#include "CPingClient.h"
 
@@ -59,6 +62,8 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr);
 void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr);
 void *MySQLPipeline(CProxySocket *ptr, void *lptr);
 
+static ConfigSingleton& configSingleton = ConfigSingleton::getInstance();
+
 int main(int argc, char **argv )
 {
 
@@ -67,11 +72,29 @@ int main(int argc, char **argv )
         return -1;
     }
     int rc = atoi(argv[1]);
-    rc = (rc < 0 ) ? rc : 9100;
+    rc = (rc > 0 ) ? rc : 9100;
     cout << "Received from Command line " << rc << endl;
     CProxySocket ch(9100);  //default is 9100;
     CProxySocket pg(9200);
     CProxySocket msql(9300);
+
+    CProxySocket ch_http(9400);
+
+
+
+   /* std::string filePath = "../config/config2.xml";
+    Config* config= new Config();
+    config->LoadProxyConfigurations(filePath);
+    PROXY_CONFIG proxyConfig = config->GetProxyConfig();
+    RESOLVE_CONFIG resolveConfig = {"cluster1","node-name1","service-name1-1"};
+    auto serviceConfig = config->Resolve(resolveConfig);*/
+
+    // Setting Http proxy
+
+    if (!ch_http.SetHandler(new CHttpHandler ()) ) {
+        cout << "Failed to set ClickHouse HTTP Handler.................." << endl;
+        return -2;
+    }
 
     // Setting up ClickHouse Proxy
 
@@ -130,6 +153,12 @@ int main(int argc, char **argv )
 
     if (!msql.Start() ) {
         cout << "Failed To Start MySQL Proxy Server........................" << endl;
+        return -3;
+
+    }
+
+    if (!ch_http.Start() ) {
+        cout << "Failed To Start HTTP Proxy Server........................" << endl;
         return -3;
 
     }
