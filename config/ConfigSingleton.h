@@ -22,7 +22,7 @@ public:
         return instance;
     }
 
-    SERVICE Resolve(RESOLVE_CONFIG config);
+    RESOLVE_ENDPOINT_RESULT Resolve(RESOLVE_CONFIG config);
 private:
     ConfigSingleton()= default;
     ~ConfigSingleton()= default;

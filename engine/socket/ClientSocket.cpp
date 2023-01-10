@@ -30,14 +30,17 @@ bool CClientSocket::Resolve()   {
 }
 
 bool CClientSocket::Connect() {
-    m_ConnectSock = socket(AF_INET,SOCK_STREAM,0);
-    if (m_ConnectSock <0 ) { cout <<"Failed To Retrieve Handle" << endl ; return false; }
+    m_ConnectSock = socket(AF_INET, SOCK_STREAM, 0);
+    if (m_ConnectSock < 0) {
+        cout << "Failed To Retrieve Handle" << endl;
+        return false;
+    }
 
     if (connect(m_ConnectSock,
-                (struct sockaddr*)&m_Server,
+                (struct sockaddr *) &m_Server,
                 sizeof(m_Server))
         == SOCKET_ERROR) {
-        cout << "Failed To Create Socket Client "  << endl;
+        cout << "Failed To Create Socket Client " << endl;
         return false;
     }
     ProtocolHelper::SetReadTimeOut(m_ConnectSock, 1);

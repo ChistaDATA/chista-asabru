@@ -104,12 +104,13 @@ XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
             if (NULL != pEndPoints)
             {
                 XMLElement *pEndPoint = pEndPoints->FirstChildElement("END_POINT");
-                REMOTE_END_POINT endPoint;
-                auto endPointName = pEndPoint->Attribute("name");
-                endPoint.endPointName = endPointName;
 
                 while (pEndPoint)
                 {
+                    REMOTE_END_POINT endPoint;
+                    auto endPointName = pEndPoint->Attribute("name");
+                    endPoint.endPointName = endPointName;
+
                     XMLElement *pReadWrite = pEndPoint->FirstChildElement("READ_WRITE");
                     if (NULL != pReadWrite)
                     {
@@ -156,9 +157,9 @@ XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
                             // read next sibling element
                             pService = pService->NextSiblingElement("SERVICE");
                         }
-                        cluster.endPoints.emplace_back(endPoint);
-                        pEndPoint = pEndPoint->NextSiblingElement("END_POINT");
                     }
+                    cluster.endPoints.emplace_back(endPoint);
+                    pEndPoint = pEndPoint->NextSiblingElement("END_POINT");
                 }
                 proxyConfig.clusters.emplace_back(cluster);
                 pCluster = pCluster->NextSiblingElement("CLUSTER");
@@ -170,9 +171,10 @@ XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
 }
 
 
-SERVICE ConfigSingleton::Resolve(RESOLVE_CONFIG config)
+RESOLVE_ENDPOINT_RESULT ConfigSingleton::Resolve(RESOLVE_CONFIG config)
 {
     //PROXY_CONFIG tempProxyConfig;
+    RESOLVE_ENDPOINT_RESULT result;
     CLUSTER cluster;
     auto size = m_ProxyConfig.clusters.size();
     //if (size == 0) { cout << "Cluster Name not found" << endl; return ; }
@@ -213,5 +215,13 @@ SERVICE ConfigSingleton::Resolve(RESOLVE_CONFIG config)
             break;
         }
     }
-    return service;
+
+    result.port = service.port;
+    result.ipaddress = endpoint.host;
+    result.r_w = endpoint.readWrite;
+    result.alias="";
+    result.reserved = 0;
+    memset(result.Buffer, 0, sizeof result.Buffer);
+
+    return result;
 }

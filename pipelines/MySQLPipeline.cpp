@@ -1,6 +1,10 @@
 #include "../handlers/CProtocolServer.h"
 #include "../test/ProxyInfo.h"
 #include "../engine/socket/ClientSocket.h"
+#include "../config/config_types.h"
+#include "../config/ConfigSingleton.h"
+
+static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 
 void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
 
@@ -9,8 +13,30 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
     char bfr[32000];
     int RetVal;
 
+    RESOLVE_CONFIG resolveConfig;
+    if(CData.Sh==9160)
+    {
+        resolveConfig = {"cluster2","mysql_node1","mysql_wire_service1"};
+    }else if(CData.Sh==9170)
+    {
+        RESOLVE_CONFIG resolveConfig = {"cluster2","mysql_node1","mysql_tls_service1"};
+    }
+
+
+/*#if 1
+    RESOLVE_CONFIG resolveConfig = {"cluster2","mysql_node1","mysql_wire_service1"};
+#else
+    RESOLVE_CONFIG resolveConfig = {"cluster2","mysql_node1","mysql_tls_service1"};
+#endif*/
+
+    auto result = configSingleton.Resolve(resolveConfig);
+
+    END_POINT *ep = new END_POINT{result.ipaddress, result.port, result.r_w, result.alias,
+                                  result.reserved, "  "};
+    /*
     END_POINT *ep = new END_POINT{"127.0.0.1", 3306, 1, "", 0,
                                   "  "}; // Resolve("firstcluster", "127.0.0.1" , 9000, pd );
+                                  */
     if (ep == 0) {
         return 0;
     }
@@ -62,7 +88,7 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
 #ifdef INLINE_LOGIC
             send(CData.forward_port, bfr, RetVal, 0);
 #else
-            cout << "Calling Inline Handler.." << endl;
+            cout << "Calling Proxy Handler.." << endl;
             if (!proxy_handler->HandleUpstreamData(bfr, RetVal, CData)) {
 
                 return 0;

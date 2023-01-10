@@ -46,15 +46,6 @@ typedef struct
 
 }REMOTE_END_POINT;
 
-typedef struct{
-    string ipaddress;  // ip address of the Remote Endpoint
-    int port;               //  port at which Remote Listens
-    int r_w;               //  Read Endpoint or Write EndPoint
-    string alias;         //  unused
-    float reserved;     //  unused
-    char Buffer[255];   // unused
-}END_POINT;
-
 typedef struct
 {
     vector<REMOTE_END_POINT> endPoints;
@@ -81,3 +72,14 @@ typedef struct
     string	protocol;
 
 }RESOLVE_CONFIG;
+
+typedef struct
+{
+    string ipaddress;  // ip address of the Remote Endpoint
+    int port;               //  port at which Remote Listens
+    int r_w;               //  Read Endpoint or Write EndPoint
+    string alias;         //  unused
+    float reserved;     //  unused
+    char Buffer[255];   // unused
+
+}RESOLVE_ENDPOINT_RESULT;
