@@ -43,7 +43,7 @@ void *CProxySocket::ThreadHandler(CProxySocket *ptr, void *lptr) {
     char bfr[32000];
     int RetVal;
 
-    END_POINT *ep = new END_POINT{"127.0.0.1", 9000, 1, "", 0,
+    END_POINT *ep = new END_POINT{"127.0.0.1", 9440, 1, "", 0,
                                   "  "}; // Resolve("firstcluster", "127.0.0.1" , 9000, pd );
     if (ep == 0) {
         return 0;

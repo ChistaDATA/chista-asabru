@@ -42,11 +42,13 @@ typedef struct
     string host;
     vector<SERVICE> services;
 
-}END_POINT;
+    string ipaddress;
+
+}REMOTE_END_POINT;
 
 typedef struct
 {
-    vector<END_POINT> endPoints;
+    vector<REMOTE_END_POINT> endPoints;
     string clusterName;
 
 }CLUSTER;
@@ -70,3 +72,14 @@ typedef struct
     string	protocol;
 
 }RESOLVE_CONFIG;
+
+typedef struct
+{
+    string ipaddress;  // ip address of the Remote Endpoint
+    int port;               //  port at which Remote Listens
+    int r_w;               //  Read Endpoint or Write EndPoint
+    string alias;         //  unused
+    float reserved;     //  unused
+    char Buffer[255];   // unused
+
+}RESOLVE_ENDPOINT_RESULT;

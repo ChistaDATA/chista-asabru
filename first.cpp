@@ -14,8 +14,10 @@
 using namespace std;
 
 #include "handlers/CProtocolServer.h"
+#include "handlers/CHttpHandler.h"
+#include "config/config.h"
+#include "config/ConfigSingleton.h"
 
-//#include "CPingClient.h"
 
 typedef struct
 {
@@ -58,6 +60,13 @@ int main(int argc, char **argv )
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr);
 void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr);
 void *MySQLPipeline(CProxySocket *ptr, void *lptr);
+void *PassthroughPipeLine(CProtocolSocket *ptr, void *lptr);
+
+
+static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
+
+int ch_port = 9100;
+//int ch_http_port = 9110;
 
 int main(int argc, char **argv )
 {
@@ -67,72 +76,109 @@ int main(int argc, char **argv )
         return -1;
     }
     int rc = atoi(argv[1]);
-    rc = (rc < 0 ) ? rc : 9100;
+    rc = (rc > 0 ) ? rc : 9100;
     cout << "Received from Command line " << rc << endl;
-    CProxySocket ch(9100);  //default is 9100;
-    CProxySocket pg(9200);
-    CProxySocket msql(9300);
 
-    // Setting up ClickHouse Proxy
-
-    if(!ch.SetPipeline(ClickHousePipeline))
-    {
-        cout << "Failed to set ClickHouse Pipeline.................." << endl;
-        return -2;
-
+    if (rc == 9100 || rc == 9120|| rc == 9110 || rc == 9120) {
+        ch_port = rc;
     }
 
-    if (!ch.SetHandler(new CHWirePTHandler ()) ) {
-        cout << "Failed to set ClickHouse Handler.................." << endl;
-        return -2;
-    }
-
-    // Setting up Postgres Proxy
-
-    if(!pg.SetPipeline(PostgreSQLPipeline))
-    {
-        cout << "Failed to set PostgreSQL Pipeline.................." << endl;
-        return -2;
-
-    }
-
-    if (!pg.SetHandler(new CPostgreSQLHandler ()) ) {
-        cout << "Failed to set PostgreSQL Handler.................." << endl;
-        return -2;
-    }
+    /*if (rc == 9110 || rc == 9120) {
+        ch_http_port = rc;
+    }*/
 
 
-    // Setting up MySQL Proxy
 
-    if(!msql.SetPipeline(MySQLPipeline))
-    {
-        cout << "Failed to set MySQL Pipeline.................." << endl;
-        return -2;
+        // Clickhouse Wire level - TLS proxy -- port 9120
+    CProxySocket ch(ch_port == 9100 || ch_port == 9120 ? ch_port : 9100);
 
-    }
+        // Setting up ClickHouse Proxy
+        if(!ch.SetPipeline(ClickHousePipeline))
+        {
+            cout << "Failed to set ClickHouse Pipeline.................." << endl;
+            return -2;
 
-    if (!msql.SetHandler(new CMySQLHandler ()) ) {
-        cout << "Failed to set MySQL Handler.................." << endl;
-        return -2;
-    }
+        }
 
-    if (!ch.Start() ) {
-        cout << "Failed To Start ClickHouse Proxy Server........................" << endl;
-        return -3;
+        if (!ch.SetHandler(new CHWirePTHandler ()) ) {
+            cout << "Failed to set ClickHouse Handler.................." << endl;
+            return -2;
+        }
 
-    }
+        if (!ch.Start() ) {
+            cout << "Failed To Start ClickHouse Proxy Server........................" << endl;
+            return -3;
 
-    if (!pg.Start() ) {
-        cout << "Failed To Start PostgreSQL Proxy Server........................" << endl;
-        return -3;
+        }
 
-    }
 
-    if (!msql.Start() ) {
-        cout << "Failed To Start MySQL Proxy Server........................" << endl;
-        return -3;
 
-    }
+        /*// Clickhouse http proxy with port 9130
+        CProxySocket ch_http(ch_http_port == 9110 || ch_http_port == 9120 ? ch_http_port : 9120);
+
+        // Setting Http proxy
+        if (!ch_http.SetHandler(new CHttpHandler ()) ) {
+            cout << "Failed to set ClickHouse HTTP Handler.................." << endl;
+            return -2;
+        }
+
+        if(!ch_http.SetPipeline( ClickHousePipeline))
+        {
+            cout << "Failed to set ClickHouse Passthrough Pipeline.................." << endl;
+            return -2;
+        }
+
+        if (!ch_http.Start()) {
+            cout << "Failed To Start HTTP Proxy Server........................" << endl;
+            return -3;
+        }*/
+
+
+
+
+        // PostgreSQL proxy with port 9140
+        CProxySocket pg(9140);
+
+        // Setting up Postgres Proxy
+
+        if(!pg.SetPipeline(PostgreSQLPipeline))
+        {
+            cout << "Failed to set PostgreSQL Pipeline.................." << endl;
+            return -2;
+        }
+
+        if (!pg.SetHandler(new CPostgreSQLHandler ()) ) {
+            cout << "Failed to set PostgreSQL Handler.................." << endl;
+            return -2;
+        }
+
+        if (!pg.Start() ) {
+            cout << "Failed To Start PostgreSQL Proxy Server........................" << endl;
+            return -3;
+
+        }
+
+        // MySQL proxy with port 9160
+        CProxySocket msql(9160);
+
+        // Setting up MySQL Proxy
+
+        if(!msql.SetPipeline(MySQLPipeline))
+        {
+            cout << "Failed to set MySQL Pipeline.................." << endl;
+            return -2;
+        }
+
+        if (!msql.SetHandler(new CMySQLHandler ()) ) {
+            cout << "Failed to set MySQL Handler.................." << endl;
+            return -2;
+        }
+
+        if (!msql.Start() ) {
+            cout << "Failed To Start MySQL Proxy Server........................" << endl;
+            return -3;
+        }
+
     while(1);
     return 0;
 }

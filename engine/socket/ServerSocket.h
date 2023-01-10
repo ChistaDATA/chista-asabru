@@ -108,8 +108,8 @@ class CServerSocket
 
 public:
     struct sockaddr_in m_RemoteAddress
-            {
-            };
+    {
+    };
     SOCKET m_ListnerSocket = -1;
     NODE_INFO info;
     //-------------------------------- Parametrize Thread Routine
@@ -117,7 +117,7 @@ public:
 
 #ifdef WINDOWS_OS
     static DWORD WINAPI ListenThreadProc(LPVOID lpParameter);
-       static DWORD WINAPI ClientThreadProc(LPVOID lpParam);
+    static DWORD WINAPI ClientThreadProc(LPVOID lpParam);
 #else
     static void *ListenThreadProc(void *lpParameter);
     static void *ClientThreadProc(void *lpParam);

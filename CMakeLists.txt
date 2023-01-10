@@ -32,6 +32,11 @@ add_executable(Chista_Asabru
         pipelines/ClickHousePipeline.cpp
         pipelines/PostgreSQLPipeline.cpp
         pipelines/MySQLPipeline.cpp
-        pipelines/PassthroughPipeline.cpp)
+        pipelines/PassthroughPipeline.cpp
+        handlers/CHttpHandler.h
+        handlers/CHttpHandler.cpp
+        common/LineGrabber.h
+        config/ConfigSingleton.h
+        config/ConfigSingleton.cpp)
 
 target_link_libraries(Chista_Asabru tinyxml2)

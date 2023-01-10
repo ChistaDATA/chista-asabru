@@ -1,6 +1,10 @@
 #include "../handlers/CProtocolServer.h"
 #include "../test/ProxyInfo.h"
 #include "../engine/socket/ClientSocket.h"
+#include "../config/config_types.h"
+#include "../config/ConfigSingleton.h"
+
+static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 
 void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr) {
 
@@ -9,8 +13,28 @@ void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr) {
     char bfr[32000];
     int RetVal;
 
+    RESOLVE_CONFIG resolveConfig;
+    if (CData.Sh == 9140) {
+        resolveConfig = {"cluster2", "pg_node1", "pg_wire_service1"};
+    } else if (CData.Sh == 9150) {
+        resolveConfig = {"cluster2", "pg_node1", "pg_tls_service1"};
+    }
+
+/*#if 0
+    RESOLVE_CONFIG resolveConfig = {"cluster2","pg_node1","pg_wire_service1"};
+#else
+    RESOLVE_CONFIG resolveConfig = {"cluster2","pg_node1","pg_tls_service1"};
+#endif*/
+
+    auto result = configSingleton.Resolve(resolveConfig);
+
+    END_POINT *ep = new END_POINT{result.ipaddress, result.port, result.r_w, result.alias,
+                                  result.reserved, "  "};
+    /*
     END_POINT *ep = new END_POINT{"127.0.0.1", 5432, 1, "", 0,
                                   "  "}; // Resolve("firstcluster", "127.0.0.1" , 9000, pd );
+    */
+
     if (ep == 0) {
         return 0;
     }
@@ -62,7 +86,7 @@ void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr) {
 #ifdef INLINE_LOGIC
             send(CData.forward_port, bfr, RetVal, 0);
 #else
-            cout << "Calling Inline Handler.." << endl;
+            cout << "Calling Proxy Handler.." << endl;
             if (!proxy_handler->HandleUpstreamData(bfr, RetVal, CData)) {
 
                 return 0;
