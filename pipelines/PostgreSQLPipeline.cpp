@@ -5,6 +5,7 @@
 #include "../config/ConfigSingleton.h"
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
+extern int pg_port;
 
 void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr) {
 
@@ -14,9 +15,9 @@ void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr) {
     int RetVal;
 
     RESOLVE_CONFIG resolveConfig;
-    if (CData.Sh == 9140) {
+    if (pg_port == 9140) {
         resolveConfig = {"cluster2", "pg_node1", "pg_wire_service1"};
-    } else if (CData.Sh == 9150) {
+    } else if (pg_port == 9150) {
         resolveConfig = {"cluster2", "pg_node1", "pg_tls_service1"};
     }
 

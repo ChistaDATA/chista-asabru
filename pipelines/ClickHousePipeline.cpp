@@ -9,6 +9,8 @@
 extern int ch_port;
 extern int ch_http_port;
 
+extern int pg_port;
+
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr) {
 
     CLIENT_DATA CData;
@@ -18,7 +20,21 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr) {
 
     RESOLVE_CONFIG resolveConfig;
 
+
+
+   /* if (ch_http_port == 9110) {
+        resolveConfig = {"cluster1", "ch_wire_http_node1", "ch_http_service1"};
+    }else if (ch_http_port == 9130) {
+        resolveConfig = {"cluster1", "ch_tls_node1", "ch_tls_http_service1"};
+    }*/
+
     if (ch_port == 9100) {
+        resolveConfig = {"cluster1", "ch_wire_http_node1", "ch_wire_service1"};
+    }else if (ch_port == 9120) {
+        resolveConfig = {"cluster1", "ch_tls_node1", "ch_tls_wire_service1"};
+    }
+
+    /*if (ch_port == 9100) {
         resolveConfig = {"cluster1", "ch_wire_http_node1", "ch_wire_service1"};
     } else if (ch_port == 9110) {
         resolveConfig = {"cluster1", "ch_wire_http_node1", "ch_http_service1"};
@@ -26,7 +42,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr) {
         resolveConfig = {"cluster1", "ch_tls_node1", "ch_tls_wire_service1"};
     } else if (ch_port == 9130) {
         resolveConfig = {"cluster1", "ch_tls_node1", "ch_tls_http_service1"};
-    }
+    }*/
     auto result = configSingleton.Resolve(resolveConfig);
 
     END_POINT *ep = new END_POINT{result.ipaddress, result.port, result.r_w, result.alias,
