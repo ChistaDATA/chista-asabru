@@ -5,6 +5,7 @@
 #include "../config/ConfigSingleton.h"
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
+extern int mysql_port;
 
 void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
 
@@ -14,10 +15,10 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
     int RetVal;
 
     RESOLVE_CONFIG resolveConfig;
-    if(CData.Sh==9160)
+    if(mysql_port==9160)
     {
         resolveConfig = {"cluster2","mysql_node1","mysql_wire_service1"};
-    }else if(CData.Sh==9170)
+    }else if(mysql_port==9170)
     {
         RESOLVE_CONFIG resolveConfig = {"cluster2","mysql_node1","mysql_tls_service1"};
     }

@@ -4,14 +4,14 @@
 		<WORK_SPACE name="w1">
 			<LOCAL_ENDPOINTS>
 				<CLUSTER name ="cluster1"/>
-				<LOCAL_END_POINT name="node-name">
-					<HOST>"host_name"</HOST>
+				<LOCAL_END_POINT name="node-name1">
+					<HOST>"localhost"</HOST>
 					<SERVICES>
-						<SERVICE name="service-name">
+						<SERVICE name="service-name1-1">
 							<PORT>1100</PORT>
 							<PROTOCOL>CH_WIRE</PROTOCOL>
 						</SERVICE>
-						<SERVICE name="service-name">
+						<SERVICE name="service-name1-2">
 							<PORT>1101</PORT>
 							<PROTOCOL>PG_WIRE</PROTOCOL>
 						</SERVICE>
@@ -24,14 +24,14 @@
 		<WORK_SPACE name="w2">
 			<LOCAL_ENDPOINTS>
 				<CLUSTER name ="cluster2"/>
-				<LOCAL_END_POINT name="node-name">
-					<HOST>"host_name"</HOST>
+				<LOCAL_END_POINT name="node-name2">
+					<HOST>"localhost"</HOST>
 					<SERVICES>
-						<SERVICE name="service-name">
+						<SERVICE name="service-name2-1">
 							<PORT>2200</PORT>
 							<PROTOCOL>CH_WIRE</PROTOCOL>
 						</SERVICE>
-						<SERVICE name="service-name">
+						<SERVICE name="service-name2-2">
 							<PORT>2202</PORT>
 							<PROTOCOL>PG_WIRE</PROTOCOL>
 						</SERVICE>
@@ -44,32 +44,32 @@
 	<CLUSTERS>
 		<CLUSTER name ="cluster1">
 			<END_POINTS>
-				<END_POINT name="node-name">
+				<END_POINT name="ch_wire_http_node1">
 					<READ_WRITE>yes</READ_WRITE>
-					<HOST>"host_name"</HOST>
+					<HOST>localhost</HOST>
 					<SERVICES>
-						<SERVICE name="service-name">
-							<PORT>3300</PORT>
+						<SERVICE name="ch_wire_service1">
+							<PORT>9000</PORT>
 							<PROTOCOL>CH_WIRE</PROTOCOL>
 						</SERVICE>
-						<SERVICE name="service-name">
-							<PORT>3301</PORT>
-							<PROTOCOL>PG_WIRE</PROTOCOL>
+						<SERVICE name="ch_http_service1">
+							<PORT>8123</PORT>
+							<PROTOCOL>CH_HTTP</PROTOCOL>
 						</SERVICE>
 					</SERVICES>                                 
                 </END_POINT>
 
-				<END_POINT name="node-name">
+				<END_POINT name="ch_tls_node1">
 					<READ_WRITE>no</READ_WRITE>
-					<HOST>"host_name"</HOST>
+					<HOST>localhost</HOST>
 					<SERVICES>
-						<SERVICE name="service-name">
-							<PORT>4400</PORT>
-							<PROTOCOL> CH_WIRE</PROTOCOL>
+						<SERVICE name="ch_tls_wire_service1">
+							<PORT>9440</PORT>
+							<PROTOCOL> CH_TLS_WIRE</PROTOCOL>
 						</SERVICE>
-						<SERVICE name="service-name">
-							<PORT>4401</PORT>
-							<PROTOCOL>PG_WIRE</PROTOCOL>
+						<SERVICE name="ch_tls_http_service1">
+							<PORT>8443</PORT>
+							<PROTOCOL>CH_TLS_HTTP</PROTOCOL>
 						</SERVICE>
 					</SERVICES>                                 
                 </END_POINT>
@@ -78,35 +78,34 @@
 
 		<CLUSTER name ="cluster2">
 			<END_POINTS>
-				<END_POINT name="node-name">
-					<READ_WRITE>yes</READ_WRITE>
-					<HOST>"host_name"</HOST>
-					<SERVICES>
-						<SERVICE name="service-name">
-							<PORT>5500</PORT>
-							<PROTOCOL>CH_WIRE</PROTOCOL>
-						</SERVICE>
-						<SERVICE name="service-name">
-							<PORT>5501</PORT>
-							<PROTOCOL>PG_WIRE</PROTOCOL>
-						</SERVICE>
-					</SERVICES>                                 
-                </END_POINT>
-
-				<END_POINT name="node-name">
+				<END_POINT name="pg_node1">
 					<READ_WRITE>no</READ_WRITE>
-					<HOST> "host_name"</HOST>
+					<HOST>localhost</HOST>
 					<SERVICES>
-						<SERVICE name="service-name">
-							<PORT>6600</PORT>
-							<PROTOCOL>CH_WIRE</PROTOCOL>
-						</SERVICE>
-						<SERVICE name="service-name">
-							<PORT>6601</PORT>
+						<SERVICE name="pg_wire_service1">
+							<PORT>5432</PORT>
 							<PROTOCOL>PG_WIRE</PROTOCOL>
+						</SERVICE>
+						<SERVICE name="pg_tls_service1">
+							<PORT>2345</PORT>
+							<PROTOCOL>PG_TLS_WIRE</PROTOCOL>
 						</SERVICE>
 					</SERVICES>                                 
                 </END_POINT>
+				<END_POINT name="mysql_node1">
+					<READ_WRITE>yes</READ_WRITE>
+					<HOST>localhost</HOST>
+					<SERVICES>
+						<SERVICE name="mysql_wire_service1">
+							<PORT>3306</PORT>
+							<PROTOCOL>MYSQL_WIRE</PROTOCOL>
+						</SERVICE>
+						<SERVICE name="mysql_tls_service1">
+							<PORT>5501</PORT>
+							<PROTOCOL>MYSQL_TLS_WIRE</PROTOCOL>
+						</SERVICE>
+					</SERVICES>
+				</END_POINT>
 			</END_POINTS>
 		</CLUSTER>
 	</CLUSTERS>

@@ -67,6 +67,8 @@ static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 
 int ch_port = 9100;
 //int ch_http_port = 9110;
+int pg_port = 9140;
+int mysql_port = 9160;
 
 int main(int argc, char **argv )
 {
@@ -79,17 +81,25 @@ int main(int argc, char **argv )
     rc = (rc > 0 ) ? rc : 9100;
     cout << "Received from Command line " << rc << endl;
 
-    if (rc == 9100 || rc == 9120|| rc == 9110 || rc == 9120) {
+    if (rc == 9100 || rc == 9120) {
         ch_port = rc;
     }
 
-    /*if (rc == 9110 || rc == 9120) {
+    /*if (rc == 9110 || rc == 9130) {
         ch_http_port = rc;
     }*/
 
+    if (rc == 9140 || rc == 9150) {
+        pg_port = rc;
+    }
+
+    if (rc == 9160 || 9170) {
+        mysql_port = rc;
+    }
 
 
-        // Clickhouse Wire level - TLS proxy -- port 9120
+
+    // Clickhouse Wire level - TLS proxy -- port 9120
     CProxySocket ch(ch_port == 9100 || ch_port == 9120 ? ch_port : 9100);
 
         // Setting up ClickHouse Proxy
@@ -114,7 +124,7 @@ int main(int argc, char **argv )
 
 
         /*// Clickhouse http proxy with port 9130
-        CProxySocket ch_http(ch_http_port == 9110 || ch_http_port == 9120 ? ch_http_port : 9120);
+        CProxySocket ch_http(ch_http_port == 9110 || ch_http_port == 9130 ? ch_http_port : 9110);
 
         // Setting Http proxy
         if (!ch_http.SetHandler(new CHttpHandler ()) ) {
@@ -133,11 +143,8 @@ int main(int argc, char **argv )
             return -3;
         }*/
 
-
-
-
-        // PostgreSQL proxy with port 9140
-        CProxySocket pg(9140);
+        // PostgreSQL proxy with port 9140 or 9150
+        CProxySocket pg(pg_port);
 
         // Setting up Postgres Proxy
 
@@ -155,7 +162,6 @@ int main(int argc, char **argv )
         if (!pg.Start() ) {
             cout << "Failed To Start PostgreSQL Proxy Server........................" << endl;
             return -3;
-
         }
 
         // MySQL proxy with port 9160
