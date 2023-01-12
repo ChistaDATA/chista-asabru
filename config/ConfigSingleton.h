@@ -17,7 +17,7 @@ class ConfigSingleton
 public:
     static ConfigSingleton& getInstance(){
         static ConfigSingleton instance;
-        instance.LoadProxyConfigurations("../config/config2.xml");
+        instance.LoadProxyConfigurations("../config/config.xml");
         // volatile int dummy{};
         return instance;
     }
