@@ -5,7 +5,6 @@
 #include "../config/ConfigSingleton.h"
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
-extern int mysql_port;
 
 void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
 
@@ -14,30 +13,11 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
     char bfr[32000];
     int RetVal;
 
-    RESOLVE_CONFIG resolveConfig;
-    if(mysql_port==9160)
-    {
-        resolveConfig = {"cluster2","mysql_node1","mysql_wire_service1"};
-    }else if(mysql_port==9170)
-    {
-        RESOLVE_CONFIG resolveConfig = {"cluster2","mysql_node1","mysql_tls_service1"};
-    }
-
-
-/*#if 1
-    RESOLVE_CONFIG resolveConfig = {"cluster2","mysql_node1","mysql_wire_service1"};
-#else
-    RESOLVE_CONFIG resolveConfig = {"cluster2","mysql_node1","mysql_tls_service1"};
-#endif*/
-
-    auto result = configSingleton.Resolve(resolveConfig);
+    RESOLVE_ENDPOINT_RESULT result = ptr->GetConfigValues();
 
     END_POINT *ep = new END_POINT{result.ipaddress, result.port, result.r_w, result.alias,
                                   result.reserved, "  "};
-    /*
-    END_POINT *ep = new END_POINT{"127.0.0.1", 3306, 1, "", 0,
-                                  "  "}; // Resolve("firstcluster", "127.0.0.1" , 9000, pd );
-                                  */
+
     if (ep == 0) {
         return 0;
     }

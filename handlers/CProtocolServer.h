@@ -2,6 +2,7 @@
 #define PROTOCOL_DOT_H
 
 #include "../engine/socket/ServerSocket.h"
+#include "../config/config_types.h"
 
 class CProtocolHandler {
 public:
@@ -163,6 +164,8 @@ class CProxySocket : public CServerSocket {
     static void *ThreadHandler(CProxySocket *ptr, void *lptr);
 
     std::function<void *(void *)> thread_routine_override = 0;
+
+    RESOLVE_ENDPOINT_RESULT m_configValues;
 public:
 
     CProxySocket(int port) : CServerSocket(port, "DEFAULT") {
@@ -187,6 +190,17 @@ public:
     }
 
     CProxyHandler *GetHandler() { return m_handler; }
+
+    bool SetConfigValues(RESOLVE_ENDPOINT_RESULT configValues)
+    {
+        m_configValues = configValues;
+        return true;
+    }
+
+    RESOLVE_ENDPOINT_RESULT GetConfigValues()
+    {
+        return m_configValues;
+    }
 
     bool Start() {
         return Open("<str>", thread_routine_override);
