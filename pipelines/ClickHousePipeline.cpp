@@ -2,12 +2,10 @@
 #include "../handlers/CProtocolServer.h"
 #include "../test/ProxyInfo.h"
 #include "../engine/socket/ClientSocket.h"
-#include "../config/config_types.h"
 #include "../config/ConfigSingleton.h"
 
- static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
-extern int ch_port;
-extern int ch_http_port;
+static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
+
 
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr) {
 
@@ -16,27 +14,11 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr) {
     char bfr[32000];
     int RetVal;
 
-    RESOLVE_CONFIG resolveConfig;
-
-    if (ch_port == 9100) {
-        resolveConfig = {"cluster1", "ch_wire_http_node1", "ch_wire_service1"};
-    } else if (ch_port == 9110) {
-        resolveConfig = {"cluster1", "ch_wire_http_node1", "ch_http_service1"};
-    } else if (ch_port == 9120) {
-        resolveConfig = {"cluster1", "ch_tls_node1", "ch_tls_wire_service1"};
-    } else if (ch_port == 9130) {
-        resolveConfig = {"cluster1", "ch_tls_node1", "ch_tls_http_service1"};
-    }
-    auto result = configSingleton.Resolve(resolveConfig);
+    RESOLVE_ENDPOINT_RESULT result=ptr->GetConfigValues();
 
     END_POINT *ep = new END_POINT{result.ipaddress, result.port, result.r_w, result.alias,
                                   result.reserved, "  "}; // Resolve("firstcluster", "127.0.0.1" , 9000, pd );
 
-
-    /*
-    END_POINT *ep = new END_POINT{"127.0.0.1", 9000, 1, "", 0,
-                                  "  "}; // Resolve("firstcluster", "127.0.0.1" , 9000, pd );
-                                  */
     if (ep == 0) {
         return 0;
     }

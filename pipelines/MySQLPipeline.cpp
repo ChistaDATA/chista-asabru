@@ -13,30 +13,11 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
     char bfr[32000];
     int RetVal;
 
-    RESOLVE_CONFIG resolveConfig;
-    if(CData.Sh==9160)
-    {
-        resolveConfig = {"cluster2","mysql_node1","mysql_wire_service1"};
-    }else if(CData.Sh==9170)
-    {
-        RESOLVE_CONFIG resolveConfig = {"cluster2","mysql_node1","mysql_tls_service1"};
-    }
-
-
-/*#if 1
-    RESOLVE_CONFIG resolveConfig = {"cluster2","mysql_node1","mysql_wire_service1"};
-#else
-    RESOLVE_CONFIG resolveConfig = {"cluster2","mysql_node1","mysql_tls_service1"};
-#endif*/
-
-    auto result = configSingleton.Resolve(resolveConfig);
+    RESOLVE_ENDPOINT_RESULT result = ptr->GetConfigValues();
 
     END_POINT *ep = new END_POINT{result.ipaddress, result.port, result.r_w, result.alias,
                                   result.reserved, "  "};
-    /*
-    END_POINT *ep = new END_POINT{"127.0.0.1", 3306, 1, "", 0,
-                                  "  "}; // Resolve("firstcluster", "127.0.0.1" , 9000, pd );
-                                  */
+
     if (ep == 0) {
         return 0;
     }
