@@ -3,3 +3,8 @@
 cmake-build-debug/
 build/
 *.o
+*.pem
+__pycache__/
+*.csv
+*.xz
+*.backup

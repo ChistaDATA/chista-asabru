@@ -1,6 +1,4 @@
-import pandas as pd
 from clickhouse_driver import Client
-import numpy as np
 import os
 import yaml
 import requests
@@ -26,41 +24,66 @@ class AsabruCH:
         self.dataset_csv_name = config['dataset_csv_name']
         self.database_name = config['database']
         self.table_name = config['table']
+        self.port = config['port']
+        self.ca_cert = config['ca_cert']
+        self.ssl = True if config['ssl']=='True' else False
 
-        self.client = Client(host=self.ch_host, user=self.ch_user, password=self.ch_password)
+        if self.ssl:
+            print('Using SSL/TLS')
+
+
+    def create_client(self):
+        if not self.ssl:
+            client = Client(host=self.ch_host, user=self.ch_user, password=self.ch_password, port=self.port, 
+                                send_receive_timeout=600)
+        if self.ssl:
+            client = Client(host=self.ch_host, user=self.ch_user, password=self.ch_password, port=self.port, 
+                                send_receive_timeout=600, ca_certs=self.ca_cert, secure=True )
+
+        return client
         
 
     def load_dataset(self):
 
-        databases = self.client.execute('SHOW DATABASES')
+        client = self.create_client()
+
+        databases = client.execute('SHOW DATABASES')
         databases = [ database[0] for database in databases]
         
         if self.database_name not in databases:
 
-            self.client.execute(f'CREATE DATABASE {self.database_name}')
+            client.execute(f'CREATE DATABASE {self.database_name}')
             print('Database {self.database_name} created')
+
+        client.disconnect()
 
         ## download data
         full_url = self.dataset_url + self.dataset_file_name
+        # print('Starting the dataset download')
 
         # with requests.get(full_url, stream=True) as r:
         #     with open(self.dataset_file_name , 'wb') as f:
         #         f.write(r.content)
         # print(f'Downloaded {self.dataset_file_name}')
 
+        # print('Extracting the dataset from archive')
         # with lzma.open(self.dataset_file_name) as f, open(self.dataset_csv_name, 'wb') as fout:
         #     file_content = f.read()
         #     fout.write(file_content)
         # print(f'Extracted {self.dataset_csv_name}')
 
         ## create table
-
-        self.client.execute(self.sql_statements['create']['c1'])
+        client = self.create_client()
+        client.execute(self.sql_statements['create']['c1'])
         print('Table "cell_towers"  created')
+        client.disconnect()
 
         ## Load data
+        if not self.ssl:
+            os.system(f'clickhouse-client --host {self.ch_host} --user {self.ch_user} --password {self.ch_password} --port {self.port} --query "INSERT INTO {self.database_name}.cell_towers FORMAT CSVWithNames" < cell_towers.csv')
+        else:
+            os.system(f'clickhouse-client --secure --host {self.ch_host} --user {self.ch_user} --password {self.ch_password} --port {self.port} --query "INSERT INTO {self.database_name}.cell_towers FORMAT CSVWithNames" < cell_towers.csv')
 
-        os.system(f'clickhouse-client --host {self.ch_host} --user {self.ch_user} --password {self.ch_password} --query "INSERT INTO {self.database_name}.cell_towers FORMAT CSVWithNames" < cell_towers.csv')
         print('Successfully loaded the data in to the table')
 
         ## Remove downloaded files
@@ -80,15 +103,21 @@ class AsabruCH:
         iters = 10
         queries = len(self.sql_statements['read'].keys())
 
+        print('Starting the benchmark')
+
         for x in range(iters):
+            client = self.create_client()
+            print(f'Iteration {x+1}')
 
             iter_start = time.time()
 
             for query_key in self.sql_statements['read'].keys():
-                print(self.sql_statements['read'][query_key])
-                self.client.execute(self.sql_statements['read'][query_key])
+                query = self.sql_statements['read'][query_key]
+                client.execute(query)
+                print(query)
             
             iter_end = time.time() - iter_start
+            client.disconnect()
 
             loop_times.append(iter_end)
 

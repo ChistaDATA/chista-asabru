@@ -1,10 +1,6 @@
-import pandas as pd
 import mysql.connector
-import numpy as np
 import os
 import yaml
-import requests
-import lzma
 import time
 from statistics import mean, median
 
@@ -21,15 +17,32 @@ class AsabruMySQL:
         self.user = config['username']
         self.password = config['password']
         self.database = config['database']
-        self.table_name = config['table']
+        self.port = config['port']
+        self.ca_cert = config['ca_cert']
+        self.ssl = True if config['ssl']=='True' else False
 
-        self.client = mysql.connector.connect(host=self.host,
-                                              user=self.user,
-                                              password=self.password,
-                                              ssl_ca='/var/lib/mysql/ca.pem')
+        if self.ssl:
+            print ('SSL Enabled')
 
 
-        print('Success!')
+    def create_client(self):
+
+
+        if self.ssl:
+            client = mysql.connector.connect(host=self.host,
+                                            port=self.port,
+                                            user=self.user,
+                                            password=self.password,
+                                            ssl_ca=self.ca_cert)
+
+        else:
+            client = mysql.connector.connect(host=self.host,
+                                            port=self.port,
+                                            user=self.user,
+                                            password=self.password)
+
+        return client
+
 
     def benchmark_performance(self):
         print ('Starting benchmark')
@@ -41,14 +54,16 @@ class AsabruMySQL:
 
         for x in range(iters):
 
+            client = self.create_client()
+
             iter_start = time.time()
 
             for query_key in self.sql_statements['read'].keys():
                 res = []
                 # print(self.sql_statements['read'][query_key])
-                cursor = self.client.cursor()
-                # cursor.execute("SHOW STATUS LIKE 'Ssl_cipher'")
-                # print(cursor.fetchone())
+                cursor = client.cursor()
+                # cursor.execute("SHOW STATUS LIKE '%Ssl_cipher%'")
+                # print(cursor.fetchall())
                 cursor.execute(self.sql_statements['read'][query_key])
                 result = cursor.fetchall()
                 # for x in myresult:
@@ -56,7 +71,7 @@ class AsabruMySQL:
                 cursor.close()
             
             iter_end = time.time() - iter_start
-
+            client.close()
             loop_times.append(iter_end)
 
         print ('Average Time taken : ', mean(loop_times))

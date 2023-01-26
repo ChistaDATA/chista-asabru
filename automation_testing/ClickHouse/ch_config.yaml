@@ -1,7 +1,9 @@
 host: 'localhost'
 username: 'default'
 password: '123456'
-
+port: '9120'
+ssl: 'True'
+ca_cert: '/home/vijay/SSL/custom_ca.crt'
 dataset_url: 'https://datasets.clickhouse.com/'
 dataset_file_name: 'cell_towers.csv.xz'
 dataset_csv_name: 'cell_towers.csv'
