@@ -1,0 +1,12 @@
+read:
+  r1: "select * from actor where actor_id%2=0"
+  r2: "select first_name, count(first_name) from actor group by first_name order by first_name"
+  r3: "select country_id, count(country_id) from city group by country_id order by country_id"
+  r4: "select COUNT(distinct length) from film"
+  r5: "select distinct rental_date from rental"
+
+
+
+
+
+

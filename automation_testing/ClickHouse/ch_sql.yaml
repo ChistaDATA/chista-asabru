@@ -1,0 +1,8 @@
+create:
+  c1: "CREATE TABLE IF NOT EXISTS asabru_testing.cell_towers(radio String, mcc UInt16, net UInt16, area UInt16, cell UInt64, unit Int16, lon Float64, lat Float64, range UInt32, samples UInt32, changeable UInt8, created DateTime, updated DateTime, averageSignal UInt8) ENGINE = MergeTree ORDER BY (radio, mcc, net, created)"
+read:
+  r1: "SELECT radio, count() AS c FROM asabru_testing.cell_towers GROUP BY radio ORDER BY c DESC"
+  r2: "SELECT mcc, count() FROM asabru_testing.cell_towers GROUP BY mcc ORDER BY count() DESC LIMIT 10"
+  r3: "SELECT COUNT(*) FROM asabru_testing.cell_towers"
+  r4: "SELECT * FROM asabru_testing.cell_towers LIMIT 1000"
+  r5: "SELECT * FROM asabru_testing.cell_towers LIMIT 10000"
