@@ -1,10 +1,5 @@
-import pandas as pd
 import psycopg2
-import numpy as np
-import os
 import yaml
-import requests
-import lzma
 import time
 from statistics import mean, median
 
@@ -18,15 +13,28 @@ class AsabruPostgres:
             self.sql_statements = yaml.safe_load(f)
 
         self.host = config['host']
+        self.port = config['port']
         self.user = config['username']
         self.password = config['password']
         self.database = config['database']
+        self.ca_cert = config['ca_cert']
+        self.ssl = True if config['ssl']=='True' else False
 
-        self.client = psycopg2.connect(database=self.database, user = self.user, password = self.password,
-                                        host = self.host, sslmode='require')
+        if self.ssl:
+            print('SSL Enabled!')
 
+    def create_client(self):
 
-        print('Success!')
+        if self.ssl:
+            client = psycopg2.connect(database=self.database, user = self.user, password = self.password,
+                                    host = self.host, port=self.port, sslmode='verify-ca',
+                                    sslrootcert=self.ca_cert)
+        else:
+            client = psycopg2.connect(database=self.database, user = self.user, password = self.password,
+                                    host = self.host, port=self.port)
+
+        return client
+
 
     def benchmark_performance(self):
         print ('Starting benchmark')
@@ -38,17 +46,20 @@ class AsabruPostgres:
 
         for x in range(iters):
 
+            client = self.create_client()
             iter_start = time.time()
 
             for query_key in self.sql_statements['read'].keys():
                 res = []
                 # print(self.sql_statements['read'][query_key])
-                cursor = self.client.cursor()
+                cursor = client.cursor()
                 cursor.execute(self.sql_statements['read'][query_key])
                 result = cursor.fetchall()
                 for x in result:
                     res.append(x)
+                # print (res)
                 cursor.close()
+            client.close()
             
             iter_end = time.time() - iter_start
 
