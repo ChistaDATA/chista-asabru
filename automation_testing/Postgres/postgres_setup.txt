@@ -1,0 +1,9 @@
+sudo apt-get install libpq-dev
+
+CREATE USER asabru WITH ENCRYPTED PASSWORD '123456';
+
+ALTER USER asabru WITH ENCRYPTED PASSWORD '123456';
+
+
+pg_restore -U postgres -d dvdrental /home/vijay/Downloads/dvdrental.tar
+
