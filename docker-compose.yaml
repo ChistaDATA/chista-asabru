@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  clickhouse-1:
+    image: clickhouse/clickhouse-server:22.6
+    ports:
+      - "9000:9000"
+      - "9440:9440"
+      - "8123:8123"
+      - "8443:8443"
+    ## Uncomment the below lines to setup TLS for wire level protocol
+    ## Reference : https://www.bytebase.com/blog/how-to-configure-clickhouse-ssl-connection/
+    # volumes:
+    #   - /Users/midhundarvin/software/openssl/ca.pem:/etc/clickhouse-server/ca.pem
+    #   - /Users/midhundarvin/software/openssl/server.pem:/etc/clickhouse-server/server.pem
+    #   - /Users/midhundarvin/software/openssl/server.key:/etc/clickhouse-server/server.key
+    #   - /Users/midhundarvin/software/openssl/dhparam.pem:/etc/clickhouse-server/dhparam.pem
+    #   - /Users/midhundarvin/software/openssl/config.xml:/etc/clickhouse-server/config.xml
+  
+  postgres-1:
+    image: postgres:14.4
+    ports:
+      - "5432:5432"
+      - "2345:2345"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123456}
+      PGDATA: /var/lib/postgresql/postgres-1/data/pgdata
+    volumes:
+      - source: pg_data
+        target: /var/lib/postgresql/postgres-1/data
+        type: volume
+volumes:
+  pg_data:
+      
