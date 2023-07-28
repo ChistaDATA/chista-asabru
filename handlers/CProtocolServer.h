@@ -202,8 +202,8 @@ public:
         return m_configValues;
     }
 
-    bool Start() {
-        return Open("<str>", thread_routine_override);
+    bool Start(string identifier) {
+        return Open(identifier, thread_routine_override);
     }
 
 };
