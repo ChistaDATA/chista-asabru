@@ -41,28 +41,28 @@ DWORD WINAPI ClientThreadProc(LPVOID lpParam);
 //--------------- Call WSACleanUP for resource de-allocation
 void Cleanup()
 {
-	WSACleanup();
+    WSACleanup();
 }
 //------------ Initialize WinSock Library
 bool StartSocket()
 {
-	WORD Ver;
-	WSADATA wsd;
-	Ver = MAKEWORD(2, 2);
-	if (WSAStartup(Ver, &wsd) == SOCKET_ERROR)
-	{
-		WSACleanup();
-		return false;
-	}
-	return true;
+    WORD Ver;
+    WSADATA wsd;
+    Ver = MAKEWORD(2, 2);
+    if (WSAStartup(Ver, &wsd) == SOCKET_ERROR)
+    {
+        WSACleanup();
+        return false;
+    }
+    return true;
 }
 //-----------------Get Last Socket Error
 int SocketGetLastError() { return WSAGetLastError(); }
 //----------------- Close Socket
 int CloseSocket(SOCKET s)
 {
-	closesocket(s);
-	return 0;
+    closesocket(s);
+    return 0;
 }
 
 /* This is the critical section object (statically allocated). */
@@ -70,16 +70,16 @@ CRITICAL_SECTION m_CriticalSection;
 
 void InitializeLock()
 {
-	InitializeCriticalSection(&m_CriticalSection);
+    InitializeCriticalSection(&m_CriticalSection);
 }
 
 void AcquireLock()
 {
-	EnterCriticalSection(&m_CriticalSection);
+    EnterCriticalSection(&m_CriticalSection);
 }
 void ReleaseLock()
 {
-	LeaveCriticalSection(&m_CriticalSection);
+    LeaveCriticalSection(&m_CriticalSection);
 }
 
 #else // POSIX
@@ -103,13 +103,15 @@ void *ClientThreadProc(void *lpParam);
 #define SOCKET_ERROR (-1)
 
 #if defined(__APPLE__)
-    /* This is the critical section object (statically allocated). */
-    static pthread_mutex_t cs_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
+/* This is the critical section object (statically allocated). */
+static pthread_mutex_t cs_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
 #else
-    static pthread_mutex_t cs_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+static pthread_mutex_t cs_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 #endif
 
-void InitializeLock() {}
+void InitializeLock()
+{
+}
 void AcquireLock()
 {
     /* Enter the critical section -- other threads are locked out */
@@ -158,7 +160,7 @@ bool CServerSocket::StartListeningThread(string node_info, std::function<void *(
 {
 
     strcpy(info.node_info, node_info.c_str());
-    cout << "\nFirst Thread  =>" << info.node_info << endl;
+    cout << "\nThread  => " << info.node_info << endl;
     info.mode = 1;
     this->thread_routine = pthread_routine;
     info.ptr_to_instance = (void *)this;
@@ -170,7 +172,7 @@ bool CServerSocket::StartListeningThread(string node_info, std::function<void *(
 #ifdef WINDOWS_OS
     DWORD Thid;
 
-	CreateThread(NULL, 0, CServerSocket::ListenThreadProc, (void *)&info, 0, &Thid);
+    CreateThread(NULL, 0, CServerSocket::ListenThreadProc, (void *)&info, 0, &Thid);
 #else
     pthread_t thread1;
     int iret1;
@@ -179,7 +181,7 @@ bool CServerSocket::StartListeningThread(string node_info, std::function<void *(
     iret1 = pthread_create(&thread1, NULL, CServerSocket::ListenThreadProc, (void *)&info);
 
 #endif
-    cout << "Started First Listening Thread " << endl;
+    cout << "Started Listening Thread :" << endl;
     return true;
 }
 ///////////////////////////////////////
@@ -260,19 +262,18 @@ bool ProtocolHelper::WriteSocketBuffer(SOCKET s, char *bfr, int size)
 
 #ifdef WINDOWS_OS
 DWORD WINAPI CServerSocket::ListenThreadProc(
-	LPVOID lpParameter)
+    LPVOID lpParameter)
 #else
 void *CServerSocket::ListenThreadProc(
-        void *lpParameter)
+    void *lpParameter)
 #endif
 {
 
-    printf("Entered the Listener Thread....\n");
+    printf("Entered the Listener Thread :\n");
     NODE_INFO info;
     memcpy(&info, lpParameter, sizeof(NODE_INFO));
     CServerSocket *curr_instance = (CServerSocket *)(info.ptr_to_instance);
-    cout << "node info => "
-         << "string(info.node_info)" << endl;
+    cout << "node info => " << string(info.node_info) << endl;
     if (curr_instance == 0)
     {
         cout << "Failed to Retrieve Pointers" << endl;
@@ -280,12 +281,13 @@ void *CServerSocket::ListenThreadProc(
     }
     while (1)
     {
-        cout << "................" << endl;
+        cout << "started client thread loop :\n"
+             << endl;
         unsigned int Len = sizeof(curr_instance->m_RemoteAddress);
 
 #ifdef WINDOWS_OS
         SOCKET InComingSocket = accept(curr_instance->m_ListnerSocket,
-									   (struct sockaddr *)&(curr_instance->m_RemoteAddress), (int *)&Len);
+                                       (struct sockaddr *)&(curr_instance->m_RemoteAddress), (int *)&Len);
 #else
         SOCKET InComingSocket = accept(curr_instance->m_ListnerSocket,
                                        (struct sockaddr *)&(curr_instance->m_RemoteAddress), (socklen_t *)&Len);
@@ -314,8 +316,8 @@ void *CServerSocket::ListenThreadProc(
 #ifdef WINDOWS_OS
 
         // ClientData.Sh = InComingSocket;
-		::CreateThread(NULL, 0, CServerSocket::ClientThreadProc, (LPVOID)&ClientData,
-					   0, &ThreadId);
+        ::CreateThread(NULL, 0, CServerSocket::ClientThreadProc, (LPVOID)&ClientData,
+                       0, &ThreadId);
 #else
         pthread_t thread2;
         // ClientData.Sh = InComingSocket;
@@ -328,10 +330,10 @@ void *CServerSocket::ListenThreadProc(
 
 #ifdef WINDOWS_OS
 DWORD WINAPI CServerSocket::ClientThreadProc(
-	LPVOID lpParam)
+    LPVOID lpParam)
 #else
 void *CServerSocket::ClientThreadProc(
-        void *lpParam)
+    void *lpParam)
 #endif
 {
 

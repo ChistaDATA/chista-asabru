@@ -38,3 +38,8 @@ make
 ```
  ./Chista_Asabru <port>
 ```
+
+Run the clickhouse client in SSL mode
+```
+./clickhouse client --config <your-config-path>/clickhouse-client-ssl.xml --host 127.0.0.1 --port 9120
+```
