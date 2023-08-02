@@ -3,37 +3,68 @@
 #include "CHttpHandler.h"
 #include "../common/LineGrabber.h"
 
+CHttpHandler::CHttpHandler(CHttpParser *parser)
+{
+    this->parser = parser;
+}
 
-
-CHttpHandler::CHttpHandler() {}
-
-bool CHttpHandler::HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &CData) {
-
-    // Log the Content and Forward the Data to the EndPoint
+/**
+ * Function that handles upstream data
+ * @param buffer - the buffer that we receive from upstream ( source dbs )
+ * @param length - length of the buffer
+ * @param clientData - contains connection information about the client
+ */
+bool CHttpHandler::HandleUpstreamData(void *buffer, int length, CLIENT_DATA &clientData)
+{
     cout << "=============== CH http(up) ===================" << endl;
     cout << "Received a Client packet..................... " << endl;
-    cout << "Length of Packet is " << len << endl;
-    cout << "Packet Type = " << (int) *((unsigned char *) Buffer) << endl;
-    cout << "======================================" << endl;
-    LogResponse((char*)Buffer,len);
-    send(CData.forward_port, Buffer, len, 0);
+    cout << "Length of Packet is " << length << endl;
+    cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
+
+    // Parse the buffer to a metadata struct
+    // This is done so as to analyze the packet easily and filter or apply custom logic
+    HttpMetadata metadata = this->parser->construct(buffer, length);
+
+    // Log the Content
+    this->parser->logMetadata(&metadata);
+
+    // Reconstruct the buffer from the metadata struct
+    void *deconstructedBuffer = this->parser->deconstruct(&metadata);
+    
+    int deconstructedBufferSize = strlen((char *)deconstructedBuffer);
+    cout << "Lengths : " << length << " " << deconstructedBufferSize << endl;
+
+    LogResponse((char *) buffer, length);
+    LogResponse((char *) deconstructedBuffer, deconstructedBufferSize);
+
+    // Forward the Data to the EndPoint
+    send(clientData.forward_port, deconstructedBuffer, deconstructedBufferSize, 0);
+
+    // free the buffer memory
+    free(deconstructedBuffer);
     return true;
 }
 
-bool CHttpHandler::HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &CData) {
+/**
+ * Function that handles downstream data
+ * @param buffer - the buffer / response that we receive from downstream ( target dbs )
+ * @param length - length of the buffer
+ * @param clientData - contains connection information about the client
+ */
+bool CHttpHandler::HandleDownStreamData(void *buffer, int length, CLIENT_DATA &clientData)
+{
 
     // Log the Content and Forward the Data to the EndPoint
     cout << "================= CH http (down) =================" << endl;
     cout << "Received a Server packet..................... " << endl;
-    cout << "Length of Packet is " << len << endl;
-    cout << "Packet Type = " << (int) *((unsigned char *) Buffer) << endl;
+    cout << "Length of Packet is " << length << endl;
+    cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
     cout << "======================================" << endl;
-    send(CData.Sh, Buffer, len, 0);
+    send(clientData.Sh, buffer, length, 0);
     return true;
 }
 
-
-void CHttpHandler::LogResponse(char * buffer, int len)
+void CHttpHandler::LogResponse(char *buffer, int len)
 {
     LineGrabber ln(buffer, len);
     string first_line = ln.getNextLine();
@@ -56,7 +87,7 @@ void CHttpHandler::LogResponse(char * buffer, int len)
     while (!ln.isEof())
     {
         string test = ln.getNextLine();
-        if (strlen(test.c_str()) == 0)
+        if (strlen(test.c_str()) == 0) // break if there is an empty line
         {
             break;
         }
@@ -64,6 +95,8 @@ void CHttpHandler::LogResponse(char * buffer, int len)
         header_map.insert(temp);
         cout << temp.first << ": " << temp.second << endl;
     }
+
+    // Rest of the packet will be the body
     cout << "--------------------------------------------------------------------------------" << endl;
     cout << "Body" << endl;
     cout << "--------------------------------------------------------------------------------" << endl;
@@ -80,16 +113,19 @@ void CHttpHandler::LogResponse(char * buffer, int len)
     cout << "================================================================================" << endl;
 }
 
-pair<string, string> ChopLine(string str) {
+pair<string, string> ChopLine(string str)
+{
     char buffer[4096];
     ::strcpy(buffer, str.c_str());
     char *ptr = buffer;
     string key;
     string value;
-    while (*ptr != 0 && *ptr != ':') {
+    while (*ptr != 0 && *ptr != ':')
+    {
         ptr++;
     }
-    if (*ptr == 0) {
+    if (*ptr == 0)
+    {
         return pair<string, string>("", "");
     }
     *ptr++ = 0;
@@ -97,4 +133,3 @@ pair<string, string> ChopLine(string str) {
     value = string(ptr);
     return pair<string, string>(key, value);
 }
-

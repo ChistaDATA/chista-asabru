@@ -143,23 +143,26 @@ int main(int argc, char **argv)
     port = (port > 0) ? port : 9100;
     cout << "Received from Command line " << port << endl;
 
+    // Create Parsers
+    CHttpParser *httpParser = new CHttpParser();
+
     // Create PipelineFunction mappings
     PipelineFunctionMap pipelineFunctionMap;
-    pipelineFunctionMap[CLICKHOUSE_WIRE_LEVEL] = &ClickHousePipeline;
-    pipelineFunctionMap[CLICKHOUSE_HTTP] = &ClickHousePipeline;
-    pipelineFunctionMap[CLICKHOUSE_WIRE_LEVEL_TLS] = &ClickHousePipeline;
-    pipelineFunctionMap[CLICKHOUSE_HTTP_TLS] = &ClickHousePipeline;
-    pipelineFunctionMap[POSTGRESQL] = &PostgreSQLPipeline;
-    pipelineFunctionMap[POSTGRESQL_TLS] = &PostgreSQLPipeline;
-    pipelineFunctionMap[MYSQL] = &MySQLPipeline;
-    pipelineFunctionMap[MYSQL_TLS] = &MySQLPipeline;
+    pipelineFunctionMap[CLICKHOUSE_WIRE_LEVEL] = ClickHousePipeline;
+    pipelineFunctionMap[CLICKHOUSE_HTTP] = ClickHousePipeline;
+    pipelineFunctionMap[CLICKHOUSE_WIRE_LEVEL_TLS] = ClickHousePipeline;
+    pipelineFunctionMap[CLICKHOUSE_HTTP_TLS] = ClickHousePipeline;
+    pipelineFunctionMap[POSTGRESQL] = PostgreSQLPipeline;
+    pipelineFunctionMap[POSTGRESQL_TLS] = PostgreSQLPipeline;
+    pipelineFunctionMap[MYSQL] = MySQLPipeline;
+    pipelineFunctionMap[MYSQL_TLS] = MySQLPipeline;
 
     // Create ProxyHandler mappings
     ProxyHandlerMap proxyHandlerMap;
     proxyHandlerMap[CLICKHOUSE_WIRE_LEVEL] = new CHWirePTHandler();
-    proxyHandlerMap[CLICKHOUSE_HTTP] = new CHttpHandler();
+    proxyHandlerMap[CLICKHOUSE_HTTP] = new CHttpHandler(httpParser);
     proxyHandlerMap[CLICKHOUSE_WIRE_LEVEL_TLS] = new CHWirePTHandler();
-    proxyHandlerMap[CLICKHOUSE_HTTP_TLS] = new CHttpHandler();
+    proxyHandlerMap[CLICKHOUSE_HTTP_TLS] = new CHttpHandler(httpParser);
     proxyHandlerMap[POSTGRESQL] = new CPostgreSQLHandler();
     proxyHandlerMap[POSTGRESQL_TLS] = new CPostgreSQLHandler();
     proxyHandlerMap[MYSQL] = new CMySQLHandler();

@@ -29,12 +29,17 @@ add_executable(Chista_Asabru
 
         test/ProxyInfo.h test/ProxyInfo.cpp
 
+        parsers/CHttpParser.h
+        parsers/ChttpParser.cpp
+
         pipelines/ClickHousePipeline.cpp
         pipelines/PostgreSQLPipeline.cpp
         pipelines/MySQLPipeline.cpp
         pipelines/PassthroughPipeline.cpp
+
         handlers/CHttpHandler.h
         handlers/CHttpHandler.cpp
+
         common/LineGrabber.h
         config/ConfigSingleton.h
         config/ConfigSingleton.cpp)

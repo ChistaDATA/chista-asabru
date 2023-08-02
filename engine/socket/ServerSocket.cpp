@@ -215,6 +215,14 @@ string ProtocolHelper::GetIPAddressAsString(struct sockaddr_in *client_addr)
     inet_ntop(AF_INET, &ipAddr, str, INET_ADDRSTRLEN);
     return string(str);
 }
+
+string ProtocolHelper::GetIPPortAsString(struct sockaddr_in *client_addr)
+{
+    struct sockaddr_in *pV4Addr = client_addr;
+    in_port_t ipPort = pV4Addr->sin_port;
+    return std::to_string(ipPort);
+}
+
 bool ProtocolHelper::SetReadTimeOut(SOCKET s, long second)
 {
     struct timeval tv;
@@ -260,6 +268,9 @@ bool ProtocolHelper::WriteSocketBuffer(SOCKET s, char *bfr, int size)
     return true;
 }
 
+/**
+ * Creates a thread that listens to incoming connections to the socket
+ */
 #ifdef WINDOWS_OS
 DWORD WINAPI CServerSocket::ListenThreadProc(
     LPVOID lpParameter)
@@ -305,12 +316,14 @@ void *CServerSocket::ListenThreadProc(
         DWORD ThreadId;
         ClientData.Sh = InComingSocket;
         memcpy(ClientData.node_info, info.node_info, 255);
-        cout << "B4 callint Client Thread => "
+        cout << "Before callint Client Thread => "
              << "ClientData.node_info" << endl;
         ClientData.mode = info.mode;
         string remote_ip = ProtocolHelper::GetIPAddressAsString(&(curr_instance->m_RemoteAddress));
         strcpy(ClientData.remote_addr, remote_ip.c_str());
-        cout << "Remote IP address == " << remote_ip << endl;
+        cout << "Remote IP address : " << remote_ip << endl;
+        string remote_port = ProtocolHelper::GetIPPortAsString(&(curr_instance->m_RemoteAddress));
+        cout << "Remote port : " << remote_port << endl;
         ClientData.ptr_to_instance = curr_instance;
 
 #ifdef WINDOWS_OS
@@ -328,6 +341,10 @@ void *CServerSocket::ListenThreadProc(
     return 0;
 }
 
+/**
+ * Creates a client thread procedure that handles incoming and outgoing
+ * messages to the socket. It offloads the work to the handler
+ */
 #ifdef WINDOWS_OS
 DWORD WINAPI CServerSocket::ClientThreadProc(
     LPVOID lpParam)

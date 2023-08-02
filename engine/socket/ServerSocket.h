@@ -141,6 +141,7 @@ class ProtocolHelper
 {
 public:
     static string GetIPAddressAsString(struct sockaddr_in *client_addr);
+    static string GetIPPortAsString(struct sockaddr_in *client_addr);
     static bool SetReadTimeOut(SOCKET s, long second);
     static bool ReadSocketBuffer(SOCKET s, char *bfr, int size, int *num_read);
     static bool ReadSocketBuffer(SOCKET s, char *bfr, int size);
