@@ -1,5 +1,6 @@
 
 #include <map>
+#include "../common/Utils.h"
 #include "CHttpHandler.h"
 #include "../common/LineGrabber.h"
 
@@ -113,23 +114,3 @@ void CHttpHandler::LogResponse(char *buffer, int len)
     cout << "================================================================================" << endl;
 }
 
-pair<string, string> ChopLine(string str)
-{
-    char buffer[4096];
-    ::strcpy(buffer, str.c_str());
-    char *ptr = buffer;
-    string key;
-    string value;
-    while (*ptr != 0 && *ptr != ':')
-    {
-        ptr++;
-    }
-    if (*ptr == 0)
-    {
-        return pair<string, string>("", "");
-    }
-    *ptr++ = 0;
-    key = string(buffer);
-    value = string(ptr);
-    return pair<string, string>(key, value);
-}

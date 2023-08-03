@@ -39,6 +39,8 @@ add_executable(Chista_Asabru
 
         handlers/CHttpHandler.h
         handlers/CHttpHandler.cpp
+        handlers/CHttpsHandler.h
+        handlers/CHttpsHandler.cpp
 
         common/LineGrabber.h
         config/ConfigSingleton.h

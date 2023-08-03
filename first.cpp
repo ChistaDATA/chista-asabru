@@ -14,6 +14,7 @@
 
 #include "handlers/CProtocolServer.h"
 #include "handlers/CHttpHandler.h"
+#include "handlers/CHttpsHandler.h"
 #include "config/config.h"
 #include "config/ConfigSingleton.h"
 
@@ -162,7 +163,7 @@ int main(int argc, char **argv)
     proxyHandlerMap[CLICKHOUSE_WIRE_LEVEL] = new CHWirePTHandler();
     proxyHandlerMap[CLICKHOUSE_HTTP] = new CHttpHandler(httpParser);
     proxyHandlerMap[CLICKHOUSE_WIRE_LEVEL_TLS] = new CHWirePTHandler();
-    proxyHandlerMap[CLICKHOUSE_HTTP_TLS] = new CHttpHandler(httpParser);
+    proxyHandlerMap[CLICKHOUSE_HTTP_TLS] = new CHttpsHandler();
     proxyHandlerMap[POSTGRESQL] = new CPostgreSQLHandler();
     proxyHandlerMap[POSTGRESQL_TLS] = new CPostgreSQLHandler();
     proxyHandlerMap[MYSQL] = new CMySQLHandler();
