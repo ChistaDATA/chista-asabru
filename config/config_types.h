@@ -1,17 +1,19 @@
 #pragma once
 
-#include<iostream>
-#include<vector>
+#include <iostream>
+#include <vector>
 
 using namespace std;
 
+const string CRLF = "\r\n";
+
 typedef struct
 {
-    int		port;
-    string	protocol;
+    int port;
+    string protocol;
     string name;
 
-}SERVICE;
+} SERVICE;
 
 typedef struct
 {
@@ -19,21 +21,21 @@ typedef struct
     string host;
     vector<SERVICE> services;
 
-}LOCAL_END_POINT;
+} LOCAL_END_POINT;
 
 typedef struct
 {
     string clusterName;
     vector<LOCAL_END_POINT> endpoints;
 
-}LOCAL_END_POINTS;
+} LOCAL_END_POINTS;
 
 typedef struct
 {
     string name;
     LOCAL_END_POINTS localEndpoints;
 
-}WORK_SPACE;
+} WORK_SPACE;
 
 typedef struct
 {
@@ -44,42 +46,41 @@ typedef struct
 
     string ipaddress;
 
-}REMOTE_END_POINT;
+} REMOTE_END_POINT;
 
 typedef struct
 {
     vector<REMOTE_END_POINT> endPoints;
     string clusterName;
 
-}CLUSTER;
+} CLUSTER;
 
 typedef struct
 {
-    vector< WORK_SPACE> workspaces;
+    vector<WORK_SPACE> workspaces;
     vector<CLUSTER> clusters;
 
-}PROXY_CONFIG;
-
+} PROXY_CONFIG;
 
 // Resolve type
 
 typedef struct
 {
-    string	clusterName;
-    string	endPointName;
-    string	serviceName;
-    int		port;
-    string	protocol;
+    string clusterName;
+    string endPointName;
+    string serviceName;
+    int port;
+    string protocol;
 
-}RESOLVE_CONFIG;
+} RESOLVE_CONFIG;
 
 typedef struct
 {
-    string ipaddress;  // ip address of the Remote Endpoint
-    int port;               //  port at which Remote Listens
-    int r_w;               //  Read Endpoint or Write EndPoint
-    string alias;         //  unused
-    float reserved;     //  unused
-    char Buffer[255];   // unused
+    string ipaddress; // ip address of the Remote Endpoint
+    int port;         //  port at which Remote Listens
+    int r_w;          //  Read Endpoint or Write EndPoint
+    string alias;     //  unused
+    float reserved;   //  unused
+    char Buffer[255]; // unused
 
-}RESOLVE_ENDPOINT_RESULT;
+} RESOLVE_ENDPOINT_RESULT;

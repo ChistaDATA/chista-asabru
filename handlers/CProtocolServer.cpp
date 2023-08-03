@@ -7,36 +7,43 @@
 #include "../handlers/CProtocolServer.h"
 #include "../test/ProxyInfo.h"
 
-bool PingHandler::Handler(void *Buffer, int len, CLIENT_DATA &CData) {
+bool PingHandler::Handler(void *Buffer, int len, CLIENT_DATA &CData)
+{
 
     cout << "Pinged from Remote Server ....................." << endl;
     return true;
 }
 
-void *CProtocolSocket::ThreadHandler(CProtocolSocket *ptr, void *lptr) {
+void *CProtocolSocket::ThreadHandler(CProtocolSocket *ptr, void *lptr)
+{
 
     CLIENT_DATA CData;
     memcpy(&CData, lptr, sizeof(CLIENT_DATA));
     CProtocolHandler *proto_handler = ptr->GetHandler();
-    if (proto_handler == 0) {
+    if (proto_handler == 0)
+    {
         return 0;
     }
 
     char bfr[32000];
-    while (1) {
+    while (1)
+    {
         memset(bfr, 0, 32000);
         int num_read = 0;
-        if (!ProtocolHelper::ReadSocketBuffer(CData.Sh, bfr, sizeof(bfr), &num_read)) {
+        if (!ProtocolHelper::ReadSocketBuffer(CData.Sh, bfr, sizeof(bfr), &num_read))
+        {
             return nullptr;
         }
-        if (!(proto_handler->Handler(bfr, num_read, CData))) {
+        if (!(proto_handler->Handler(bfr, num_read, CData)))
+        {
             break;
         }
     }
     return 0;
 }
 
-void *CProxySocket::ThreadHandler(CProxySocket *ptr, void *lptr) {
+void *CProxySocket::ThreadHandler(CProxySocket *ptr, void *lptr)
+{
 
     CLIENT_DATA CData;
     memcpy(&CData, lptr, sizeof(CLIENT_DATA));
@@ -45,31 +52,37 @@ void *CProxySocket::ThreadHandler(CProxySocket *ptr, void *lptr) {
 
     END_POINT *ep = new END_POINT{"127.0.0.1", 9440, 1, "", 0,
                                   "  "}; // Resolve("firstcluster", "127.0.0.1" , 9000, pd );
-    if (ep == 0) {
+    if (ep == 0)
+    {
         return 0;
     }
     CProxyHandler *proxy_handler = ptr->GetHandler();
-    if (proxy_handler == 0) {
+    if (proxy_handler == 0)
+    {
         return 0;
     }
-    cout << "Resolved " << ep->ipaddress << "   " << ep->port << endl;
-    CClientSocket *client_sock = new CClientSocket((char *) (ep->ipaddress.c_str()), ep->port);
-    if (client_sock == 0) {
+    cout << "Resolved Host: " << ep->ipaddress << ", Port: " << ep->port << endl;
+    CClientSocket *client_sock = new CClientSocket((char *)(ep->ipaddress.c_str()), ep->port);
+    if (client_sock == 0)
+    {
         cout << "Failed to Create Client" << endl;
         return 0;
     }
-    if (!client_sock->Resolve()) {
+    if (!client_sock->Resolve())
+    {
         cout << "Failed to Resolve Client" << endl;
         delete client_sock;
         return 0;
     }
-    if (!client_sock->Connect()) {
+    if (!client_sock->Connect())
+    {
         cout << "Failed To Connect " << endl;
         delete client_sock;
         return 0;
     }
     SOCKET s = client_sock->GetSocket();
-    if (s == -1) {
+    if (s == -1)
+    {
         cout << "Invalid Socket" << endl;
         return 0;
     }
@@ -78,17 +91,21 @@ void *CProxySocket::ThreadHandler(CProxySocket *ptr, void *lptr) {
     ProtocolHelper::SetReadTimeOut(CData.Sh, 1);
     int num_cycles = 0;
     cout << "Entered Nested Loop " << endl;
-    while (1) {
+    while (1)
+    {
         num_cycles++;
-        while (1) {
+        while (1)
+        {
             memset(bfr, 0, 32000);
 
             RetVal = recv(CData.Sh, bfr, sizeof(bfr), 0);
-            if (RetVal == -1) {
+            if (RetVal == -1)
+            {
                 // cout << "Socket Error...or...Socket Empty " << endl;
                 break;
             }
-            if (RetVal == 0) {
+            if (RetVal == 0)
+            {
                 num_cycles++;
                 break;
             }
@@ -98,26 +115,31 @@ void *CProxySocket::ThreadHandler(CProxySocket *ptr, void *lptr) {
 #else
 
             cout << "Inside Default handler.." << endl;
-            if (!proxy_handler->HandleUpstreamData(bfr, RetVal, CData)) {
+            if (!proxy_handler->HandleUpstreamData(bfr, RetVal, CData))
+            {
 
                 return 0;
             }
 
 #endif
-            if (RetVal < 32000) {
+            if (RetVal < 32000)
+            {
                 break;
             }
             RetVal = 0;
         }
 
-        while (1) {
+        while (1)
+        {
             memset(bfr, 0, 32000);
             RetVal = recv(CData.forward_port, bfr, sizeof(bfr), 0);
 
-            if (RetVal == -1) {
+            if (RetVal == -1)
+            {
                 break;
             }
-            if (RetVal == 0) {
+            if (RetVal == 0)
+            {
                 num_cycles++;
                 break;
             }
@@ -126,17 +148,20 @@ void *CProxySocket::ThreadHandler(CProxySocket *ptr, void *lptr) {
             send(CData.Sh, bfr, RetVal, 0);
 #else
             cout << "Inside Default handler(Down ).." << endl;
-            if (!proxy_handler->HandleDownStreamData(bfr, RetVal, CData)) {
+            if (!proxy_handler->HandleDownStreamData(bfr, RetVal, CData))
+            {
                 return 0;
             }
 #endif
-            if (RetVal < 32000) {
+            if (RetVal < 32000)
+            {
                 break;
             }
             RetVal = 0;
         }
 
-        if (num_cycles > 15) {
+        if (num_cycles > 15)
+        {
             // cout <<"....................." << endl ;
             break;
         }
