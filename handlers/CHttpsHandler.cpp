@@ -1,8 +1,8 @@
 
 #include <map>
-#include "../common/Utils.h"
+#include "Utils.h"
 #include "./CHttpsHandler.h"
-#include "../common/LineGrabber.h"
+#include "LineGrabber.h"
 using namespace std;
 
 CHttpsHandler::CHttpsHandler()

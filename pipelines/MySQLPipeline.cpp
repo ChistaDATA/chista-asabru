@@ -1,6 +1,6 @@
 #include "../handlers/CProtocolServer.h"
 #include "../test/ProxyInfo.h"
-#include "../engine/socket/ClientSocket.h"
+#include "ClientSocket.h"
 #include "../config/config_types.h"
 #include "../config/ConfigSingleton.h"
 

@@ -1,7 +1,7 @@
 #pragma  once
 
 #include "CProtocolServer.h"
-#include "../engine/socket/ServerSocket.h"
+#include "ServerSocket.h"
 #include "../config/config_types.h"
 
 pair<string, string> ChopLine(string str);

@@ -1,7 +1,7 @@
 #pragma  once
 
 #include "CProtocolServer.h"
-#include "../parsers/CHttpParser.h"
+#include "CHttpParser.h"
 
 pair<string, string> ChopLine(string str);
 
