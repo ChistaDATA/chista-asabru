@@ -24,7 +24,13 @@ docker compose up -d
 
 ### Build
 
-build the asabru app from  the root of the repository
+Build the static libraries 
+
+```
+sudo chmod u+x ./build_libs.sh
+```
+
+Build the asabru app from  the root of the repository
 
 ```
 mkdir build

@@ -3,8 +3,22 @@ project(Chista_Asabru)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_subdirectory(lib)
+# add_subdirectory(lib)
+add_subdirectory(lib/tinyxml2)
+add_subdirectory(lib/asabru-commons)
+add_subdirectory(lib/asabru-parsers)
+add_subdirectory(lib/asabru-engine)
 include_directories(lib/tinyxml2)
+include_directories(lib/asabru-commons/src)
+include_directories(lib/asabru-parsers/src)
+include_directories(lib/asabru-engine/src/socket)
+include_directories(lib/asabru-engine/src/decoder)
+
+#For the shared library:
+set ( PROJECT_LINK_LIBS libtinyxml2.a libasabru_commons.a libasabru_parsers.a libasabru_engine.a)
+link_directories( lib/asabru-commons/lib )
+link_directories( lib/asabru-parsers/lib )
+link_directories( lib/asabru-engine/lib )
 
 add_executable(Chista_Asabru
         first.cpp
@@ -13,24 +27,24 @@ add_executable(Chista_Asabru
         config/config_types.h
         config/IConfigEngine.h
 
-        engine/socket/ServerSocket.h
-        engine/socket/ServerSocket.cpp
-        engine/socket/ClientSocket.h
-        engine/socket/ClientSocket.cpp
+        # engine/socket/ServerSocket.h
+        # engine/socket/ServerSocket.cpp
+        # engine/socket/ClientSocket.h
+        # engine/socket/ClientSocket.cpp
+        # engine/decoder/ClickHouse_Wire.h
+        # engine/decoder/ClickHouse_Wire.cpp
 
-        engine/decoder/ClickHouse_Wire.h
-        engine/decoder/ClickHouse_Wire.cpp
-
-        common/Utils.cpp common/Utils.h
-        common/Utils.cpp
+        # common/Utils.cpp common/Utils.h
+        # common/Utils.cpp
+        # common/LineGrabber.h
 
         handlers/CProtocolServer.h
         handlers/CProtocolServer.cpp
 
         test/ProxyInfo.h test/ProxyInfo.cpp
 
-        parsers/CHttpParser.h
-        parsers/ChttpParser.cpp
+        # parsers/CHttpParser.h
+        # parsers/ChttpParser.cpp
 
         pipelines/ClickHousePipeline.cpp
         pipelines/PostgreSQLPipeline.cpp
@@ -42,8 +56,14 @@ add_executable(Chista_Asabru
         handlers/CHttpsHandler.h
         handlers/CHttpsHandler.cpp
 
-        common/LineGrabber.h
+        
         config/ConfigSingleton.h
         config/ConfigSingleton.cpp)
 
-target_link_libraries(Chista_Asabru tinyxml2)
+target_link_libraries(
+        Chista_Asabru 
+                ${CMAKE_SOURCE_DIR}/lib/tinyxml2/build/libtinyxml2.a
+                ${CMAKE_SOURCE_DIR}/lib/asabru-commons/build/lib/libasabru_commons.a
+                ${CMAKE_SOURCE_DIR}/lib/asabru-parsers/build/lib/libasabru_parsers.a
+                ${CMAKE_SOURCE_DIR}/lib/asabru-engine/build/lib/libasabru_engine.a
+)

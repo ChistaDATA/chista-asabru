@@ -2,8 +2,8 @@
 // A Simple Protocol to test Protocol Sequencing
 // https://github.com/eminfedar/async-sockets-cpp
 
-#include "../common/Utils.h"
-#include "../engine/socket/ClientSocket.h"
+#include "Utils.h"
+#include "ClientSocket.h"
 #include "../handlers/CProtocolServer.h"
 #include "../test/ProxyInfo.h"
 

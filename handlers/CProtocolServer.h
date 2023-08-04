@@ -1,7 +1,7 @@
 #ifndef PROTOCOL_DOT_H
 #define PROTOCOL_DOT_H
 
-#include "../engine/socket/ServerSocket.h"
+#include "ServerSocket.h"
 #include "../config/config_types.h"
 
 class CProtocolHandler {
