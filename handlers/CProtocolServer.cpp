@@ -30,7 +30,7 @@ void *CProtocolSocket::ThreadHandler(CProtocolSocket *ptr, void *lptr)
     {
         memset(bfr, 0, 32000);
         int num_read = 0;
-        if (!ProtocolHelper::ReadSocketBuffer(CData.Sh, bfr, sizeof(bfr), &num_read))
+        if (!ProtocolHelper::ReadSocketBuffer(CData.client_port, bfr, sizeof(bfr), &num_read))
         {
             return nullptr;
         }
@@ -88,7 +88,7 @@ void *CProxySocket::ThreadHandler(CProxySocket *ptr, void *lptr)
     }
     CData.forward_port = s;
     ProtocolHelper::SetReadTimeOut(s, 1);
-    ProtocolHelper::SetReadTimeOut(CData.Sh, 1);
+    ProtocolHelper::SetReadTimeOut(CData.client_port, 1);
     int num_cycles = 0;
     cout << "Entered Nested Loop " << endl;
     while (1)
@@ -98,7 +98,7 @@ void *CProxySocket::ThreadHandler(CProxySocket *ptr, void *lptr)
         {
             memset(bfr, 0, 32000);
 
-            RetVal = recv(CData.Sh, bfr, sizeof(bfr), 0);
+            RetVal = recv(CData.client_port, bfr, sizeof(bfr), 0);
             if (RetVal == -1)
             {
                 // cout << "Socket Error...or...Socket Empty " << endl;

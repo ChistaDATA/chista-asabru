@@ -43,7 +43,7 @@ bool CHttpsHandler::HandleDownStreamData(void *buffer, int length, CLIENT_DATA &
     std::cout << "Length of Packet is " << length << endl;
     std::cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
     std::cout << "======================================" << endl;
-    send(clientData.Sh, buffer, length, 0);
+    send(clientData.client_port, buffer, length, 0);
     return true;
 }
 
@@ -95,4 +95,3 @@ void CHttpsHandler::LogResponse(char *buffer, int len)
     std::cout << body << endl;
     std::cout << "================================================================================" << endl;
 }
-

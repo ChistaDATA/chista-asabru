@@ -48,7 +48,7 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
     }
     CData.forward_port = s;
     ProtocolHelper::SetReadTimeOut(s, 1);
-    ProtocolHelper::SetReadTimeOut(CData.Sh, 1);
+    ProtocolHelper::SetReadTimeOut(CData.client_port, 1);
     int num_cycles = 0;
     cout << "Entered Nested Loop " << endl;
     while (1) {
@@ -56,7 +56,7 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
         while (1) {
             memset(bfr, 0, 32000);
 
-            RetVal = recv(CData.Sh, bfr, sizeof(bfr), 0);
+            RetVal = recv(CData.client_port, bfr, sizeof(bfr), 0);
             if (RetVal == -1) {
                 // cout << "Socket Error...or...Socket Empty " << endl;
                 break;

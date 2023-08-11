@@ -48,7 +48,7 @@ public:
         cout << "Length of Packet is " << len << endl;
         cout << "Packet Type = " << (int) *((unsigned char *) Buffer) << endl;
         cout << "======================================" << endl;
-        send(CData.Sh, Buffer, len, 0);
+        send(CData.client_port, Buffer, len, 0);
         return true;
     }
 };
@@ -77,7 +77,7 @@ public:
         cout << "Length of Packet is " << len << endl;
         //cout << "Packet Type = " <<  (int)  *((unsigned char *) Buffer) << endl;
         cout << "======================================" << endl;
-        send(CData.Sh, Buffer, len, 0);
+        send(CData.client_port, Buffer, len, 0);
         return true;
     }
 };
@@ -105,7 +105,7 @@ public:
         cout << "Length of Packet is " << len << endl;
         // cout << "Packet Type = " <<  (int)  *((unsigned char *) Buffer) << endl;
         cout << "======================================" << endl;
-        send(CData.Sh, Buffer, len, 0);
+        send(CData.client_port, Buffer, len, 0);
         return true;
     }
 };
@@ -180,11 +180,11 @@ public:
         return m_handler != 0;
     }
 
-    bool SetPipeline(std::function<void *(CProxySocket *, void *)> test_func) {
-        std::function<void *(void *)> myfunc = [this, test_func](void *ptr) -> void * {
-            return test_func(this, ptr);
+    bool SetPipeline(std::function<void *(CProxySocket *, void *)> pipelineFunction) {
+        std::function<void *(void *)> pipelineLamda = [this, pipelineFunction](void *ptr) -> void * {
+            return pipelineFunction(this, ptr);
         };
-        thread_routine_override = myfunc;
+        thread_routine_override = pipelineLamda;
 
         return thread_routine_override != nullptr;
     }
