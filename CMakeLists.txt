@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.21)
 project(Chista_Asabru)
 
 set(CMAKE_CXX_STANDARD 17)
+# set(OPENSSL_INCLUDE_DIR /opt/homebrew/Cellar/openssl@3/3.1.2/include)
+
+# Find OpenSSL library
+# find_package(OpenSSL REQUIRED)
 
 # add_subdirectory(lib)
 add_subdirectory(lib/tinyxml2)
@@ -10,9 +14,12 @@ add_subdirectory(lib/asabru-parsers)
 add_subdirectory(lib/asabru-engine)
 include_directories(lib/tinyxml2)
 include_directories(lib/asabru-commons/src)
+# include_directories(lib/asabru-commons/src/ssl)
 include_directories(lib/asabru-parsers/src)
 include_directories(lib/asabru-engine/src/socket)
 include_directories(lib/asabru-engine/src/decoder)
+# Add the SSL library include directory
+# include_directories(${OPENSSL_INCLUDE_DIR})
 
 #For the shared library:
 set ( PROJECT_LINK_LIBS libtinyxml2.a libasabru_commons.a libasabru_parsers.a libasabru_engine.a)
@@ -62,6 +69,7 @@ add_executable(Chista_Asabru
 
 target_link_libraries(
         Chista_Asabru 
+                # OpenSSL::SSL
                 ${CMAKE_SOURCE_DIR}/lib/tinyxml2/build/libtinyxml2.a
                 ${CMAKE_SOURCE_DIR}/lib/asabru-commons/build/lib/libasabru_commons.a
                 ${CMAKE_SOURCE_DIR}/lib/asabru-parsers/build/lib/libasabru_parsers.a

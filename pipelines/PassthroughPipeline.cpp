@@ -15,7 +15,7 @@ void *PassthroughPipeLine(CProtocolSocket *ptr, void *lptr) {
     while (1) {
         memset(bfr, 0, 32000);
         int num_read = 0;
-        if (!ProtocolHelper::ReadSocketBuffer(CData.Sh, bfr, sizeof(bfr), &num_read)) {
+        if (!ProtocolHelper::ReadSocketBuffer(CData.client_port, bfr, sizeof(bfr), &num_read)) {
             return nullptr;
         }
         if (!(proto_handler->Handler(bfr, num_read, CData))) {

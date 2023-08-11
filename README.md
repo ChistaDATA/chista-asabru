@@ -28,6 +28,7 @@ Build the static libraries
 
 ```
 sudo chmod u+x ./build_libs.sh
+./build_libs.sh
 ```
 
 Build the asabru app from  the root of the repository
@@ -39,10 +40,14 @@ cmake ..
 make
 ```
 
+```
+./build_libs.sh; cd build; cmake ..; make; cd ..;
+```
+
 ### Useage
 
 ```
- ./Chista_Asabru <port>
+ ./build/Chista_Asabru <port>
 ```
 
 Run the clickhouse client in SSL mode

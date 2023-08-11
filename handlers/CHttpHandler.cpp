@@ -61,7 +61,7 @@ bool CHttpHandler::HandleDownStreamData(void *buffer, int length, CLIENT_DATA &c
     cout << "Length of Packet is " << length << endl;
     cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
     cout << "======================================" << endl;
-    send(clientData.Sh, buffer, length, 0);
+    send(clientData.client_port, buffer, length, 0);
     return true;
 }
 

@@ -8,5 +8,4 @@ __pycache__/
 *.csv
 *.xz
 *.backup
-lib
-lib/*
+.vscode
