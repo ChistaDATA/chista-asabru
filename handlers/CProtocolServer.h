@@ -8,7 +8,7 @@ class CProtocolHandler {
 public:
     CProtocolHandler() {}
 
-    virtual bool Handler(void *Buffer, int len, CLIENT_DATA &CData) = 0;
+    virtual bool Handler(void *Buffer, int len, CLIENT_DATA &clientData) = 0;
 
     virtual ~CProtocolHandler() {}
 };
@@ -17,9 +17,9 @@ class CProxyHandler {
 public:
     CProxyHandler() {}
 
-    virtual bool HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &CData) = 0;
+    virtual bool HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &clientData) = 0;
 
-    virtual bool HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &CData) = 0;
+    virtual bool HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &clientData) = 0;
 
     virtual ~CProxyHandler() {}
 
@@ -30,25 +30,25 @@ class CHWirePTHandler : public CProxyHandler {
 public:
     CHWirePTHandler() {}
 
-    virtual bool HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &CData) {
+    virtual bool HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &clientData) {
         // Log the Content and Forward the Data to the EndPoint
         cout << "===============CH(up)===================" << endl;
         cout << "Received a Client packet..................... " << endl;
         cout << "Length of Packet is " << len << endl;
         cout << "Packet Type = " << (int) *((unsigned char *) Buffer) << endl;
         cout << "======================================" << endl;
-        send(CData.forward_port, Buffer, len, 0);
+        send(clientData.forward_port, Buffer, len, 0);
         return true;
     }
 
-    virtual bool HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &CData) {
+    virtual bool HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &clientData) {
         // Log the Content and Forward the Data to the EndPoint
         cout << "=================CH (down)=================" << endl;
         cout << "Received a Server packet..................... " << endl;
         cout << "Length of Packet is " << len << endl;
         cout << "Packet Type = " << (int) *((unsigned char *) Buffer) << endl;
         cout << "======================================" << endl;
-        send(CData.client_port, Buffer, len, 0);
+        send(clientData.client_port, Buffer, len, 0);
         return true;
     }
 };
@@ -58,7 +58,7 @@ class CPostgreSQLHandler : public CProxyHandler {
 public:
     CPostgreSQLHandler() {}
 
-    virtual bool HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &CData) {
+    virtual bool HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &clientData) {
         // Log the Content and Forward the Data to the EndPoint
         cout << "=============CPostgreSQLHandler(UP)=====================" << endl;
         cout << "Received a Client packet..................... " << endl;
@@ -66,18 +66,18 @@ public:
         cout << "Length of Packet is " << len << endl;
         //cout << "Packet Type = " <<  (int)  *((unsigned char *) Buffer) << endl;
         cout << "======================================" << endl;
-        send(CData.forward_port, Buffer, len, 0);
+        send(clientData.forward_port, Buffer, len, 0);
         return true;
     }
 
-    virtual bool HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &CData) {
+    virtual bool HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &clientData) {
         // Log the Content and Forward the Data to the EndPoint
         cout << "===============CPostgreSQLHandler(DOWN)===================" << endl;
         cout << "Received a Server packet..................... " << endl;
         cout << "Length of Packet is " << len << endl;
         //cout << "Packet Type = " <<  (int)  *((unsigned char *) Buffer) << endl;
         cout << "======================================" << endl;
-        send(CData.client_port, Buffer, len, 0);
+        send(clientData.client_port, Buffer, len, 0);
         return true;
     }
 };
@@ -87,25 +87,25 @@ class CMySQLHandler : public CProxyHandler {
 public:
     CMySQLHandler() {}
 
-    virtual bool HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &CData) {
+    virtual bool HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &clientData) {
         // Log the Content and Forward the Data to the EndPoint
         cout << "=============CMySQLHandler(UP)=====================" << endl;
         cout << "Received a Client packet..................... " << endl;
         cout << "Length of Packet is " << len << endl;
         // cout << "Packet Type = " <<  (int)  *((unsigned char *) Buffer) << endl;
         cout << "======================================" << endl;
-        send(CData.forward_port, Buffer, len, 0);
+        send(clientData.forward_port, Buffer, len, 0);
         return true;
     }
 
-    virtual bool HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &CData) {
+    virtual bool HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &clientData) {
         // Log the Content and Forward the Data to the EndPoint
         cout << "===============CMySQLHandler(DOWN)===================" << endl;
         cout << "Received a Server packet..................... " << endl;
         cout << "Length of Packet is " << len << endl;
         // cout << "Packet Type = " <<  (int)  *((unsigned char *) Buffer) << endl;
         cout << "======================================" << endl;
-        send(CData.client_port, Buffer, len, 0);
+        send(clientData.client_port, Buffer, len, 0);
         return true;
     }
 };
@@ -114,7 +114,7 @@ class PingHandler : public CProtocolHandler {
 public:
     PingHandler() {}
 
-    virtual bool Handler(void *Buffer, int len, CLIENT_DATA &CData);
+    virtual bool Handler(void *Buffer, int len, CLIENT_DATA &clientData);
 
     virtual ~PingHandler() {}
 

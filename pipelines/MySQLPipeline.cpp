@@ -8,8 +8,8 @@ static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 
 void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
 
-    CLIENT_DATA CData;
-    memcpy(&CData, lptr, sizeof(CLIENT_DATA));
+    CLIENT_DATA clientData;
+    memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
     char bfr[32000];
     int RetVal;
 
@@ -46,9 +46,9 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
         cout << "Invalid Socket" << endl;
         return 0;
     }
-    CData.forward_port = s;
+    clientData.forward_port = s;
     ProtocolHelper::SetReadTimeOut(s, 1);
-    ProtocolHelper::SetReadTimeOut(CData.client_port, 1);
+    ProtocolHelper::SetReadTimeOut(clientData.client_port, 1);
     int num_cycles = 0;
     cout << "Entered Nested Loop " << endl;
     while (1) {
@@ -56,7 +56,7 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
         while (1) {
             memset(bfr, 0, 32000);
 
-            RetVal = recv(CData.client_port, bfr, sizeof(bfr), 0);
+            RetVal = recv(clientData.client_port, bfr, sizeof(bfr), 0);
             if (RetVal == -1) {
                 // cout << "Socket Error...or...Socket Empty " << endl;
                 break;
@@ -65,12 +65,12 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
                 num_cycles++;
                 break;
             }
-            // Call HandleUpStream(bfr,retVal, CData);
+            // Call HandleUpStream(bfr,retVal, clientData);
 #ifdef INLINE_LOGIC
-            send(CData.forward_port, bfr, RetVal, 0);
+            send(clientData.forward_port, bfr, RetVal, 0);
 #else
             cout << "Calling Proxy Handler.." << endl;
-            if (!proxy_handler->HandleUpstreamData(bfr, RetVal, CData)) {
+            if (!proxy_handler->HandleUpstreamData(bfr, RetVal, clientData)) {
 
                 return 0;
             }
@@ -84,7 +84,7 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
 
         while (1) {
             memset(bfr, 0, 32000);
-            RetVal = recv(CData.forward_port, bfr, sizeof(bfr), 0);
+            RetVal = recv(clientData.forward_port, bfr, sizeof(bfr), 0);
 
             if (RetVal == -1) {
                 break;
@@ -93,13 +93,13 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
                 num_cycles++;
                 break;
             }
-            // call HandleDownStream(bfr, RetVal, CData);
+            // call HandleDownStream(bfr, RetVal, clientData);
 #ifdef INLINE_LOGIC
-            send(CData.Sh, bfr, RetVal, 0);
+            send(clientData.Sh, bfr, RetVal, 0);
 #else
 
             cout << "Calling Inline Handler (Downstream).." << endl;
-            if (!proxy_handler->HandleDownStreamData(bfr, RetVal, CData)) {
+            if (!proxy_handler->HandleDownStreamData(bfr, RetVal, clientData)) {
                 return 0;
             }
 #endif

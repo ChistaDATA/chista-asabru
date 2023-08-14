@@ -9,8 +9,8 @@ class CHttpHandler : public CProxyHandler {
     CHttpParser *parser = 0;
 public:
     CHttpHandler(CHttpParser *parser);
-    virtual bool HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &CData);
-    virtual bool HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &CData);
+    virtual bool HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &clientData);
+    virtual bool HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &clientData);
 
     void LogResponse(char * buffer, int len);
 };
