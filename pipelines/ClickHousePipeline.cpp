@@ -3,17 +3,17 @@
 #include "../test/ProxyInfo.h"
 #include "ClientSocket.h"
 #include "../config/ConfigSingleton.h"
-#include <openssl/ssl.h>
-#include <openssl/err.h>
+// #include <openssl/ssl.h>
+// #include <openssl/err.h>
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
 {
     // Initialize OpenSSL library
-    SSL_library_init();
-    SSL_load_error_strings();
-    OpenSSL_add_all_algorithms();
+    // SSL_library_init();
+    // SSL_load_error_strings();
+    // OpenSSL_add_all_algorithms();
 
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
@@ -102,7 +102,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
             }
 
 #ifdef INLINE_LOGIC
-            send(CData.forward_port, buffer, returnValue, 0);
+            send(clientData.forward_port, buffer, returnValue, 0);
 #else
             cout << "Calling Proxy Handler.." << endl;
             if (!proxy_handler->HandleUpstreamData(buffer, returnValue, clientData))
@@ -132,9 +132,9 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
                 num_cycles++;
                 break;
             }
-            // call HandleDownStream(bfr, RetVal, CData);
+            // call HandleDownStream(bfr, RetVal, clientData);
 #ifdef INLINE_LOGIC
-            send(CData.Sh, bfr, RetVal, 0);
+            send(clientData.Sh, bfr, RetVal, 0);
 #else
 
             cout << "Calling Proxy Handler (Downstream).." << endl;
