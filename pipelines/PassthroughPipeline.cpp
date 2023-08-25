@@ -1,5 +1,7 @@
-#include "../handlers/CProtocolServer.h"
+#include "../handlers/CProtocolSocket.h"
+#include "../handlers/CProxySocket.h"
 #include "../test/ProxyInfo.h"
+#include "ProtocolHelper.h"
 
 // Basic Passthrough pipeline
 void *PassthroughPipeLine(CProtocolSocket *ptr, void *lptr) {

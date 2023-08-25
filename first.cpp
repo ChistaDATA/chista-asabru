@@ -12,11 +12,15 @@
 #include <thread>
 #include <list>
 
-#include "handlers/CProtocolServer.h"
+#include "handlers/CProtocolSocket.h"
 #include "handlers/CHttpHandler.h"
 #include "handlers/CHttpsHandler.h"
 #include "config/config.h"
 #include "config/ConfigSingleton.h"
+#include "handlers/CProxySocket.h"
+#include "handlers/CHWirePTHandler.h"
+#include "handlers/CPostgreSQLHandler.h"
+#include "handlers/CMySQLHandler.h"
 // #include <openssl/ssl.h>
 // #include <openssl/err.h>
 

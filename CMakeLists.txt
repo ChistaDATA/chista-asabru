@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.21)
-project(Chista_Asabru)
-
 set(CMAKE_CXX_STANDARD 17)
+set( CMAKE_CXX_COMPILER "/usr/bin/g++" )
+set( CMAKE_C_COMPILER "/usr/bin/gcc" )
+
+project(Chista_Asabru)
 # set(OPENSSL_INCLUDE_DIR /opt/homebrew/Cellar/openssl@3/3.1.2/include)
 
 # Find OpenSSL library
@@ -45,8 +47,22 @@ add_executable(Chista_Asabru
         # common/Utils.cpp
         # common/LineGrabber.h
 
-        handlers/CProtocolServer.h
-        handlers/CProtocolServer.cpp
+        handlers/CProtocolHandler.h
+        
+        handlers/CProxySocket.h 
+        handlers/CProxySocket.cpp
+        handlers/CProtocolSocket.h
+        handlers/CProtocolSocket.cpp
+
+        handlers/CHWirePTHandler.h
+        handlers/CHWirePTHandler.cpp
+        handlers/CMySQLHandler.h
+        handlers/CMySQLHandler.cpp 
+        handlers/CPostgreSQLHandler.h
+        handlers/CPostgreSQLHandler.cpp
+        handlers/PingHandler.h
+        handlers/PingHandler.cpp
+
 
         test/ProxyInfo.h test/ProxyInfo.cpp
 
