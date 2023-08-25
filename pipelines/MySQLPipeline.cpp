@@ -1,8 +1,10 @@
-#include "../handlers/CProtocolServer.h"
+#include "../handlers/CProtocolSocket.h"
+#include "../handlers/CProxySocket.h"
 #include "../test/ProxyInfo.h"
 #include "ClientSocket.h"
 #include "../config/config_types.h"
 #include "../config/ConfigSingleton.h"
+#include "ProtocolHelper.h"
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 

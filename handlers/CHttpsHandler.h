@@ -1,6 +1,6 @@
 #pragma  once
 
-#include "CProtocolServer.h"
+#include "CProtocolSocket.h"
 #include "ServerSocket.h"
 #include "../config/config_types.h"
 

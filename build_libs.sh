@@ -19,6 +19,7 @@ do
 
     # Move into the build directory, run cmake and make.
     cd build
+    make clean
     cmake ..
     make
 
