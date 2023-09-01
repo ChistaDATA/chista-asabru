@@ -9,8 +9,8 @@ pair<string, string> ChopLine(string str);
 class CHttpsHandler : public CProxyHandler {
 public:
     CHttpsHandler();
-    virtual bool HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &clientData);
-    virtual bool HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &clientData);
+    virtual void * HandleUpstreamData(void * buffer, int buffer_length, SocketClient * target_socket);
+    virtual void * HandleDownStreamData(void * buffer, int buffer_length);
 
     void LogResponse(char * buffer, int len);
 };

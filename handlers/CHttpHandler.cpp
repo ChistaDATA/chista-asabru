@@ -13,18 +13,19 @@ CHttpHandler::CHttpHandler(CHttpParser *parser)
  * Function that handles upstream data
  * @param buffer - the buffer that we receive from upstream ( source dbs )
  * @param length - length of the buffer
- * @param clientData - contains connection information about the client
  */
-bool CHttpHandler::HandleUpstreamData(void *buffer, int length, CLIENT_DATA &clientData)
+void * CHttpHandler::HandleUpstreamData(void * buffer, int buffer_length, SocketClient * target_socket)
 {
     cout << "=============== CH http(up) ===================" << endl;
     cout << "Received a Client packet..................... " << endl;
-    cout << "Length of Packet is " << length << endl;
     cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
+    cout << "Packet Length = " << buffer_length << endl;
+
+    if (buffer_length == 0) return (void *) "";
 
     // Parse the buffer to a metadata struct
     // This is done so as to analyze the packet easily and filter or apply custom logic
-    HttpMetadata metadata = this->parser->construct(buffer, length);
+    HttpMetadata metadata = this->parser->construct(buffer, buffer_length);
 
     // Log the Content
     this->parser->logMetadata(&metadata);
@@ -33,17 +34,13 @@ bool CHttpHandler::HandleUpstreamData(void *buffer, int length, CLIENT_DATA &cli
     void *deconstructedBuffer = this->parser->deconstruct(&metadata);
     
     int deconstructedBufferSize = strlen((char *)deconstructedBuffer);
-    cout << "Lengths : " << length << " " << deconstructedBufferSize << endl;
+    cout << "Lengths : " << buffer_length << " " << deconstructedBufferSize << endl;
 
-    LogResponse((char *) buffer, length);
-    LogResponse((char *) deconstructedBuffer, deconstructedBufferSize);
-
-    // Forward the Data to the EndPoint
-    send(clientData.forward_port, deconstructedBuffer, deconstructedBufferSize, 0);
-
+    // LogResponse((char *) buffer, buffer_length);
+    // LogResponse((char *) deconstructedBuffer, deconstructedBufferSize);
+    target_socket->SendBytes((char *) deconstructedBuffer);
     // free the buffer memory
     free(deconstructedBuffer);
-    return true;
 }
 
 /**
@@ -52,17 +49,16 @@ bool CHttpHandler::HandleUpstreamData(void *buffer, int length, CLIENT_DATA &cli
  * @param length - length of the buffer
  * @param clientData - contains connection information about the client
  */
-bool CHttpHandler::HandleDownStreamData(void *buffer, int length, CLIENT_DATA &clientData)
+void * CHttpHandler::HandleDownStreamData(void * buffer, int buffer_length)
 {
 
     // Log the Content and Forward the Data to the EndPoint
     cout << "================= CH http (down) =================" << endl;
     cout << "Received a Server packet..................... " << endl;
-    cout << "Length of Packet is " << length << endl;
+    cout << "Length of Packet is " << buffer_length << endl;
     cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
-    cout << "======================================" << endl;
-    send(clientData.client_port, buffer, length, 0);
-    return true;
+
+    return buffer;
 }
 
 void CHttpHandler::LogResponse(char *buffer, int len)

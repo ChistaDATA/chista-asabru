@@ -2,7 +2,7 @@
 #include "CProxyHandler.h"
 #include "CMySQLHandler.h"
 
-bool CMySQLHandler::HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &clientData)
+void *CMySQLHandler::HandleUpstreamData(void *buffer, int len, SocketClient * target_socket)
 {
     // Log the Content and Forward the Data to the EndPoint
     std::cout << "=============CMySQLHandler(UP)=====================" << endl;
@@ -10,11 +10,10 @@ bool CMySQLHandler::HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &clien
     std::cout << "Length of Packet is " << len << endl;
     // std::cout << "Packet Type = " <<  (int)  *((unsigned char *) Buffer) << endl;
     std::cout << "======================================" << endl;
-    send(clientData.forward_port, Buffer, len, 0);
-    return true;
+    return buffer;
 }
 
-bool CMySQLHandler::HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &clientData)
+void *CMySQLHandler::HandleDownStreamData(void *buffer, int len)
 {
     // Log the Content and Forward the Data to the EndPoint
     std::cout << "===============CMySQLHandler(DOWN)===================" << endl;
@@ -22,6 +21,5 @@ bool CMySQLHandler::HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &cli
     std::cout << "Length of Packet is " << len << endl;
     // std::cout << "Packet Type = " <<  (int)  *((unsigned char *) Buffer) << endl;
     std::cout << "======================================" << endl;
-    send(clientData.client_port, Buffer, len, 0);
-    return true;
+    return buffer;
 }

@@ -8,8 +8,8 @@ class CHWirePTHandler : public CProxyHandler {
 
 public:
     CHWirePTHandler() {}
-    virtual bool HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &clientData);
-    virtual bool HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &clientData);
+    virtual void * HandleUpstreamData(void *Buffer, int len, SocketClient * target_socket);
+    virtual void * HandleDownStreamData(void *Buffer, int len);
 };
 
 #endif

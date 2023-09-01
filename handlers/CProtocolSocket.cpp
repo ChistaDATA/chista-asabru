@@ -6,7 +6,7 @@
 #include "ClientSocket.h"
 #include "CProxySocket.h"
 #include "ProtocolHelper.h"
-#include "../handlers/CProtocolSocket.h"
+#include "./CProtocolSocket.h"
 
 void *CProtocolSocket::ThreadHandler(CProtocolSocket *ptr, void *lptr)
 {
