@@ -8,9 +8,9 @@ class CProxyHandler
 public:
     CProxyHandler() {}
 
-    virtual bool HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &clientData) = 0;
+    virtual void * HandleUpstreamData(void *buffer, int buffer_length, SocketClient * target_socket) = 0;
 
-    virtual bool HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &clientData) = 0;
+    virtual void * HandleDownStreamData(void *buffer, int buffer_length) = 0;
 
     virtual ~CProxyHandler() {}
 };

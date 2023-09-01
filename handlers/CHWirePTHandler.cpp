@@ -2,26 +2,22 @@
 #include "CProxyHandler.h"
 #include "CHWirePTHandler.h"
 
-bool CHWirePTHandler::HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &clientData)
+void *CHWirePTHandler::HandleUpstreamData(void *buffer, int len, SocketClient * target_socket)
 {
     // Log the Content and Forward the Data to the EndPoint
     std::cout << "===============CH(up)===================" << endl;
     std::cout << "Received a Client packet..................... " << endl;
     std::cout << "Length of Packet is " << len << endl;
-    std::cout << "Packet Type = " << (int)*((unsigned char *)Buffer) << endl;
-    std::cout << "======================================" << endl;
-    send(clientData.forward_port, Buffer, len, 0);
-    return true;
+    std::cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
+    return buffer;
 }
 
-bool CHWirePTHandler::HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &clientData)
+void *CHWirePTHandler::HandleDownStreamData(void *buffer, int len)
 {
     // Log the Content and Forward the Data to the EndPoint
     std::cout << "=================CH (down)=================" << endl;
     std::cout << "Received a Server packet..................... " << endl;
     std::cout << "Length of Packet is " << len << endl;
-    std::cout << "Packet Type = " << (int)*((unsigned char *)Buffer) << endl;
-    std::cout << "======================================" << endl;
-    send(clientData.client_port, Buffer, len, 0);
-    return true;
+    std::cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
+    return buffer;
 }

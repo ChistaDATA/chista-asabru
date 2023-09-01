@@ -2,27 +2,23 @@
 #include "CProxyHandler.h"
 #include "CPostgreSQLHandler.h"
 
-bool CPostgreSQLHandler::HandleUpstreamData(void *Buffer, int len, CLIENT_DATA &clientData)
+void * CPostgreSQLHandler::HandleUpstreamData(void *buffer, int len, SocketClient * target_socket)
 {
     // Log the Content and Forward the Data to the EndPoint
     std::cout << "=============CPostgreSQLHandler(UP)=====================" << endl;
     std::cout << "Received a Client packet..................... " << endl;
 
     std::cout << "Length of Packet is " << len << endl;
-    // std::cout << "Packet Type = " <<  (int)  *((unsigned char *) Buffer) << endl;
-    std::cout << "======================================" << endl;
-    send(clientData.forward_port, Buffer, len, 0);
-    return true;
+
+    return buffer;
 }
 
-bool CPostgreSQLHandler::HandleDownStreamData(void *Buffer, int len, CLIENT_DATA &clientData)
+void * CPostgreSQLHandler::HandleDownStreamData(void *buffer, int len)
 {
     // Log the Content and Forward the Data to the EndPoint
     std::cout << "===============CPostgreSQLHandler(DOWN)===================" << endl;
     std::cout << "Received a Server packet..................... " << endl;
     std::cout << "Length of Packet is " << len << endl;
-    // std::cout << "Packet Type = " <<  (int)  *((unsigned char *) Buffer) << endl;
-    std::cout << "======================================" << endl;
-    send(clientData.client_port, Buffer, len, 0);
-    return true;
+
+    return buffer;
 }
