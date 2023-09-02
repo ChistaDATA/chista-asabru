@@ -9,7 +9,8 @@ void *CHWirePTHandler::HandleUpstreamData(void *buffer, int len, SocketClient * 
     std::cout << "Received a Client packet..................... " << endl;
     std::cout << "Length of Packet is " << len << endl;
     std::cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
-    return buffer;
+
+    target_socket->SendBytes((char *) buffer);
 }
 
 void *CHWirePTHandler::HandleDownStreamData(void *buffer, int len)

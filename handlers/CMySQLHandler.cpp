@@ -10,7 +10,8 @@ void *CMySQLHandler::HandleUpstreamData(void *buffer, int len, SocketClient * ta
     std::cout << "Length of Packet is " << len << endl;
     // std::cout << "Packet Type = " <<  (int)  *((unsigned char *) Buffer) << endl;
     std::cout << "======================================" << endl;
-    return buffer;
+    
+    target_socket->SendBytes((char *) buffer);
 }
 
 void *CMySQLHandler::HandleDownStreamData(void *buffer, int len)
