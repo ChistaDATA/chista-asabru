@@ -21,7 +21,7 @@ void *CHttpsHandler::HandleUpstreamData(void *buffer, int length, SocketClient *
     std::cout << "Length of Packet is " << length << endl;
     std::cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
 
-    return buffer;
+    target_socket->SendBytes((char *) buffer);
 }
 
 /**

@@ -10,7 +10,7 @@ void * CPostgreSQLHandler::HandleUpstreamData(void *buffer, int len, SocketClien
 
     std::cout << "Length of Packet is " << len << endl;
 
-    return buffer;
+    target_socket->SendBytes((char *) buffer);
 }
 
 void * CPostgreSQLHandler::HandleDownStreamData(void *buffer, int len)
