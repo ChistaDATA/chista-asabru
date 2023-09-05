@@ -49,9 +49,7 @@ void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr)
             // calling handler
 
             cout << "Calling Proxy Handler.." << endl;
-            char *result = (char *)proxy_handler->HandleUpstreamData((void *)bytes.c_str(), (int)bytes.size(), &target_socket);
-
-            target_socket.SendBytes(result);
+            proxy_handler->HandleUpstreamData((void *)bytes.c_str(), (int)bytes.size(), &target_socket);
             // std::cout << "Server: " << bytes << std::endl;
 
             if (bytes.empty())
@@ -60,7 +58,7 @@ void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr)
         if (sel.Readable(&target_socket))
         {
             std::string bytes = target_socket.ReceiveBytes();
-            client_socket->SendBytes(bytes);
+            client_socket->SendBytes((char *) bytes.c_str(), bytes.size());
             // std::cout << "Client: " << bytes << std::endl;
             if (bytes.empty())
                 still_connected = false;

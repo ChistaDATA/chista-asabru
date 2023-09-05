@@ -16,12 +16,14 @@ CHttpsHandler::CHttpsHandler()
  */
 void *CHttpsHandler::HandleUpstreamData(void *buffer, int length, SocketClient * target_socket)
 {
-    std::cout << "=============== CH http(up) ===================" << endl;
+    std::cout << "=============== CH https (up) ===================" << endl;
     std::cout << "Received a Client packet..................... " << endl;
     std::cout << "Length of Packet is " << length << endl;
     std::cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
 
-    target_socket->SendBytes((char *) buffer);
+    target_socket->SendBytes((char *) buffer, length);
+
+    std::cout << "Send bytes successfully!" << endl;
 }
 
 /**
@@ -29,16 +31,18 @@ void *CHttpsHandler::HandleUpstreamData(void *buffer, int length, SocketClient *
  * @param buffer - the buffer / response that we receive from downstream ( target dbs )
  * @param length - length of the buffer
  */
-void * CHttpsHandler::HandleDownStreamData(void *buffer, int length)
+void * CHttpsHandler::HandleDownStreamData(void *buffer, int length,  Socket * client_socket)
 {
 
     // Log the Content and Forward the Data to the EndPoint
-    std::cout << "================= CH http (down) =================" << endl;
+    std::cout << "================= CH https (down) =================" << endl;
     std::cout << "Received a Server packet..................... " << endl;
     std::cout << "Length of Packet is " << length << endl;
     std::cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
     
-    return buffer;
+    client_socket->SendBytes((char *) buffer, length);
+
+    std::cout << "Send bytes successfully!" << endl;
 }
 
 void CHttpsHandler::LogResponse(char *buffer, int len)

@@ -48,6 +48,7 @@ void *CProxySocket::ThreadHandler(CProxySocket *ptr, void *lptr)
         return 0;
     }
 
+    Socket * client_socket;
     SocketClient target_socket(ep->ipaddress, ep->port);
     clientData.forward_port = s;
     ProtocolHelper::SetReadTimeOut(s, 1);
@@ -112,7 +113,7 @@ void *CProxySocket::ThreadHandler(CProxySocket *ptr, void *lptr)
             send(clientData.Sh, bfr, RetVal, 0);
 #else
             cout << "Inside Default handler(Down ).." << endl;
-            if (!proxy_handler->HandleDownStreamData(bfr, RetVal))
+            if (!proxy_handler->HandleDownStreamData(bfr, RetVal, client_socket))
             {
                 return 0;
             }

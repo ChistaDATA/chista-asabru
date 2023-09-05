@@ -10,7 +10,7 @@ class CHttpsHandler : public CProxyHandler {
 public:
     CHttpsHandler();
     virtual void * HandleUpstreamData(void * buffer, int buffer_length, SocketClient * target_socket);
-    virtual void * HandleDownStreamData(void * buffer, int buffer_length);
+    virtual void * HandleDownStreamData(void * buffer, int buffer_length, Socket * client_socket);
 
     void LogResponse(char * buffer, int len);
 };

@@ -47,13 +47,8 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
         {
             std::string bytes = client_socket->ReceiveBytes();
 
-            // calling handler
-
-            cout << "Calling Proxy Handler.." << endl;
-            char *result = (char *)proxy_handler->HandleUpstreamData((void *)bytes.c_str(), (int)bytes.size(), &target_socket);
-
-            target_socket.SendBytes(result);
-            // std::cout << "Server: " << bytes << std::endl;
+            cout << "Calling Proxy Upstream Handler.." << endl;
+            proxy_handler->HandleUpstreamData((void *)bytes.c_str(), (int)bytes.size(), &target_socket);
 
             if (bytes.empty())
                 still_connected = false;
@@ -61,8 +56,10 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
         if (sel.Readable(&target_socket))
         {
             std::string bytes = target_socket.ReceiveBytes();
-            client_socket->SendBytes(bytes);
-            // std::cout << "Client: " << bytes << std::endl;
+
+            cout << "Calling Proxy Downstream Handler.." << endl;
+            proxy_handler->HandleDownStreamData((void *) bytes.c_str(), bytes.size(), client_socket);
+
             if (bytes.empty())
                 still_connected = false;
         }
