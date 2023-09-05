@@ -38,7 +38,7 @@ void * CHttpHandler::HandleUpstreamData(void * buffer, int buffer_length, Socket
 
     // LogResponse((char *) buffer, buffer_length);
     // LogResponse((char *) deconstructedBuffer, deconstructedBufferSize);
-    target_socket->SendBytes((char *) deconstructedBuffer);
+    target_socket->SendBytes((char *) deconstructedBuffer, deconstructedBufferSize);
     // free the buffer memory
     free(deconstructedBuffer);
 }
@@ -49,7 +49,7 @@ void * CHttpHandler::HandleUpstreamData(void * buffer, int buffer_length, Socket
  * @param length - length of the buffer
  * @param clientData - contains connection information about the client
  */
-void * CHttpHandler::HandleDownStreamData(void * buffer, int buffer_length)
+void * CHttpHandler::HandleDownStreamData(void * buffer, int buffer_length, Socket * client_socket)
 {
 
     // Log the Content and Forward the Data to the EndPoint
@@ -57,8 +57,8 @@ void * CHttpHandler::HandleDownStreamData(void * buffer, int buffer_length)
     cout << "Received a Server packet..................... " << endl;
     cout << "Length of Packet is " << buffer_length << endl;
     cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
-
-    return buffer;
+    
+    client_socket->SendBytes((char *) buffer, buffer_length);
 }
 
 void CHttpHandler::LogResponse(char *buffer, int len)

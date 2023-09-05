@@ -11,40 +11,6 @@
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 
-CClientSocket *createDatabaseConnection(char *server_address, int server_port)
-{
-    CClientSocket *target_socket = new CClientSocket(server_address, server_port);
-
-    if (target_socket == 0)
-    {
-        cout << "ClickHousePipeline -> Failed to create target connection" << endl;
-        return 0;
-    }
-
-    if (!target_socket->Resolve())
-    {
-        cout << "ClickHousePipeline -> Failed to resolve target" << endl;
-        delete target_socket;
-        return 0;
-    }
-
-    if (!target_socket->Connect())
-    {
-        cout << "ClickHousePipeline -> Failed To connect to target socket " << endl;
-        delete target_socket;
-        return 0;
-    }
-
-    if (target_socket->GetSocket() == -1)
-    {
-        cout << "Invalid target socket" << endl;
-        delete target_socket;
-        return 0;
-    }
-
-    return target_socket;
-}
-
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
 {
     // Initialize OpenSSL library
@@ -76,20 +42,11 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
     cout << "Resolved (Target) Host: " << target_endpoint->ipaddress << endl
          << "Resolved (Target) Port: " << target_endpoint->port << endl;
 
-    // CClientSocket *target_socket = createDatabaseConnection((char *)(target_endpoint->ipaddress.c_str()), target_endpoint->port);
-
-    // if (target_socket->GetSocket() <= 0) {
-    //     cout << "Error occured while creating target database connection!" << endl;
-    //     return 0;
-    // }
-
-    // clientData.forward_port = target_socket->GetSocket(); // Target Port
-
-    // ProtocolHelper::SetReadTimeOut(clientData.forward_port, 1);
-    // ProtocolHelper::SetReadTimeOut(clientData.client_port, 1);
-
     Socket *client_socket = (Socket *)clientData.client_socket;
     SocketClient target_socket(target_endpoint->ipaddress, target_endpoint->port);
+
+    ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
+    ProtocolHelper::SetReadTimeOut(target_socket.GetSocket(), 1);
 
     while (1)
     {
@@ -102,22 +59,20 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
             {
                 std::string bytes = client_socket->ReceiveBytes();
 
-                // calling handler
-
-                // cout << "Calling Proxy Handler.." << endl;
-                proxy_handler->HandleUpstreamData((void *) bytes.c_str(), bytes.size(), &target_socket);
-
-                // target_socket.SendBytes(bytes);
-                // std::cout << "Server: " << bytes << std::endl;
+                cout << "Calling Proxy Upstream Handler.." << endl;
+                proxy_handler->HandleUpstreamData((void *)bytes.c_str(), bytes.size(), &target_socket);
 
                 if (bytes.empty())
                     still_connected = false;
             }
             if (sel.Readable(&target_socket))
             {
+                cout << "target socket is readable, reading bytes : " << endl;
                 std::string bytes = target_socket.ReceiveBytes();
-                client_socket->SendBytes(bytes);
-                // std::cout << "Client: " << bytes << std::endl;
+
+                cout << "Calling Proxy Downstream Handler.." << endl;
+                proxy_handler->HandleDownStreamData((void *)bytes.c_str(), bytes.size(), client_socket);
+
                 if (bytes.empty())
                     still_connected = false;
             }
@@ -133,98 +88,77 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         }
     }
 
+    // int num_cycles = 0;
+    // char buffer[32000];
+    // int RetVal;
+    // while (1)
+    // {
+    //     num_cycles++;
+    //     while (1)
+    //     {
+    //         memset(buffer, 0, 32000);
+
+    //         // RetVal = recv(client_socket->GetSocket(), buffer, sizeof(buffer), 0);
+    //         char buf[32000];
+    //         int RetVal = client_socket->ReceiveBytesTemp(buf);
+    //         if (RetVal < 0)
+    //         {
+    //             // cout << "Socket Error...or...Socket Empty " << endl;
+    //             break;
+    //         }
+    //         if (RetVal == 0)
+    //         {
+    //             num_cycles++;
+    //             break;
+    //         }
+
+    //         send(target_socket.GetSocket(), buf, RetVal, 0);
+
+    //         if (RetVal < 32000)
+    //         {
+    //             break;
+    //         }
+    //         RetVal = 0;
+    //     }
+
+    //     while (1)
+    //     {
+    //         memset(buffer, 0, 32000);
+    //         RetVal = recv(target_socket.GetSocket(), buffer, sizeof(buffer), 0);
+
+    //         if (RetVal == -1)
+    //         {
+    //             break;
+    //         }
+    //         if (RetVal == 0)
+    //         {
+    //             num_cycles++;
+    //             break;
+    //         }
+    //         // call HandleDownStream(bfr, RetVal, CData);
+
+    //         send(client_socket->GetSocket(), buffer, RetVal, 0);
+
+    //         if (RetVal < 32000)
+    //         {
+    //             break;
+    //         }
+    //         RetVal = 0;
+    //     }
+
+    //     if (num_cycles > 15)
+    //     {
+    //         // cout <<"....................." << endl ;
+    //         break;
+    //     }
+    // }
+
     delete client_socket;
 #ifdef WINDOWS_OS
     return 0;
 #else
     return nullptr;
 #endif
-
-    //     int num_cycles = 0;
-    //     cout << "Entered Nested Loop :" << endl;
-
-    //     /**
-    //      * Listen for incoming requests and outgoing requests
-    //      */
-    //     char buffer[32000];
-    //     int returnValue;
-    //     while (1)
-    //     {
-    //         num_cycles++;
-
-    //         // Incoming requests
-    //         while (1)
-    //         {
-    //             memset(buffer, 0, 32000);
-
-    //             returnValue = recv(clientData.client_port, buffer, sizeof(buffer), 0);
-    //             cout << "Received value in socket :" << returnValue << endl;
-    //             if (returnValue == -1)
-    //             {
-    //                 break;
-    //             }
-    //             if (returnValue == 0)
-    //             {
-    //                 num_cycles++;
-    //                 break;
-    // }
-
-    // #ifdef INLINE_LOGIC
-    //             send(clientData.forward_port, buffer, returnValue, 0);
-    // #else
-    //             cout << "Calling Proxy Handler.." << endl;
-    //             if (!proxy_handler->HandleUpstreamData(buffer, returnValue, clientData))
-    //     {
-    //         cout << "The handler is not defined. Exiting!" << endl;
-    //         return 0;
-    //     }
-    // #endif
-    //             if (returnValue < 32000)
-    //             {
-    //                 break;
-    //             }
-    //             returnValue = 0;
-    //         }
-
-    //         // Outgoing requests
-    //         while (1)
-    //         {
-    //             memset(buffer, 0, 32000);
-    //             returnValue = recv(clientData.forward_port, buffer, sizeof(buffer), 0);
-
-    //             if (returnValue == -1)
-    //             {
-    //                 break;
-    //             }
-    //             if (returnValue == 0)
-    //             {
-    //                 num_cycles++;
-    //                 break;
-    //             }
-    //             // call HandleDownStream(bfr, RetVal, clientData);
-    // #ifdef INLINE_LOGIC
-    //             send(clientData.Sh, bfr, RetVal, 0);
-    // #else
-
-    //             cout << "Calling Proxy Handler (Downstream).." << endl;
-    //             if (!proxy_handler->HandleDownStreamData(buffer, returnValue, clientData))
-    //             {
-    //         return 0;
-    //     }
-    // #endif
-    //             if (returnValue < 32000)
-    //             {
-    //                 break;
-    //             }
-    //             returnValue = 0;
-    //         }
-
-    //         if (num_cycles > 15)
-    //         {
-    //             // cout <<"....................." << endl ;
-    //             break;
-    //         }
-    //     }
 
     return 0;
 }
