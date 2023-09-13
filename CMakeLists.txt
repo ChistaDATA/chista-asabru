@@ -15,6 +15,7 @@ add_subdirectory(lib/asabru-commons)
 add_subdirectory(lib/asabru-parsers)
 add_subdirectory(lib/asabru-engine)
 include_directories(lib/tinyxml2)
+include_directories(lib/libuv/include)
 include_directories(lib/asabru-commons/src)
 # include_directories(lib/asabru-commons/src/ssl)
 include_directories(lib/asabru-parsers/src)
@@ -69,6 +70,7 @@ add_executable(Chista_Asabru
         # parsers/CHttpParser.h
         # parsers/ChttpParser.cpp
 
+        pipelines/Pipeline.h
         pipelines/ClickHousePipeline.cpp
         pipelines/PostgreSQLPipeline.cpp
         pipelines/MySQLPipeline.cpp
@@ -87,6 +89,7 @@ target_link_libraries(
         Chista_Asabru 
                 # OpenSSL::SSL
                 ${CMAKE_SOURCE_DIR}/lib/tinyxml2/build/libtinyxml2.a
+                ${CMAKE_SOURCE_DIR}/lib/libuv/build/libuv.a
                 ${CMAKE_SOURCE_DIR}/lib/asabru-commons/build/lib/libasabru_commons.a
                 ${CMAKE_SOURCE_DIR}/lib/asabru-parsers/build/lib/libasabru_parsers.a
                 ${CMAKE_SOURCE_DIR}/lib/asabru-engine/build/lib/libasabru_engine.a

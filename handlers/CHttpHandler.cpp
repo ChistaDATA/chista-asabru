@@ -14,14 +14,15 @@ CHttpHandler::CHttpHandler(CHttpParser *parser)
  * @param buffer - the buffer that we receive from upstream ( source dbs )
  * @param length - length of the buffer
  */
-void * CHttpHandler::HandleUpstreamData(void * buffer, int buffer_length, SocketClient * target_socket)
+void *CHttpHandler::HandleUpstreamData(void *buffer, int buffer_length, uv_stream_t *target)
 {
     cout << "=============== CH http(up) ===================" << endl;
     cout << "Received a Client packet..................... " << endl;
     cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
     cout << "Packet Length = " << buffer_length << endl;
 
-    if (buffer_length == 0) return (void *) "";
+    if (buffer_length == 0)
+        return (void *)"";
 
     // Parse the buffer to a metadata struct
     // This is done so as to analyze the packet easily and filter or apply custom logic
@@ -32,13 +33,15 @@ void * CHttpHandler::HandleUpstreamData(void * buffer, int buffer_length, Socket
 
     // Reconstruct the buffer from the metadata struct
     void *deconstructedBuffer = this->parser->deconstruct(&metadata);
-    
+
     int deconstructedBufferSize = strlen((char *)deconstructedBuffer);
     cout << "Lengths : " << buffer_length << " " << deconstructedBufferSize << endl;
 
-    // LogResponse((char *) buffer, buffer_length);
-    // LogResponse((char *) deconstructedBuffer, deconstructedBufferSize);
-    target_socket->SendBytes((char *) deconstructedBuffer, deconstructedBufferSize);
+    // Data received from the client, forward it to the target server
+    uv_write_t write_req;
+    uv_buf_t write_buf = uv_buf_init((char *)deconstructedBuffer, deconstructedBufferSize);
+    uv_write(&write_req, (uv_stream_t *)target, &write_buf, 1, NULL);
+
     // free the buffer memory
     free(deconstructedBuffer);
 }
@@ -49,7 +52,7 @@ void * CHttpHandler::HandleUpstreamData(void * buffer, int buffer_length, Socket
  * @param length - length of the buffer
  * @param clientData - contains connection information about the client
  */
-void * CHttpHandler::HandleDownStreamData(void * buffer, int buffer_length, Socket * client_socket)
+void *CHttpHandler::HandleDownStreamData(void *buffer, int buffer_length, uv_stream_t *client)
 {
 
     // Log the Content and Forward the Data to the EndPoint
@@ -57,8 +60,11 @@ void * CHttpHandler::HandleDownStreamData(void * buffer, int buffer_length, Sock
     cout << "Received a Server packet..................... " << endl;
     cout << "Length of Packet is " << buffer_length << endl;
     cout << "Packet Type = " << (int)*((unsigned char *)buffer) << endl;
-    
-    client_socket->SendBytes((char *) buffer, buffer_length);
+
+    // Data received from the target server, forward it to the client
+    uv_write_t write_req;
+    uv_buf_t write_buf = uv_buf_init((char *) buffer, buffer_length);
+    uv_write(&write_req, client, &write_buf, 1, NULL);
 }
 
 void CHttpHandler::LogResponse(char *buffer, int len)
@@ -109,4 +115,3 @@ void CHttpHandler::LogResponse(char *buffer, int len)
     cout << body << endl;
     cout << "================================================================================" << endl;
 }
-
