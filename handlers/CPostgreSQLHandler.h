@@ -9,8 +9,8 @@ class CPostgreSQLHandler : public CProxyHandler
 
 public:
     CPostgreSQLHandler() {}
-    virtual void * HandleUpstreamData(void *Buffer, int len, SocketClient * target_socket);
-    virtual void * HandleDownStreamData(void *Buffer, int len, Socket * client_socket);
+    virtual void * HandleUpstreamData(void *Buffer, int len,  uv_stream_t * target);
+    virtual void * HandleDownStreamData(void *Buffer, int len, uv_stream_t *client);
 };
 
 #endif

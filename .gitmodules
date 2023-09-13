@@ -13,3 +13,6 @@
 	path = lib/asabru-commons
 	url = https://github.com/ChistaDATA/asabru-commons.git
 	branch = main
+[submodule "lib/libuv"]
+	path = lib/libuv
+	url = https://github.com/libuv/libuv.git
