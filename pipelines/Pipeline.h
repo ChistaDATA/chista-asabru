@@ -1,8 +1,8 @@
 
 #ifndef PIPELINE_DOT_H
 #define PIPELINE_DOT_H
-#include "../handlers/CProtocolSocket.h"
-#include "../handlers/CProxySocket.h"
+#include "CProtocolSocket.h"
+#include "CProxySocket.h"
 #include "../test/ProxyInfo.h"
 #include "ClientSocket.h"
 #include "../config/ConfigSingleton.h"

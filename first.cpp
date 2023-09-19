@@ -11,16 +11,13 @@
 #include <iostream>
 #include <thread>
 #include <list>
+#include <map>
 
-#include "handlers/CProtocolSocket.h"
-#include "handlers/CHttpHandler.h"
-#include "handlers/CHttpsHandler.h"
-#include "config/config.h"
 #include "config/ConfigSingleton.h"
-#include "handlers/CProxySocket.h"
-#include "handlers/CHWirePTHandler.h"
-#include "handlers/CPostgreSQLHandler.h"
-#include "handlers/CMySQLHandler.h"
+
+#include "CProtocolSocket.h"
+#include "CProxySocket.h"
+
 // #include <openssl/ssl.h>
 // #include <openssl/err.h>
 
@@ -38,19 +35,15 @@ static const string MYSQL_TLS = "MySQLTLS";
 
 /* Proxy pipelines map */
 typedef void *(*PipelineFunction)(CProxySocket *ptr, void *lptr);
-typedef map<string, PipelineFunction> PipelineFunctionMap;
-
-/* Proxy handlers map */
-typedef map<string, CProxyHandler *> ProxyHandlerMap;
+typedef std::map<string, PipelineFunction> PipelineFunctionMap;
 
 /* Proxy sockets map */
-typedef map<string, CProxySocket *> ProxySocketsMap;
+typedef std::map<string, CProxySocket *> ProxySocketsMap;
 
 int startProxyServer(
     string proxyName,
     RESOLVE_CONFIG *resolveConfig,
     PipelineFunctionMap *pipelineFunctionMap,
-    ProxyHandlerMap *proxyHandlerMap,
     ProxySocketsMap * proxySocketsMap
 );
 
@@ -151,7 +144,7 @@ int main(int argc, char **argv)
     cout << "Received from Command line " << port << endl;
 
     // Create Parsers
-    CHttpParser *httpParser = new CHttpParser();
+    // CHttpParser *httpParser = new CHttpParser();
 
     // Create PipelineFunction mappings
     PipelineFunctionMap pipelineFunctionMap;
@@ -164,16 +157,6 @@ int main(int argc, char **argv)
     pipelineFunctionMap[MYSQL] = MySQLPipeline;
     pipelineFunctionMap[MYSQL_TLS] = MySQLPipeline;
 
-    // Create ProxyHandler mappings
-    ProxyHandlerMap proxyHandlerMap;
-    proxyHandlerMap[CLICKHOUSE_WIRE_LEVEL] = new CHWirePTHandler();
-    proxyHandlerMap[CLICKHOUSE_HTTP] = new CHttpHandler(httpParser);
-    proxyHandlerMap[CLICKHOUSE_WIRE_LEVEL_TLS] = new CHWirePTHandler();
-    proxyHandlerMap[CLICKHOUSE_HTTP_TLS] = new CHttpsHandler();
-    proxyHandlerMap[POSTGRESQL] = new CPostgreSQLHandler();
-    proxyHandlerMap[POSTGRESQL_TLS] = new CPostgreSQLHandler();
-    proxyHandlerMap[MYSQL] = new CMySQLHandler();
-    proxyHandlerMap[MYSQL_TLS] = new CMySQLHandler();
 
     // Create Proxy sockets mapping
     ProxySocketsMap proxySocketsMap;
@@ -206,7 +189,6 @@ int main(int argc, char **argv)
             proxyConfigs[i].proxyName,
             &proxyConfigs[i].resolveConfig,
             &pipelineFunctionMap,
-            &proxyHandlerMap,
             &proxySocketsMap
         );
         if (proxy < 0)
@@ -222,7 +204,6 @@ int startProxyServer(
     string proxyName,
     RESOLVE_CONFIG *resolveConfig,
     PipelineFunctionMap *pipelineFunctionMap,
-    ProxyHandlerMap *proxyHandlerMap,
     ProxySocketsMap * proxySocketsMap
 )
 {
@@ -236,8 +217,8 @@ int startProxyServer(
         cout << "Failed to set " << proxyName << " Pipeline ..!" << endl;
         return -2;
     }
-
-    if (!(*socket).SetHandler((*proxyHandlerMap)[proxyName]))
+    CProxyHandler *proxyHandler = (CProxyHandler *) configValues.handler;
+    if (!(*socket).SetHandler(proxyHandler))
     {
         cout << "Failed to set " << proxyName << " Handler ..!" << endl;
         return -2;

@@ -11,8 +11,18 @@ CMake
 Install docker and docker compose
 `https://docs.docker.com/engine/install/`
 `https://docs.docker.com/compose/install/`
+
+### Submodules
+
+This `chista-asabru` project consists of the following sub-modules :
+
+1. [asabru-engine](https://github.com/ChistaDATA/asabru-engine) : This is the core engine of project, which provides abstraction over platform depedent networking APIs.
+2. [asabru-commons](https://github.com/ChistaDATA/asabru-commons) : This repo contains the common utility classes for the chista database proxy.
+3. [asabru-parsers](https://github.com/ChistaDATA/asabru-parsers) : This repo contains the code for the ChistaDATA database proxy parsers.
+4. [asabru-handlers](https://github.com/ChistaDATA/asabru-handlers) : This repo contains the various handlers for the chista database proxy.
 ### Development setup
-clone using 
+
+Clone the project using the following command. This will clone the submodules of the project and the external dependencies into the `lib` folder.
 ```
 git clone --recurse-submodules
 ````
@@ -24,24 +34,29 @@ docker compose up -d
 
 ### Build
 
-Build the static libraries 
+##### Build the dependency libraries
 
 ```
 sudo chmod u+x ./build_libs.sh
 ./build_libs.sh
 ```
+##### Set environment variables
+```
+export CONFIG_FILE=<path-to-config>;
+export PLUGINS_FOLDER_PATH=<path-to-plugins-folder>;
 
-Build the asabru app from  the root of the repository
+Eg.
+export CONFIG_FILE=/Users/midhundarvin/workplace/chistadata/chista-asabru/config/config.xml;
+export PLUGINS_FOLDER_PATH=/Users/midhundarvin/workplace/chistadata/chista-asabru/lib/asabru-handlers/build;
+```
+
+##### Build the asabru app from  the root of the repository
 
 ```
 mkdir build
 cd build
 cmake ..
 make
-```
-
-```
-./build_libs.sh; cd build; cmake ..; make; cd ..;
 ```
 
 ### Useage

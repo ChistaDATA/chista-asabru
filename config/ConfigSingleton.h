@@ -1,11 +1,13 @@
 #ifndef CONFIG_SINGLETON_DOT_H
 #define CONFIG_SINGLETON_DOT_H
 
+#include <cstdlib>
 #include <iostream>
-
-#include "../lib/tinyxml2/tinyxml2.h"
+#include "TypeFactory.h"
+#include "tinyxml2.h"
 #include "config_types.h"
 #include "IConfigEngine.h"
+#include "CProxyHandler.h"
 
 using namespace tinyxml2;
 
@@ -20,25 +22,24 @@ using namespace tinyxml2;
 
 class ConfigSingleton
 {
-public:
-    static ConfigSingleton &getInstance()
-    {
-        static ConfigSingleton instance;
-        instance.LoadProxyConfigurations("../config/config.xml");
-        // volatile int dummy{};
-        return instance;
-    }
+    private:
+        
+        ConfigSingleton() = default;
+        ~ConfigSingleton() = default;
+        ConfigSingleton(const ConfigSingleton &) = delete;
+        ConfigSingleton &operator=(const ConfigSingleton &) = delete;
+        PROXY_CONFIG m_ProxyConfig;
+        XMLError LoadProxyConfigurations(std::string filePath);
+        TypeFactory * typeFactory = new TypeFactory();
+    public:
+        static ConfigSingleton &getInstance()
+        {
+            static ConfigSingleton instance;
+            instance.LoadProxyConfigurations(std::getenv("CONFIG_FILE"));
+            return instance;
+        }
 
-    RESOLVE_ENDPOINT_RESULT Resolve(RESOLVE_CONFIG config);
-
-private:
-    ConfigSingleton() = default;
-    ~ConfigSingleton() = default;
-    ConfigSingleton(const ConfigSingleton &) = delete;
-    ConfigSingleton &operator=(const ConfigSingleton &) = delete;
-
-    PROXY_CONFIG m_ProxyConfig;
-    XMLError LoadProxyConfigurations(std::string filePath);
+        RESOLVE_ENDPOINT_RESULT Resolve(RESOLVE_CONFIG config);
 };
 
 #endif
