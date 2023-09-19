@@ -4,14 +4,14 @@
 		<WORK_SPACE name="w1">
 			<LOCAL_ENDPOINTS>
 				<CLUSTER name ="cluster1"/>
-				<LOCAL_END_POINT name="node-name">
-					<HOST>"host_name"</HOST>
+				<LOCAL_END_POINT name="node-name1">
+					<HOST>"localhost"</HOST>
 					<SERVICES>
-						<SERVICE name="service-name">
+						<SERVICE name="service-name1-1">
 							<PORT>1100</PORT>
 							<PROTOCOL>CH_WIRE</PROTOCOL>
 						</SERVICE>
-						<SERVICE name="service-name">
+						<SERVICE name="service-name1-2">
 							<PORT>1101</PORT>
 							<PROTOCOL>PG_WIRE</PROTOCOL>
 						</SERVICE>
@@ -24,14 +24,14 @@
 		<WORK_SPACE name="w2">
 			<LOCAL_ENDPOINTS>
 				<CLUSTER name ="cluster2"/>
-				<LOCAL_END_POINT name="node-name">
-					<HOST>"host_name"</HOST>
+				<LOCAL_END_POINT name="node-name2">
+					<HOST>"localhost"</HOST>
 					<SERVICES>
-						<SERVICE name="service-name">
+						<SERVICE name="service-name2-1">
 							<PORT>2200</PORT>
 							<PROTOCOL>CH_WIRE</PROTOCOL>
 						</SERVICE>
-						<SERVICE name="service-name">
+						<SERVICE name="service-name2-2">
 							<PORT>2202</PORT>
 							<PROTOCOL>PG_WIRE</PROTOCOL>
 						</SERVICE>

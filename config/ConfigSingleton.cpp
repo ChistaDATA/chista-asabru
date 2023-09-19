@@ -1,5 +1,9 @@
 #include "ConfigSingleton.h"
-
+#include "TypeFactory.h"
+/**
+ * Function to load the proxy configuration
+ * @param filePath the file path to the config.xml file
+*/
 XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
 {
     XMLDocument xmlDoc;
@@ -7,93 +11,22 @@ XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
     XMLCheckResult(eResult);
 
     XMLNode *pRoot = xmlDoc.FirstChildElement("clickhouse-proxy-v2");
-    if (pRoot == nullptr) { return XML_ERROR_FILE_READ_ERROR; }
+    if (pRoot == nullptr)
+    {
+        return XML_ERROR_FILE_READ_ERROR;
+    }
 
     PROXY_CONFIG proxyConfig;
-
-    // Get 'workspaces' 
-    XMLElement *pWorkSpaces = pRoot->FirstChildElement("WORK_SPACES");
-    if (NULL != pWorkSpaces)
-    {
-
-        XMLElement *pWorkSpace = pWorkSpaces->FirstChildElement("WORK_SPACE");
-        while (pWorkSpace)
-        {
-            WORK_SPACE workSpace;
-            workSpace.name = pWorkSpace->Attribute("name");
-
-            XMLElement *pLocalEndpoints = pWorkSpace->FirstChildElement("LOCAL_ENDPOINTS");
-            if (pLocalEndpoints == nullptr) { return XML_ERROR_PARSING_ELEMENT; }
-
-            LOCAL_END_POINTS localEndpoints;
-
-            XMLElement *pCluster = pLocalEndpoints->FirstChildElement("CLUSTER");
-            if (pCluster == nullptr) { return XML_ERROR_PARSING_ELEMENT; }
-            auto clusterName = pCluster->Attribute("name");
-            localEndpoints.clusterName = clusterName;
-
-            XMLElement *pLocalEndPoint = pLocalEndpoints->FirstChildElement("LOCAL_END_POINT");
-            if (pLocalEndPoint == nullptr) { return XML_ERROR_PARSING_ELEMENT; }
-
-
-            auto nodeName = pLocalEndPoint->Attribute("name");
-            LOCAL_END_POINT localEndPoint;
-            localEndPoint.node = nodeName;
-
-            XMLElement *pHost = pLocalEndPoint->FirstChildElement("HOST");
-            if (pHost == nullptr) { return XML_ERROR_PARSING_ELEMENT; }
-            localEndPoint.host = pHost->GetText();
-
-            XMLElement *pServices = pLocalEndPoint->FirstChildElement("SERVICES");
-            if (pServices == nullptr) { return XML_ERROR_PARSING_ELEMENT; }
-
-            if (NULL != pServices)
-            {
-                XMLElement *pService = pServices->FirstChildElement("SERVICE");
-                if (pService == nullptr) { return XML_ERROR_PARSING_ELEMENT; }
-
-                while (pService)
-                {
-                    SERVICE service;
-                    auto serviceName = pService->Attribute("name");
-                    service.name = serviceName;
-
-                    XMLElement *pPort = pService->FirstChildElement("PORT");
-                    if (NULL != pPort)
-                    {
-                        auto port = 0;
-                        eResult = pPort->QueryIntText(&port);
-                        service.port = port;
-                        XMLCheckResult(eResult);
-                    }
-
-                    XMLElement *pHostName = pService->FirstChildElement("PROTOCOL");
-                    if (NULL != pHostName)
-                    {
-                        auto protocol = "";
-                        protocol = pHostName->GetText();
-                        service.protocol = protocol;
-                    }
-                    localEndPoint.services.emplace_back(service);
-                    // read next sibling element
-                    pService = pService->NextSiblingElement("SERVICE");
-                }
-                localEndpoints.endpoints.emplace_back(localEndPoint);
-            }
-            workSpace.localEndpoints = localEndpoints;
-            proxyConfig.workspaces.emplace_back(workSpace);
-
-            pWorkSpace = pWorkSpace->NextSiblingElement("WORK_SPACE");
-        }
-
-    }
 
     // Get 'clusters'
     XMLElement *pClusters = pRoot->FirstChildElement("CLUSTERS");
     if (NULL != pClusters)
     {
         XMLElement *pCluster = pClusters->FirstChildElement("CLUSTER");
-        if (pCluster == nullptr) { return XML_ERROR_PARSING_ELEMENT; }
+        if (pCluster == nullptr)
+        {
+            return XML_ERROR_PARSING_ELEMENT;
+        }
         while (pCluster)
         {
             CLUSTER cluster;
@@ -126,7 +59,10 @@ XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
                     }
 
                     XMLElement *pServices = pEndPoint->FirstChildElement("SERVICES");
-                    if (pServices == nullptr) { return XML_ERROR_PARSING_ELEMENT; }
+                    if (pServices == nullptr)
+                    {
+                        return XML_ERROR_PARSING_ELEMENT;
+                    }
 
                     if (NULL != pServices)
                     {
@@ -153,6 +89,15 @@ XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
                                 protocol = pHostName->GetText();
                                 service.protocol = protocol;
                             }
+
+                            XMLElement *handlerElement = pService->FirstChildElement("HANDLER");
+                            if (NULL != handlerElement)
+                            {
+                                auto handler = "";
+                                handler = handlerElement->GetText();
+                                service.handler = handler;
+                            }
+
                             endPoint.services.emplace_back(service);
                             // read next sibling element
                             pService = pService->NextSiblingElement("SERVICE");
@@ -166,18 +111,17 @@ XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
             }
         }
     }
+
     m_ProxyConfig = proxyConfig;
     return XML_SUCCESS;
 }
 
-
 RESOLVE_ENDPOINT_RESULT ConfigSingleton::Resolve(RESOLVE_CONFIG config)
 {
-    //PROXY_CONFIG tempProxyConfig;
     RESOLVE_ENDPOINT_RESULT result;
     CLUSTER cluster;
     auto size = m_ProxyConfig.clusters.size();
-    //if (size == 0) { cout << "Cluster Name not found" << endl; return ; }
+    // if (size == 0) { cout << "Cluster Name not found" << endl; return ; }
 
     // Get the cluster
     for (int i = 0; i < size; i++)
@@ -191,8 +135,8 @@ RESOLVE_ENDPOINT_RESULT ConfigSingleton::Resolve(RESOLVE_CONFIG config)
 
     REMOTE_END_POINT endpoint;
     size = cluster.endPoints.size();
-    //if (size == 0) { cout << "Remote End Point Name not found" << endl; return; }
-    //Get the end point corresponding to the cluster
+    // if (size == 0) { cout << "Remote End Point Name not found" << endl; return; }
+    // Get the end point corresponding to the cluster
 
     for (int i = 0; i < size; i++)
     {
@@ -205,7 +149,7 @@ RESOLVE_ENDPOINT_RESULT ConfigSingleton::Resolve(RESOLVE_CONFIG config)
 
     SERVICE service;
     size = endpoint.services.size();
-    //if (size == 0) { cout << "Service Name not found" << endl; return; }
+    // if (size == 0) { cout << "Service Name not found" << endl; return; }
 
     for (int i = 0; i < size; i++)
     {
@@ -219,9 +163,14 @@ RESOLVE_ENDPOINT_RESULT ConfigSingleton::Resolve(RESOLVE_CONFIG config)
     result.port = service.port;
     result.ipaddress = endpoint.host;
     result.r_w = endpoint.readWrite;
-    result.alias="";
+    result.alias = "";
     result.reserved = 0;
     memset(result.Buffer, 0, sizeof result.Buffer);
+
+    /**
+     * Resolve the Handler class
+    */
+    result.handler = typeFactory->GetType(service.handler);
 
     return result;
 }

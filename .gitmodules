@@ -1,6 +1,9 @@
 [submodule "lib/tinyxml2"]
 	path = lib/tinyxml2
 	url = https://github.com/leethomason/tinyxml2.git
+[submodule "lib/libuv"]
+	path = lib/libuv
+	url = https://github.com/libuv/libuv.git
 [submodule "asabru-parsers"]
 	path = lib/asabru-parsers
 	url = https://github.com/ChistaDATA/asabru-parsers.git
@@ -13,6 +16,7 @@
 	path = lib/asabru-commons
 	url = https://github.com/ChistaDATA/asabru-commons.git
 	branch = main
-[submodule "lib/libuv"]
-	path = lib/libuv
-	url = https://github.com/libuv/libuv.git
+[submodule "lib/asabru-handlers"]
+	path = lib/asabru-handlers
+	url = https://github.com/ChistaDATA/asabru-handlers
+	branch = main

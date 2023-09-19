@@ -1,9 +1,17 @@
 cmake_minimum_required(VERSION 3.21)
 set(CMAKE_CXX_STANDARD 17)
-set( CMAKE_CXX_COMPILER "/usr/bin/g++" )
-set( CMAKE_C_COMPILER "/usr/bin/gcc" )
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_COMPILER "/usr/bin/g++")
+set(CMAKE_C_COMPILER "/usr/bin/gcc")
 
-project(Chista_Asabru)
+project(Chista_Asabru VERSION 1.0)
+
+# Get the value of an environment variable and set it as a preprocessor definition
+# Use $ENV{VAR_NAME} to access the value of the environment variable VAR_NAME
+# and set it as a preprocessor definition
+add_definitions(-DPLUGINS_FOLDER_PATH="$ENV{PLUGINS_FOLDER_PATH}")
+add_definitions(-DCONFIG_FILE="$ENV{CONFIG_FILE}")
+
 # set(OPENSSL_INCLUDE_DIR /opt/homebrew/Cellar/openssl@3/3.1.2/include)
 
 # Find OpenSSL library
@@ -17,10 +25,13 @@ add_subdirectory(lib/asabru-engine)
 include_directories(lib/tinyxml2)
 include_directories(lib/libuv/include)
 include_directories(lib/asabru-commons/src)
+include_directories(lib/asabru-commons/src/config)
+include_directories(lib/asabru-commons/src/util)
 # include_directories(lib/asabru-commons/src/ssl)
 include_directories(lib/asabru-parsers/src)
 include_directories(lib/asabru-engine/src/socket)
 include_directories(lib/asabru-engine/src/decoder)
+include_directories(lib/asabru-engine/src/interface)
 # Add the SSL library include directory
 # include_directories(${OPENSSL_INCLUDE_DIR})
 
@@ -29,61 +40,22 @@ set ( PROJECT_LINK_LIBS libtinyxml2.a libasabru_commons.a libasabru_parsers.a li
 link_directories( lib/asabru-commons/lib )
 link_directories( lib/asabru-parsers/lib )
 link_directories( lib/asabru-engine/lib )
+link_directories( lib/asabru-handlers/lib )
 
 add_executable(Chista_Asabru
         first.cpp
-        config/config.h
-        config/config.cpp
-        config/config_types.h
-        config/IConfigEngine.h
 
-        # engine/socket/ServerSocket.h
-        # engine/socket/ServerSocket.cpp
-        # engine/socket/ClientSocket.h
-        # engine/socket/ClientSocket.cpp
-        # engine/decoder/ClickHouse_Wire.h
-        # engine/decoder/ClickHouse_Wire.cpp
+        config/ConfigSingleton.cpp
+        config/TypeFactory.cpp
 
-        # common/Utils.cpp common/Utils.h
-        # common/Utils.cpp
-        # common/LineGrabber.h
+        test/ProxyInfo.h 
+        test/ProxyInfo.cpp
 
-        handlers/CProtocolHandler.h
-        
-        handlers/CProxySocket.h 
-        handlers/CProxySocket.cpp
-        handlers/CProtocolSocket.h
-        handlers/CProtocolSocket.cpp
-
-        handlers/CHWirePTHandler.h
-        handlers/CHWirePTHandler.cpp
-        handlers/CMySQLHandler.h
-        handlers/CMySQLHandler.cpp 
-        handlers/CPostgreSQLHandler.h
-        handlers/CPostgreSQLHandler.cpp
-        handlers/PingHandler.h
-        handlers/PingHandler.cpp
-
-
-        test/ProxyInfo.h test/ProxyInfo.cpp
-
-        # parsers/CHttpParser.h
-        # parsers/ChttpParser.cpp
-
-        pipelines/Pipeline.h
         pipelines/ClickHousePipeline.cpp
         pipelines/PostgreSQLPipeline.cpp
         pipelines/MySQLPipeline.cpp
         pipelines/PassthroughPipeline.cpp
-
-        handlers/CHttpHandler.h
-        handlers/CHttpHandler.cpp
-        handlers/CHttpsHandler.h
-        handlers/CHttpsHandler.cpp
-
-        
-        config/ConfigSingleton.h
-        config/ConfigSingleton.cpp)
+)
 
 target_link_libraries(
         Chista_Asabru 

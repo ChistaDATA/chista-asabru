@@ -9,6 +9,9 @@ do
   # Avoid the root directory itself ('.'). 
   if [[ $dir != "./lib" ]]
   then
+    # if [[ $dir == "./lib/libuv" ]]; then
+    #   continue
+    # fi
     cd $dir
 
     # If the build directory doesn't exist, create it.
