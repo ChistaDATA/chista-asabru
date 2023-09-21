@@ -23,16 +23,6 @@
 
 using namespace std;
 
-/* String constants to identify the proxy types */
-static const string CLICKHOUSE_WIRE_LEVEL = "ClickHouseWireLevel";
-static const string CLICKHOUSE_HTTP = "ClickHouseHttp";
-static const string CLICKHOUSE_WIRE_LEVEL_TLS = "ClickHouseWireLevelTLS";
-static const string CLICKHOUSE_HTTP_TLS = "ClickHouseHttpTLS";
-static const string POSTGRESQL = "PostgreSQL";
-static const string POSTGRESQL_TLS = "PostgreSQLTLS";
-static const string MYSQL = "MySQL";
-static const string MYSQL_TLS = "MySQLTLS";
-
 /* Proxy pipelines map */
 typedef void *(*PipelineFunction)(CProxySocket *ptr, void *lptr);
 typedef std::map<string, PipelineFunction> PipelineFunctionMap;
@@ -41,10 +31,9 @@ typedef std::map<string, PipelineFunction> PipelineFunctionMap;
 typedef std::map<string, CProxySocket *> ProxySocketsMap;
 
 int startProxyServer(
-    string proxyName,
-    RESOLVE_CONFIG *resolveConfig,
-    PipelineFunctionMap *pipelineFunctionMap,
-    ProxySocketsMap * proxySocketsMap
+    PipelineFunction pipelineFunction,
+    CProxySocket *socket,
+    RESOLVE_ENDPOINT_RESULT configValues
 );
 
 /**
@@ -132,64 +121,27 @@ int main(int argc, char **argv)
 {
     // install our error handler
     signal(SIGSEGV, errorHandler);
-
-    // Parse arguments
-    if (argc != 2)
-    {
-        fprintf(stdout, "PORT must be passed as argument. Failed to Start the app\n");
-        return -1;
-    }
-    int port = atoi(argv[1]);
-    port = (port > 0) ? port : 9100;
-    cout << "Received from Command line " << port << endl;
+    std::vector<RESOLVE_ENDPOINT_RESULT> configValues = configSingleton.LoadProxyConfigurations();
 
     // Create Parsers
     // CHttpParser *httpParser = new CHttpParser();
 
     // Create PipelineFunction mappings
     PipelineFunctionMap pipelineFunctionMap;
-    pipelineFunctionMap[CLICKHOUSE_WIRE_LEVEL] = ClickHousePipeline;
-    pipelineFunctionMap[CLICKHOUSE_HTTP] = ClickHousePipeline;
-    pipelineFunctionMap[CLICKHOUSE_WIRE_LEVEL_TLS] = ClickHousePipeline;
-    pipelineFunctionMap[CLICKHOUSE_HTTP_TLS] = ClickHousePipeline;
-    pipelineFunctionMap[POSTGRESQL] = PostgreSQLPipeline;
-    pipelineFunctionMap[POSTGRESQL_TLS] = PostgreSQLPipeline;
-    pipelineFunctionMap[MYSQL] = MySQLPipeline;
-    pipelineFunctionMap[MYSQL_TLS] = MySQLPipeline;
+    pipelineFunctionMap["ClickHousePipeline"] = ClickHousePipeline;
+    pipelineFunctionMap["PostgreSQLPipeline"] = PostgreSQLPipeline;
+    pipelineFunctionMap["MySQLPipeline"] = MySQLPipeline;
 
 
     // Create Proxy sockets mapping
     ProxySocketsMap proxySocketsMap;
-    proxySocketsMap[CLICKHOUSE_WIRE_LEVEL] = new CProxySocket(9100);
-    proxySocketsMap[CLICKHOUSE_HTTP] = new CProxySocket(9110);
-    proxySocketsMap[CLICKHOUSE_WIRE_LEVEL_TLS] = new CProxySocket(9120);
-    proxySocketsMap[CLICKHOUSE_HTTP_TLS] = new CProxySocket(9130);
-    proxySocketsMap[POSTGRESQL] = new CProxySocket(9140);
-    proxySocketsMap[POSTGRESQL_TLS] = new CProxySocket(9150);
-    proxySocketsMap[MYSQL] = new CProxySocket(9160);
-    proxySocketsMap[MYSQL_TLS] = new CProxySocket(9170);
-
-    // Create Proxy Configs
-    PROXY_INIT_CONFIG proxyConfigs[] = {
-        {.proxyName = CLICKHOUSE_WIRE_LEVEL, .resolveConfig = {"cluster1", "ch_wire_http_node1", "ch_wire_service1"}},
-        {.proxyName = CLICKHOUSE_HTTP, .resolveConfig = {"cluster1", "ch_wire_http_node1", "ch_http_service1"}},
-        {.proxyName = CLICKHOUSE_WIRE_LEVEL_TLS, .resolveConfig = {"cluster1", "ch_tls_node1", "ch_tls_wire_service1"}},
-        {.proxyName = CLICKHOUSE_HTTP_TLS, .resolveConfig = {"cluster1", "ch_tls_node1", "ch_tls_http_service1"}},
-        {.proxyName = POSTGRESQL, .resolveConfig =  {"cluster2", "pg_node1", "pg_wire_service1"}},
-        {.proxyName = POSTGRESQL_TLS, .resolveConfig =  {"cluster2", "pg_node1", "pg_tls_service1"}},
-        {.proxyName = MYSQL, .resolveConfig =  {"cluster2", "mysql_node1", "mysql_wire_service1"}},
-        {.proxyName = MYSQL_TLS, .resolveConfig =  {"cluster2", "mysql_node1", "mysql_tls_service1"}},
-    };
-    int numberOfProxies = sizeof proxyConfigs / sizeof proxyConfigs[0];
-
-    
-    for (int i = 0; i < numberOfProxies; i++)
-    {
+    for (auto value: configValues) {
+        proxySocketsMap[value.name] = new CProxySocket(value.proxyPort);
+        pipelineFunctionMap[value.name] = pipelineFunctionMap[value.pipeline];
         int proxy = startProxyServer(
-            proxyConfigs[i].proxyName,
-            &proxyConfigs[i].resolveConfig,
-            &pipelineFunctionMap,
-            &proxySocketsMap
+            pipelineFunctionMap[value.name],
+            proxySocketsMap[value.name],
+            value
         );
         if (proxy < 0)
             return proxy;
@@ -201,30 +153,28 @@ int main(int argc, char **argv)
 
 
 int startProxyServer(
-    string proxyName,
-    RESOLVE_CONFIG *resolveConfig,
-    PipelineFunctionMap *pipelineFunctionMap,
-    ProxySocketsMap * proxySocketsMap
+    PipelineFunction pipelineFunction,
+    CProxySocket *socket,
+    RESOLVE_ENDPOINT_RESULT configValue
 )
 {
     // Create proxies
-    CProxySocket *socket = (*proxySocketsMap)[proxyName];
-    auto configValues = configSingleton.Resolve(*resolveConfig);
+    std::string proxyName = configValue.name;
 
     // Setting up ClickHouse Proxy
-    if (!(*socket).SetPipeline((*pipelineFunctionMap)[proxyName]))
+    if (!(*socket).SetPipeline(pipelineFunction))
     {
         cout << "Failed to set " << proxyName << " Pipeline ..!" << endl;
         return -2;
     }
-    CProxyHandler *proxyHandler = (CProxyHandler *) configValues.handler;
+    CProxyHandler *proxyHandler = (CProxyHandler *) configValue.handler;
     if (!(*socket).SetHandler(proxyHandler))
     {
         cout << "Failed to set " << proxyName << " Handler ..!" << endl;
         return -2;
     }
 
-    if (!(*socket).SetConfigValues(configValues))
+    if (!(*socket).SetConfigValues(configValue))
     {
         cout << "Failed to set " << proxyName << " Config values ..!" << endl;
         return -2;
