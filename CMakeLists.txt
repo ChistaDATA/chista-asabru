@@ -37,10 +37,6 @@ include_directories(lib/asabru-engine/src/interface)
 
 #For the shared library:
 set ( PROJECT_LINK_LIBS libtinyxml2.a libasabru_commons.a libasabru_parsers.a libasabru_engine.a)
-link_directories( lib/asabru-commons/lib )
-link_directories( lib/asabru-parsers/lib )
-link_directories( lib/asabru-engine/lib )
-link_directories( lib/asabru-handlers/lib )
 
 add_executable(Chista_Asabru
         first.cpp

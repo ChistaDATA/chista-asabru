@@ -3,7 +3,7 @@
 /**
  * Function to load the proxy configuration
  * @param filePath the file path to the config.xml file
-*/
+ */
 XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
 {
     XMLDocument xmlDoc;
@@ -73,6 +73,15 @@ XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
                             auto serviceName = pService->Attribute("name");
                             service.name = serviceName;
 
+                            XMLElement *pProxyPort = pService->FirstChildElement("PROXY_PORT");
+                            if (NULL != pProxyPort)
+                            {
+                                auto proxyPort = 0;
+                                eResult = pProxyPort->QueryIntText(&proxyPort);
+                                service.proxyPort = proxyPort;
+                                XMLCheckResult(eResult);
+                            }
+
                             XMLElement *pPort = pService->FirstChildElement("PORT");
                             if (NULL != pPort)
                             {
@@ -98,6 +107,14 @@ XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
                                 service.handler = handler;
                             }
 
+                            XMLElement *pipelineElement = pService->FirstChildElement("PIPELINE");
+                            if (NULL != pipelineElement)
+                            {
+                                auto pipeline = "";
+                                pipeline = pipelineElement->GetText();
+                                service.pipeline = pipeline;
+                            }
+
                             endPoint.services.emplace_back(service);
                             // read next sibling element
                             pService = pService->NextSiblingElement("SERVICE");
@@ -114,6 +131,39 @@ XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
 
     m_ProxyConfig = proxyConfig;
     return XML_SUCCESS;
+}
+
+std::vector<RESOLVE_ENDPOINT_RESULT> ConfigSingleton::LoadProxyConfigurations()
+{
+    std::vector<RESOLVE_ENDPOINT_RESULT> results;
+    std::vector<CLUSTER> clusters = m_ProxyConfig.clusters;
+    for (auto cluster : clusters)
+    {
+        for (auto endpoint : cluster.endPoints)
+        {
+            for (auto service : endpoint.services)
+            {
+                RESOLVE_ENDPOINT_RESULT result;
+                result.name = service.name;
+                result.ipaddress = endpoint.host;
+                result.proxyPort = service.proxyPort;
+                result.port = service.port;
+                result.r_w = endpoint.readWrite;
+                result.alias = "";
+                result.reserved = 0;
+                memset(result.Buffer, 0, sizeof result.Buffer);
+
+                // Resolve the Pipeline
+                result.pipeline = service.pipeline;
+                // Resolve the Handler class
+                result.handler = typeFactory->GetType(service.handler);
+
+                results.push_back(result);
+            }
+        }
+    }
+
+    return results;
 }
 
 RESOLVE_ENDPOINT_RESULT ConfigSingleton::Resolve(RESOLVE_CONFIG config)
@@ -169,7 +219,7 @@ RESOLVE_ENDPOINT_RESULT ConfigSingleton::Resolve(RESOLVE_CONFIG config)
 
     /**
      * Resolve the Handler class
-    */
+     */
     result.handler = typeFactory->GetType(service.handler);
 
     return result;

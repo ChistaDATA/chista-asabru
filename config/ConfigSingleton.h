@@ -40,6 +40,7 @@ class ConfigSingleton
         }
 
         RESOLVE_ENDPOINT_RESULT Resolve(RESOLVE_CONFIG config);
+        std::vector<RESOLVE_ENDPOINT_RESULT> LoadProxyConfigurations();
 };
 
 #endif

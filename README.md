@@ -61,8 +61,11 @@ make
 
 ### Useage
 
+The proxy configurations are given in the `config.xml` file, we need to set the config file path location in ENV variables. Proxy will fetch the 
+configurations from that location and start the server.
+
 ```
- ./build/Chista_Asabru <port>
+ ./build/Chista_Asabru
 ```
 
 Run the clickhouse client in SSL mode
