@@ -73,6 +73,12 @@ For Linux systems
 docker build --no-cache --progress=plain -t asabru-proxy .
 ```
 
+### Run Docker Image
+
+```
+docker run --platform=linux/amd64 -it -e CONFIG_FILE_URL='https://gist.githubusercontent.com/midhunadarvin/0e0b38927571816c73b72adfa92978bb/raw/ed9687cb8a3b10324e747e12f6fddf35e0effc6c/config.xml' asabru-proxy
+```
+
 ### Useage
 
 The proxy configurations are given in the `config.xml` file, we need to set the config file path location in ENV variables. Proxy will fetch the 
