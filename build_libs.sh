@@ -3,8 +3,17 @@
 # Getting the root directory of your project
 root_dir=$(pwd)
 
+list_of_directories=(
+  ./lib/tinyxml2
+  ./lib/libuv
+  ./lib/asabru-commons 
+  ./lib/asabru-engine 
+  ./lib/asabru-parsers
+  ./lib/asabru-handlers
+)
 # For each subdirectory
-for dir in $(find ./lib -maxdepth 1 -type d)
+# for dir in $(find ./lib -maxdepth 1 -type d)
+for dir in ${list_of_directories[@]}
 do
   # Avoid the root directory itself ('.'). 
   if [[ $dir != "./lib" ]]
