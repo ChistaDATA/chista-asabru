@@ -59,6 +59,20 @@ cmake ..
 make
 ```
 
+### Docker Build
+
+For MacOS M1 systems
+
+```
+docker build --platform linux/amd64 --no-cache --progress=plain -t asabru-proxy .
+```
+
+For Linux systems
+
+```
+docker build --no-cache --progress=plain -t asabru-proxy .
+```
+
 ### Useage
 
 The proxy configurations are given in the `config.xml` file, we need to set the config file path location in ENV variables. Proxy will fetch the 
@@ -72,3 +86,4 @@ Run the clickhouse client in SSL mode
 ```
 ./clickhouse client --config <your-config-path>/clickhouse-client-ssl.xml --host 127.0.0.1 --port 9120
 ```
+
