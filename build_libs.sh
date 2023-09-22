@@ -22,7 +22,7 @@ do
     #   continue
     # fi
     cd $dir
-
+    # rm -rf ./build
     # If the build directory doesn't exist, create it.
     if [[ ! -d build ]]
     then
@@ -32,7 +32,7 @@ do
     # Move into the build directory, run cmake and make.
     cd build
     make clean
-    cmake ..
+    cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON
     make
 
     # Go back to the root directory

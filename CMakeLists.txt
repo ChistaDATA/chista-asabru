@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 set(CMAKE_C_COMPILER "/usr/bin/gcc")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 project(Chista_Asabru VERSION 1.0)
 
@@ -61,4 +62,5 @@ target_link_libraries(
                 ${CMAKE_SOURCE_DIR}/lib/asabru-commons/build/lib/libasabru_commons.a
                 ${CMAKE_SOURCE_DIR}/lib/asabru-parsers/build/lib/libasabru_parsers.a
                 ${CMAKE_SOURCE_DIR}/lib/asabru-engine/build/lib/libasabru_engine.a
+                ${CMAKE_DL_LIBS}
 )
