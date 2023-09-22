@@ -1,5 +1,32 @@
 #include "ConfigSingleton.h"
 #include "TypeFactory.h"
+#include "Utils.h"
+
+/**
+ * Function to load the config.xml file from a URL
+ */
+void ConfigSingleton::DownloadConfigFile(std::string url, std::string outputFilePath) {
+    // giving system command and storing return value
+    std::string command = "/bin/curl " + url + " --output " + outputFilePath;
+    int returnCode = system(command.c_str());
+ 
+    // checking if the command was executed successfully
+    if (returnCode == 0) {
+        std::cout << "File downloaded successfully!" << std::endl;
+    }
+    else {
+        std::cerr << "Failed to download file :" << returnCode << endl;
+            
+    }
+ 
+
+    // if (downloadFileWithCurl(url, outputFilePath)) {
+    //     std::cout << "File downloaded successfully!" << std::endl;
+    // } else {
+    //     std::cerr << "Failed to download file" << std::endl;
+    // }
+}
+
 /**
  * Function to load the proxy configuration
  * @param filePath the file path to the config.xml file

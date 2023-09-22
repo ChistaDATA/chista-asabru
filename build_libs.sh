@@ -22,7 +22,7 @@ do
     #   continue
     # fi
     cd $dir
-    # rm -rf ./build
+    rm -rf ./build
     # If the build directory doesn't exist, create it.
     if [[ ! -d build ]]
     then

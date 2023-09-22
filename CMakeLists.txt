@@ -12,6 +12,7 @@ project(Chista_Asabru VERSION 1.0)
 # and set it as a preprocessor definition
 add_definitions(-DPLUGINS_FOLDER_PATH="$ENV{PLUGINS_FOLDER_PATH}")
 add_definitions(-DCONFIG_FILE="$ENV{CONFIG_FILE}")
+add_definitions(-DCONFIG_FILE_URL="$ENV{CONFIG_FILE_URL}")
 
 # set(OPENSSL_INCLUDE_DIR /opt/homebrew/Cellar/openssl@3/3.1.2/include)
 

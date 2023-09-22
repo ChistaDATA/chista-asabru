@@ -22,25 +22,29 @@ using namespace tinyxml2;
 
 class ConfigSingleton
 {
-    private:
-        
-        ConfigSingleton() = default;
-        ~ConfigSingleton() = default;
-        ConfigSingleton(const ConfigSingleton &) = delete;
-        ConfigSingleton &operator=(const ConfigSingleton &) = delete;
-        PROXY_CONFIG m_ProxyConfig;
-        XMLError LoadProxyConfigurations(std::string filePath);
-        TypeFactory * typeFactory = new TypeFactory();
-    public:
-        static ConfigSingleton &getInstance()
-        {
-            static ConfigSingleton instance;
-            instance.LoadProxyConfigurations(std::getenv("CONFIG_FILE"));
-            return instance;
-        }
+private:
+    ConfigSingleton() {
+        DownloadConfigFile(std::getenv("CONFIG_FILE_URL"), "config.xml");
+        LoadProxyConfigurations("config.xml");
+    };
+    ~ConfigSingleton() = default;
+    ConfigSingleton(const ConfigSingleton &) = delete;
+    ConfigSingleton &operator=(const ConfigSingleton &) = delete;
+    PROXY_CONFIG m_ProxyConfig;
+    XMLError LoadProxyConfigurations(std::string filePath);
+    TypeFactory *typeFactory = new TypeFactory();
 
-        RESOLVE_ENDPOINT_RESULT Resolve(RESOLVE_CONFIG config);
-        std::vector<RESOLVE_ENDPOINT_RESULT> LoadProxyConfigurations();
+public:
+    static bool initialized;
+    static ConfigSingleton &getInstance()
+    {
+        static ConfigSingleton instance;
+        return instance;
+    }
+
+    RESOLVE_ENDPOINT_RESULT Resolve(RESOLVE_CONFIG config);
+    std::vector<RESOLVE_ENDPOINT_RESULT> LoadProxyConfigurations();
+    void DownloadConfigFile(std::string url, std::string outputFilePath);
 };
 
 #endif
