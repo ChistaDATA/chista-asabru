@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <execinfo.h>
+// #include <execinfo.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -99,19 +99,19 @@ int main(int argc, char **argv )
 /**
  * Error handler
  */
-void errorHandler(int sig)
-{
-    void *array[10];
-    size_t size;
+// void errorHandler(int sig)
+// {
+//     void *array[10];
+//     size_t size;
 
-    // get void*'s for all entries on the stack
-    size = backtrace(array, 10);
+//     // get void*'s for all entries on the stack
+//     size = backtrace(array, 10);
 
-    // print out all the frames to stderr
-    fprintf(stderr, "Error: signal %d:\n", sig);
-    backtrace_symbols_fd(array, size, STDERR_FILENO);
-    exit(1);
-}
+//     // print out all the frames to stderr
+//     fprintf(stderr, "Error: signal %d:\n", sig);
+//     backtrace_symbols_fd(array, size, STDERR_FILENO);
+//     exit(1);
+// }
 
 /**
  * Database Proxy main function
@@ -120,7 +120,7 @@ void errorHandler(int sig)
 int main(int argc, char **argv)
 {
     // install our error handler
-    signal(SIGSEGV, errorHandler);
+    // signal(SIGSEGV, errorHandler);
     std::vector<RESOLVE_ENDPOINT_RESULT> configValues = configSingleton.LoadProxyConfigurations();
 
     // Create Parsers

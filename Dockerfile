@@ -1,11 +1,31 @@
-FROM danger89/cmake:latest AS builder
+FROM arm64v8/alpine:latest AS builder
+
+RUN apk update \
+  && apk upgrade \
+  && apk add --no-cache \
+    clang \
+    clang-dev \
+    alpine-sdk \
+    dpkg \
+    cmake \
+    ccache \
+    python3 \
+    bash
+
+RUN ln -sf /usr/bin/clang /usr/bin/cc \
+  && ln -sf /usr/bin/clang++ /usr/bin/c++ \
+  && update-alternatives --install /usr/bin/cc cc /usr/bin/clang 10\
+  && update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 10\
+  && update-alternatives --auto cc \
+  && update-alternatives --auto c++ \
+  && update-alternatives --display cc \
+  && update-alternatives --display c++ \
+  && ls -l /usr/bin/cc /usr/bin/c++ \
+  && cc --version \
+  && c++ --version
 
 # Set the working directory inside the container
 WORKDIR /app
-
-RUN set -ex;                                                                      \
-    apt-get update;                                                               \
-    apt-get install -y g++ libzmq3-dev; 
 
 # Copy the CMake project files into the container
 COPY . /app
@@ -22,12 +42,34 @@ RUN cd build && cmake .. && make
 # The second stage will install the runtime dependencies only and copy
 # the compiled executables
 
-FROM debian:buster AS runtime
+FROM arm64v8/alpine:latest AS runtime
 
-RUN set -ex;                                                                      \
-    apt-get update;                                                               \
-    apt-get install -y curl; 
-RUN ln -s /usr/bin/curl /bin/curl
+RUN apk update \
+  && apk upgrade \
+  && apk add --no-cache \
+    clang \
+    clang-dev \
+    alpine-sdk \
+    dpkg \
+    cmake \
+    ccache \
+    python3 \
+    bash
+
+RUN ln -sf /usr/bin/clang /usr/bin/cc \
+  && ln -sf /usr/bin/clang++ /usr/bin/c++ \
+  && update-alternatives --install /usr/bin/cc cc /usr/bin/clang 10\
+  && update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 10\
+  && update-alternatives --auto cc \
+  && update-alternatives --auto c++ \
+  && update-alternatives --display cc \
+  && update-alternatives --display c++ \
+  && ls -l /usr/bin/cc /usr/bin/c++ \
+  && cc --version \
+  && c++ --version
+
+RUN mkdir -p /opt/bin
+RUN ln -s /usr/bin/curl /opt/bin/curl
 
 COPY --from=0 /app/build/Chista_Asabru /bin/Chista_Asabru
 COPY --from=0 /app/lib/asabru-handlers/build /asabru-handlers

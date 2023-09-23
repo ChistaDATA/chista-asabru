@@ -64,8 +64,14 @@ namespace clickhouse_pipeline
         if (status < 0)
         {
             fprintf(stderr, "Target connection error: %s\n", uv_strerror(status));
-            uv_close((uv_handle_t *)&req->handle, NULL);
-            free(req);
+            try {
+                uv_close((uv_handle_t *)&req->handle, NULL);
+                free(req);
+            } catch (std::exception &e) {
+                cout << e.what() << endl;
+                cout << "Error when trying to close request" << endl;
+            }
+            
             return;
         }
         ConnectionData *connection_data = (ConnectionData *)req->data;
