@@ -7,7 +7,7 @@
  */
 void ConfigSingleton::DownloadConfigFile(std::string url, std::string outputFilePath) {
     // giving system command and storing return value
-    std::string command = "/bin/curl " + url + " --output " + outputFilePath;
+    std::string command = "/opt/bin/curl " + url + " --output " + outputFilePath;
     int returnCode = system(command.c_str());
  
     // checking if the command was executed successfully

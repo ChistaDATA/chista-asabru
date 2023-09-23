@@ -12,6 +12,16 @@ Install docker and docker compose
 `https://docs.docker.com/engine/install/`
 `https://docs.docker.com/compose/install/`
 
+Install curl on your system
+
+https://everything.curl.dev/get
+
+Run the following command to create a symlink
+
+```
+ln -s /usr/bin/curl /opt/bin/curl
+```
+
 ### Submodules
 
 This `chista-asabru` project consists of the following sub-modules :
@@ -46,7 +56,7 @@ export CONFIG_FILE=<path-to-config>;
 export PLUGINS_FOLDER_PATH=<path-to-plugins-folder>;
 
 Eg.
-export CONFIG_FILE=/Users/midhundarvin/workplace/chistadata/chista-asabru/config/config.xml;
+export CONFIG_FILE_URL=https://gist.githubusercontent.com/midhunadarvin/0e0b38927571816c73b72adfa92978bb/raw/5ec7f42a9c7f71d9ddf70056609954bf8b317575/config.xml
 export PLUGINS_FOLDER_PATH=/Users/midhundarvin/workplace/chistadata/chista-asabru/lib/asabru-handlers/build;
 ```
 

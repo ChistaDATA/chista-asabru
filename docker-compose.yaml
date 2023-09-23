@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   asabru-proxy:  
-    platform: linux/amd64
+    # platform: linux/amd64
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -15,7 +15,8 @@ services:
       - "9160:9160" 
       - "9170:9170" 
     environment:
-      CONFIG_FILE_URL: https://gist.githubusercontent.com/midhunadarvin/0e0b38927571816c73b72adfa92978bb/raw/a42c16b0da3f99ddf7c854b8e30b8d0bc7deaae1/config.xml
+      CONFIG_FILE_URL: https://gist.githubusercontent.com/midhunadarvin/d7f8cfe003fd8e709cebb2d639435243/raw/27a8e168796c0ce958a74e255d885e0a9e7e37c3/config.xml
+    # network_mode: "host"
     links:
       - "clickhouse-1:database"
 
