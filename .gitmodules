@@ -14,7 +14,7 @@
 	branch = main
 [submodule "asabru-commons"]
 	path = lib/asabru-commons
-	url = https://github.com/ChistaDATA/asabru-commons.git
+	url = git@github.com:ChistaDATA/asabru-commons.git
 	branch = main
 [submodule "lib/asabru-handlers"]
 	path = lib/asabru-handlers
