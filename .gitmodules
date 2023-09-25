@@ -6,11 +6,11 @@
 	url = https://github.com/libuv/libuv.git
 [submodule "asabru-parsers"]
 	path = lib/asabru-parsers
-	url = https://github.com/ChistaDATA/asabru-parsers.git
+	url = git@github.com:ChistaDATA/asabru-parsers.git
 	branch = main
 [submodule "asabru-engine"]
 	path = lib/asabru-engine
-	url = https://github.com/ChistaDATA/asabru-engine.git
+	url = git@github.com:ChistaDATA/asabru-engine.git
 	branch = main
 [submodule "asabru-commons"]
 	path = lib/asabru-commons
@@ -18,5 +18,5 @@
 	branch = main
 [submodule "lib/asabru-handlers"]
 	path = lib/asabru-handlers
-	url = https://github.com/ChistaDATA/asabru-handlers
+	url = git@github.com:ChistaDATA/asabru-handlers.git
 	branch = main
