@@ -71,14 +71,6 @@ make
 
 ### Docker Build
 
-For MacOS M1 systems
-
-```
-docker build --platform linux/amd64 --no-cache --progress=plain -t asabru-proxy .
-```
-
-For Linux systems
-
 ```
 docker build --no-cache --progress=plain -t asabru-proxy .
 ```

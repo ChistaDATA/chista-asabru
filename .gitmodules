@@ -11,7 +11,7 @@
 [submodule "asabru-engine"]
 	path = lib/asabru-engine
 	url = git@github.com:ChistaDATA/asabru-engine.git
-	branch = main
+	branch = thread-per-client
 [submodule "asabru-commons"]
 	path = lib/asabru-commons
 	url = git@github.com:ChistaDATA/asabru-commons.git
@@ -19,4 +19,4 @@
 [submodule "lib/asabru-handlers"]
 	path = lib/asabru-handlers
 	url = git@github.com:ChistaDATA/asabru-handlers.git
-	branch = main
+	branch = thread-per-client
