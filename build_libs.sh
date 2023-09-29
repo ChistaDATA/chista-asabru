@@ -5,7 +5,7 @@ root_dir=$(pwd)
 
 list_of_directories=(
   ./lib/tinyxml2
-  ./lib/libuv
+  # ./lib/libuv
   ./lib/asabru-commons 
   ./lib/asabru-engine 
   ./lib/asabru-parsers
@@ -32,6 +32,8 @@ do
     # Move into the build directory, run cmake and make.
     cd build
     make clean
+    # cmake -DCMAKE_BUILD_TYPE=Debug ..
+    # cmake --build .
     cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON
     make
 

@@ -14,12 +14,8 @@
 #include <map>
 
 #include "config/ConfigSingleton.h"
-
 #include "CProtocolSocket.h"
 #include "CProxySocket.h"
-
-// #include <openssl/ssl.h>
-// #include <openssl/err.h>
 
 using namespace std;
 
@@ -58,6 +54,7 @@ typedef struct
 void PerformLogic() {}
 
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr);
+void *ClickHouseSSLPipeline(CProxySocket *ptr, void *lptr);
 void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr);
 void *MySQLPipeline(CProxySocket *ptr, void *lptr);
 void *PassthroughPipeLine(CProtocolSocket *ptr, void *lptr);
@@ -119,7 +116,13 @@ int main(int argc, char **argv )
  */
 int main(int argc, char **argv)
 {
-    // install our error handler
+
+    // Initialize SSL library
+    // SSL_library_init();
+    // OpenSSL_add_all_algorithms();
+    // SSL_load_error_strings();
+
+    // // install our error handler
     // signal(SIGSEGV, errorHandler);
     std::vector<RESOLVE_ENDPOINT_RESULT> configValues = configSingleton.LoadProxyConfigurations();
 
@@ -129,6 +132,7 @@ int main(int argc, char **argv)
     // Create PipelineFunction mappings
     PipelineFunctionMap pipelineFunctionMap;
     pipelineFunctionMap["ClickHousePipeline"] = ClickHousePipeline;
+    pipelineFunctionMap["ClickHouseSSLPipeline"] = ClickHouseSSLPipeline;
     pipelineFunctionMap["PostgreSQLPipeline"] = PostgreSQLPipeline;
     pipelineFunctionMap["MySQLPipeline"] = MySQLPipeline;
 
@@ -136,8 +140,8 @@ int main(int argc, char **argv)
     // Create Proxy sockets mapping
     ProxySocketsMap proxySocketsMap;
     for (auto value: configValues) {
-        proxySocketsMap[value.name] = new CProxySocket(value.proxyPort);
-        pipelineFunctionMap[value.name] = pipelineFunctionMap[value.pipeline];
+            proxySocketsMap[value.name] = new CProxySocket(value.proxyPort);
+            pipelineFunctionMap[value.name] = pipelineFunctionMap[value.pipeline];
         int proxy = startProxyServer(
             pipelineFunctionMap[value.name],
             proxySocketsMap[value.name],

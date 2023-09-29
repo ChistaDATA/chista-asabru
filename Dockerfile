@@ -3,6 +3,8 @@ FROM arm64v8/alpine:latest AS builder
 RUN apk update \
   && apk upgrade \
   && apk add --no-cache \
+    openssl \
+    openssl-dev \
     clang \
     clang-dev \
     alpine-sdk \
@@ -47,6 +49,8 @@ FROM arm64v8/alpine:latest AS runtime
 RUN apk update \
   && apk upgrade \
   && apk add --no-cache \
+    openssl \
+    openssl-dev \
     clang \
     clang-dev \
     alpine-sdk \
@@ -73,7 +77,5 @@ RUN ln -s /usr/bin/curl /opt/bin/curl
 
 COPY --from=0 /app/build/Chista_Asabru /bin/Chista_Asabru
 COPY --from=0 /app/lib/asabru-handlers/build /asabru-handlers
-COPY --from=0 /app/config/config.xml /config.xml
-ENV CONFIG_FILE=/config.xml
 ENV PLUGINS_FOLDER_PATH=/asabru-handlers
 CMD ["/bin/Chista_Asabru"]

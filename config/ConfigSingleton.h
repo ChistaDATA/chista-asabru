@@ -24,8 +24,8 @@ class ConfigSingleton
 {
 private:
     ConfigSingleton() {
-        DownloadConfigFile(std::getenv("CONFIG_FILE_URL"), "config.xml");
-        LoadProxyConfigurations("config.xml");
+        DownloadConfigFile(std::getenv("CONFIG_FILE_URL"), std::getenv("CONFIG_FILE_PATH"));
+        LoadProxyConfigurations(std::getenv("CONFIG_FILE_PATH"));
     };
     ~ConfigSingleton() = default;
     ConfigSingleton(const ConfigSingleton &) = delete;

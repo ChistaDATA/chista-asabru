@@ -11,7 +11,7 @@
 
 typedef struct
 {
-    ClientTargetPair *pair;
+    // ClientTargetPair *pair;
     CProxyHandler *proxy_handler;
 } ConnectionData;
 

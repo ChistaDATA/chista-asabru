@@ -71,7 +71,7 @@ static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 //                 cout << e.what() << endl;
 //                 cout << "Error when trying to close request" << endl;
 //             }
-            
+
 //             return;
 //         }
 //         ConnectionData *connection_data = (ConnectionData *)req->data;
@@ -113,7 +113,6 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
     cout << "Resolved (Target) Host: " << target_endpoint->ipaddress << endl
          << "Resolved (Target) Port: " << target_endpoint->port << endl;
 
-  
     Socket *client_socket = (Socket *)clientData.client_socket;
     SocketClient target_socket(target_endpoint->ipaddress, target_endpoint->port);
 
@@ -124,36 +123,60 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
     {
         try
         {
-            SocketSelect sel(client_socket, &target_socket, NonBlockingSocket);
+            SocketSelect *sel;
+            try
+            {
+                sel = new SocketSelect(client_socket, &target_socket, NonBlockingSocket);
+            }
+            catch (std::exception &e)
+            {
+                cout << e.what() << endl;
+                cout << "error occurred while creating socket select " << endl;
+            }
+
             bool still_connected = true;
-
-            if (sel.Readable(client_socket))
+            try
             {
-                cout << "client socket is readable, reading bytes : " << endl;
-                std::string bytes = client_socket->ReceiveBytes();
+                if (sel->Readable(client_socket))
+                {
+                    cout << "client socket is readable, reading bytes : " << endl;
+                    std::string bytes = client_socket->ReceiveBytes();
 
-                cout << "Calling Proxy Upstream Handler.." << endl;
-                // proxy_handler->HandleUpstreamData((void *)bytes.c_str(), bytes.size(), &target_socket);
-                target_socket.SendBytes((char *) bytes.c_str(), bytes.size());
+                    cout << "Calling Proxy Upstream Handler.." << endl;
+                    // proxy_handler->HandleUpstreamData((void *)bytes.c_str(), bytes.size(), &target_socket);
+                    target_socket.SendBytes((char *)bytes.c_str(), bytes.size());
 
-                if (bytes.empty())
-                    still_connected = false;
+                    if (bytes.empty())
+                        still_connected = false;
+                }
             }
-            if (sel.Readable(&target_socket))
+            catch (std::exception &e)
             {
-                cout << "target socket is readable, reading bytes : " << endl;
-                std::string bytes = target_socket.ReceiveBytes();
-
-                cout << "Calling Proxy Downstream Handler.." << endl;
-                // proxy_handler->HandleDownStreamData((void *)bytes.c_str(), bytes.size(), client_socket);
-                client_socket->SendBytes((char *) bytes.c_str(), bytes.size());
-
-                if (bytes.empty())
-                    still_connected = false;
+                cout << "Error while sending to target " << e.what() << endl;
             }
-            if (!still_connected)
+
+            try
             {
-                break;
+                if (sel->Readable(&target_socket))
+                {
+                    cout << "target socket is readable, reading bytes : " << endl;
+                    std::string bytes = target_socket.ReceiveBytes();
+
+                    cout << "Calling Proxy Downstream Handler.." << endl;
+                    // proxy_handler->HandleDownStreamData((void *)bytes.c_str(), bytes.size(), client_socket);
+                    client_socket->SendBytes((char *)bytes.c_str(), bytes.size());
+
+                    if (bytes.empty())
+                        still_connected = false;
+                }
+                if (!still_connected)
+                {
+                    break;
+                }
+            }
+            catch (std::exception &e)
+            {
+                cout << "Error while sending to client " << e.what() << endl;
             }
         }
         catch (std::exception &e)
@@ -167,6 +190,4 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
 #else
     return nullptr;
 #endif
-
-    return 0;
 }
