@@ -201,9 +201,9 @@ void handle_client(int client_socket, std::string server_host, int server_port)
 
     // Parse the request to determine the host and port
     request = std::string(buffer, bytes_received);
-    // std::cout << "=============== Request =================" << std::endl;
-    // std::cout << request << std::endl;
-    // std::cout << "=====================================" << std::endl;
+    std::cout << "=============== Request =================" << std::endl;
+    std::cout << request << std::endl;
+    std::cout << "=====================================" << std::endl;
 
     /*
      * Create an SSL_CTX which we can use to create SSL objects from. We
@@ -347,10 +347,10 @@ void handle_client(int client_socket, std::string server_host, int server_port)
     /* In case the response didn't finish with a newline we add one now */
     printf("\n");
 
-    // std::cout << "Sending data to client : " << std::endl;
-    // std::cout << "=============== Response =================" << std::endl;
-    // std::cout << response << std::endl;
-    // std::cout << "==========================================" << std::endl;
+    std::cout << "Sending data to client : " << std::endl;
+    std::cout << "=============== Response =================" << std::endl;
+    std::cout << response << std::endl;
+    std::cout << "==========================================" << std::endl;
     send(client_socket, response.c_str(), response.length(), 0);
 
     /*
