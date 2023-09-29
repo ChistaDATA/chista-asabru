@@ -56,7 +56,8 @@ export CONFIG_FILE=<path-to-config>;
 export PLUGINS_FOLDER_PATH=<path-to-plugins-folder>;
 
 Eg.
-export CONFIG_FILE_URL=https://gist.githubusercontent.com/midhunadarvin/0e0b38927571816c73b72adfa92978bb/raw/5ec7f42a9c7f71d9ddf70056609954bf8b317575/config.xml
+export CONFIG_FILE_URL=https://pastebin.com/raw/n3ihR1M2
+export CONFIG_FILE_PATH=/tmp/config.xml
 export PLUGINS_FOLDER_PATH=/Users/midhundarvin/workplace/chistadata/chista-asabru/lib/asabru-handlers/build;
 ```
 
@@ -69,7 +70,18 @@ cmake ..
 make
 ```
 
+##### Build in Debug mode
+
+```
+mkdir debug
+cd debug
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake --build .
+```
+
 ### Docker Build
+
+If you want to build the proxy in a docker container. Follow the below steps.
 
 ```
 docker build --no-cache --progress=plain -t asabru-proxy .
@@ -78,7 +90,15 @@ docker build --no-cache --progress=plain -t asabru-proxy .
 ### Run Docker Image
 
 ```
-docker run --platform=linux/amd64 -it -e CONFIG_FILE_URL='https://gist.githubusercontent.com/midhunadarvin/0e0b38927571816c73b72adfa92978bb/raw/ed9687cb8a3b10324e747e12f6fddf35e0effc6c/config.xml' asabru-proxy
+docker run -it -e CONFIG_FILE_URL=<config-file-url> asabru-proxy
+```
+
+### Run with Docker compose
+
+Update the values for the environment variables in the docker-compose.yaml file and run the following command.
+
+```
+docker compose up -d --build
 ```
 
 ### Useage

@@ -17,7 +17,7 @@ add_definitions(-DCONFIG_FILE_URL="$ENV{CONFIG_FILE_URL}")
 # set(OPENSSL_INCLUDE_DIR /opt/homebrew/Cellar/openssl@3/3.1.2/include)
 
 # Find OpenSSL library
-# find_package(OpenSSL REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 # add_subdirectory(lib)
 add_subdirectory(lib/tinyxml2)
@@ -40,6 +40,9 @@ include_directories(lib/asabru-engine/src/interface)
 #For the shared library:
 set ( PROJECT_LINK_LIBS libtinyxml2.a libasabru_commons.a libasabru_parsers.a libasabru_engine.a)
 
+# Collect all source files
+file(GLOB_RECURSE PIPELINE_FILES "${CMAKE_SOURCE_DIR}/pipelines/*.cpp")
+
 add_executable(Chista_Asabru
         first.cpp
 
@@ -49,17 +52,14 @@ add_executable(Chista_Asabru
         test/ProxyInfo.h 
         test/ProxyInfo.cpp
 
-        pipelines/ClickHousePipeline.cpp
-        pipelines/PostgreSQLPipeline.cpp
-        pipelines/MySQLPipeline.cpp
-        pipelines/PassthroughPipeline.cpp
+        ${PIPELINE_FILES}
 )
 
 target_link_libraries(
         Chista_Asabru 
-                # OpenSSL::SSL
+                OpenSSL::SSL
                 ${CMAKE_SOURCE_DIR}/lib/tinyxml2/build/libtinyxml2.a
-                ${CMAKE_SOURCE_DIR}/lib/libuv/build/libuv.a
+                # ${CMAKE_SOURCE_DIR}/lib/libuv/build/libuv.a
                 ${CMAKE_SOURCE_DIR}/lib/asabru-commons/build/lib/libasabru_commons.a
                 ${CMAKE_SOURCE_DIR}/lib/asabru-parsers/build/lib/libasabru_parsers.a
                 ${CMAKE_SOURCE_DIR}/lib/asabru-engine/build/lib/libasabru_engine.a
