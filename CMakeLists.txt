@@ -38,7 +38,12 @@ include_directories(lib/asabru-engine/src/interface)
 # include_directories(${OPENSSL_INCLUDE_DIR})
 
 #For the shared library:
-set ( PROJECT_LINK_LIBS libtinyxml2.a libasabru_commons.a libasabru_parsers.a libasabru_engine.a)
+set ( PROJECT_LINK_LIBS 
+        libtinyxml2.a 
+        libasabru_commons.a 
+        libasabru_parsers.a 
+        libasabru_engine.a
+)
 
 # Collect all source files
 file(GLOB_RECURSE PIPELINE_FILES "${CMAKE_SOURCE_DIR}/pipelines/*.cpp")
