@@ -6,7 +6,10 @@
 #include "../config/ConfigSingleton.h"
 #include "ProtocolHelper.h"
 #include "Socket.h"
+#include "SocketSelect.h"
 #include "Pipeline.h"
+#include <utility>
+#include "CHttpParser.h"
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 
@@ -109,16 +112,20 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr)
 
   
     Socket *client_socket = (Socket *)clientData.client_socket;
-    SocketClient target_socket(target_endpoint->ipaddress, target_endpoint->port);
+    SocketClient *target_socket = new SocketClient(target_endpoint->ipaddress, target_endpoint->port);
+
+    EXECUTION_CONTEXT exec_context;
+    CHttpParser *parser = new CHttpParser();
+    exec_context.insert(make_pair("CHttpParser", parser));
 
     ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
-    ProtocolHelper::SetReadTimeOut(target_socket.GetSocket(), 1);
+    ProtocolHelper::SetReadTimeOut(target_socket->GetSocket(), 1);
 
     while (1)
     {
         try
         {
-            SocketSelect sel(client_socket, &target_socket, NonBlockingSocket);
+            SocketSelect sel(client_socket, target_socket, NonBlockingSocket);
             bool still_connected = true;
 
             if (sel.Readable(client_socket))
@@ -127,20 +134,20 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr)
                 std::string bytes = client_socket->ReceiveBytes();
 
                 cout << "Calling Proxy Upstream Handler.." << endl;
-                proxy_handler->HandleUpstreamData((void *)bytes.c_str(), bytes.size(), &target_socket);
-                // target_socket.SendBytes((char *) bytes.c_str(), bytes.size());
+                std::string response = proxy_handler->HandleUpstreamData((void *)bytes.c_str(), bytes.size(), &exec_context);
+                target_socket->SendBytes((char *)response.c_str(), response.size());
 
                 if (bytes.empty())
                     still_connected = false;
             }
-            if (sel.Readable(&target_socket))
+            if (sel.Readable(target_socket))
             {
                 cout << "target socket is readable, reading bytes : " << endl;
-                std::string bytes = target_socket.ReceiveBytes();
+                std::string bytes = target_socket->ReceiveBytes();
 
                 cout << "Calling Proxy Downstream Handler.." << endl;
-                proxy_handler->HandleDownStreamData((void *)bytes.c_str(), bytes.size(), client_socket);
-                // client_socket->SendBytes((char *) bytes.c_str(), bytes.size());
+                std::string response = proxy_handler->HandleDownStreamData((void *)bytes.c_str(), bytes.size(), &exec_context);
+                client_socket->SendBytes((char *)response.c_str(), response.size());
 
                 if (bytes.empty())
                     still_connected = false;

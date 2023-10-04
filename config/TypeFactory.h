@@ -21,7 +21,14 @@ public:
         {
             try
             {
+                std::cout << plugin << std::endl;
                 void *dlhandle = dlopen(plugin.c_str(), RTLD_LAZY);
+
+                if (dlhandle == NULL)
+                {
+                    printf("Error: %s\n", dlerror());
+                    exit(1);
+                }
 
                 std::pair<std::string, std::string> delibbed =
                     libnameothy(plugin);

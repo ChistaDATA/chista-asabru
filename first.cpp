@@ -96,19 +96,19 @@ int main(int argc, char **argv )
 /**
  * Error handler
  */
-// void errorHandler(int sig)
-// {
-//     void *array[10];
-//     size_t size;
+void errorHandler(int sig)
+{
+    void *array[10];
+    size_t size;
 
-//     // get void*'s for all entries on the stack
-//     size = backtrace(array, 10);
+    // get void*'s for all entries on the stack
+    // size = backtrace(array, 10);
 
-//     // print out all the frames to stderr
-//     fprintf(stderr, "Error: signal %d:\n", sig);
-//     backtrace_symbols_fd(array, size, STDERR_FILENO);
-//     exit(1);
-// }
+    // print out all the frames to stderr
+    fprintf(stderr, "Error: signal %d:\n", sig);
+    // backtrace_symbols_fd(array, size, STDERR_FILENO);
+    exit(1);
+}
 
 /**
  * Database Proxy main function
@@ -116,14 +116,9 @@ int main(int argc, char **argv )
  */
 int main(int argc, char **argv)
 {
-
-    // Initialize SSL library
-    // SSL_library_init();
-    // OpenSSL_add_all_algorithms();
-    // SSL_load_error_strings();
-
-    // // install our error handler
-    // signal(SIGSEGV, errorHandler);
+    // install our error handler
+    signal(SIGSEGV, errorHandler);
+    signal(SIGPIPE, errorHandler);
     std::vector<RESOLVE_ENDPOINT_RESULT> configValues = configSingleton.LoadProxyConfigurations();
 
     // Create Parsers

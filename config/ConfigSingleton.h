@@ -5,7 +5,7 @@
 #include <iostream>
 #include "TypeFactory.h"
 #include "tinyxml2.h"
-#include "config_types.h"
+#include "CommonTypes.h"
 #include "IConfigEngine.h"
 #include "CProxyHandler.h"
 
