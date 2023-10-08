@@ -4,7 +4,7 @@
 #include "CProtocolSocket.h"
 #include "CProxySocket.h"
 #include "../test/ProxyInfo.h"
-#include "ClientSocket.h"
+#include "CClientSocket.h"
 #include "../config/ConfigSingleton.h"
 #include "ProtocolHelper.h"
 #include "Socket.h"

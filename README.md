@@ -56,7 +56,7 @@ export CONFIG_FILE=<path-to-config>;
 export PLUGINS_FOLDER_PATH=<path-to-plugins-folder>;
 
 Eg.
-export CONFIG_FILE_URL=https://pastebin.com/raw/n3ihR1M2
+export CONFIG_FILE_URL=https://pastebin.com/raw/RcyrYLMc
 export CONFIG_FILE_PATH=/tmp/config.xml
 export PLUGINS_FOLDER_PATH=/Users/midhundarvin/workplace/chistadata/chista-asabru/lib/asabru-handlers/build;
 ```
