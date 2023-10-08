@@ -47,8 +47,8 @@ public:
             }
             catch (std::exception &e)
             {
-                cout << e.what() << endl;
-                cout << "Error when trying to create dynamic handler instance" << endl;
+                std::cout << e.what() << std::endl;
+                std::cout << "Error when trying to create dynamic handler instance" << std::endl;
             }
         }
     };

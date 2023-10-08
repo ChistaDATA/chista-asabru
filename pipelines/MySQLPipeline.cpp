@@ -2,7 +2,7 @@
 #include "CProtocolSocket.h"
 #include "CProxySocket.h"
 #include "../test/ProxyInfo.h"
-#include "ClientSocket.h"
+#include "CClientSocket.h"
 #include "../config/ConfigSingleton.h"
 #include "ProtocolHelper.h"
 #include "Socket.h"
@@ -112,11 +112,9 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr)
 
   
     Socket *client_socket = (Socket *)clientData.client_socket;
-    SocketClient *target_socket = new SocketClient(target_endpoint->ipaddress, target_endpoint->port);
+    CClientSocket *target_socket = new CClientSocket(target_endpoint->ipaddress, target_endpoint->port);
 
     EXECUTION_CONTEXT exec_context;
-    CHttpParser *parser = new CHttpParser();
-    exec_context.insert(make_pair("CHttpParser", parser));
 
     ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
     ProtocolHelper::SetReadTimeOut(target_socket->GetSocket(), 1);
