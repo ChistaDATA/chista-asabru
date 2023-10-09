@@ -32,7 +32,7 @@ void TypeFactory::updateLibs()
     }
 }
 
-CProxyHandler *TypeFactory::GetType(std::string type)
+BaseHandler *TypeFactory::GetType(std::string type)
 {
     return commands_map[type];
 };
