@@ -3,14 +3,15 @@
 #include <unordered_map>
 #include "globothy.h"
 #include "libnameothy.h"
-#include "CProxyHandler.h"
+#include "BaseHandler.h"
+
 #include <set>
 #include <dlfcn.h>
 
 class TypeFactory
 {
 private:
-    std::unordered_map<std::string, CProxyHandler *> commands_map;
+    std::unordered_map<std::string, BaseHandler *> commands_map;
     std::set<std::string> libNames;
 
 public:
@@ -33,16 +34,16 @@ public:
                 std::pair<std::string, std::string> delibbed =
                     libnameothy(plugin);
 
-                CProxyHandler *(*create)();
-                void (*destroy)(CProxyHandler *);
+                BaseHandler *(*create)();
+                void (*destroy)(BaseHandler *);
 
                 std::string cn = "create" + delibbed.second;
                 std::string dn = "destroy" + delibbed.second;
 
-                create = (CProxyHandler * (*)()) dlsym(dlhandle, cn.c_str());
-                destroy = (void (*)(CProxyHandler *))dlsym(dlhandle, dn.c_str());
+                create = (BaseHandler * (*)()) dlsym(dlhandle, cn.c_str());
+                destroy = (void (*)(BaseHandler *))dlsym(dlhandle, dn.c_str());
 
-                CProxyHandler *a = create();
+                BaseHandler *a = create();
                 commands_map[delibbed.second] = a;
             }
             catch (std::exception &e)
@@ -54,5 +55,5 @@ public:
     };
 
     void updateLibs();
-    CProxyHandler *GetType(std::string type);
+    BaseHandler *GetType(std::string type);
 };
