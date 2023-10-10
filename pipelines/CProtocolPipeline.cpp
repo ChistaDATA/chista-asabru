@@ -50,7 +50,6 @@ void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr)
 
                 cout << "Calling Protocol Handler.." << endl;
                 response = protocol_handler->HandleData((void *)bytes.c_str(), bytes.size(), &exec_context);
-                cout << "Response..\n" << response <<endl;
                 client_socket->SendBytes((char *)response.c_str(), response.size());
                 if (bytes.empty())
                     still_connected = false;
