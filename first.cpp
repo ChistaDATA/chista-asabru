@@ -1,14 +1,7 @@
-#include <stdio.h>
 // #include <execinfo.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <unistd.h>
-#include <spawn.h>
-#include <sys/wait.h>
-#include <string>
-#include <iostream>
+#include <csignal>
+#include <cstdlib>
+#include <cstring>
 #include <thread>
 #include <list>
 #include <map>
@@ -23,6 +16,9 @@ using namespace std;
 typedef void *(*PipelineFunction)(CProxySocket *ptr, void *lptr);
 typedef std::map<string, PipelineFunction> PipelineFunctionMap;
 
+typedef void *(*ProtocolPipelineFunction)(CProtocolSocket *ptr, void *lptr);
+typedef std::map<string, ProtocolPipelineFunction> ProtocolPipelineFunctionMap;
+
 /* Proxy sockets map */
 typedef std::map<string, CProxySocket *> ProxySocketsMap;
 
@@ -30,6 +26,12 @@ int startProxyServer(
     PipelineFunction pipelineFunction,
     CProxySocket *socket,
     RESOLVE_ENDPOINT_RESULT configValues
+);
+
+int startProtocolServer(
+    ProtocolPipelineFunction pipelineFunction,
+    CProtocolSocket *socket,
+    RESOLVE_ENDPOINT_RESULT configValue
 );
 
 /**
@@ -58,6 +60,8 @@ void *ClickHouseSSLPipeline(CProxySocket *ptr, void *lptr);
 void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr);
 void *MySQLPipeline(CProxySocket *ptr, void *lptr);
 void *PassthroughPipeLine(CProtocolSocket *ptr, void *lptr);
+
+void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr);
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 
@@ -145,6 +149,20 @@ int main(int argc, char **argv)
         if (proxy < 0)
             return proxy;
     }
+    ProtocolPipelineFunctionMap protocolPipelineFunctionMap;
+    protocolPipelineFunctionMap["ProtocolPipeline"] = ProtocolPipeline;
+    RESOLVE_ENDPOINT_RESULT protocolConfigValue = {
+            .name = "Test",
+            .ipaddress = "0.0.0.0",
+            .handler = configSingleton.typeFactory->GetType("CHttpProtocolHandler")
+    };
+
+    int protocolServer = startProtocolServer(protocolPipelineFunctionMap["ProtocolPipeline"],
+                                             new CProtocolSocket(8080),
+                                             protocolConfigValue);
+
+    if (protocolServer < 0)
+        return protocolServer;
 
     while (1);
     return 0;
@@ -182,6 +200,43 @@ int startProxyServer(
     if (!(*socket).Start(proxyName))
     {
         cout << "Failed To Start " << proxyName << " Proxy Server ..!" << endl;
+        return -3;
+    }
+
+    return 0;
+}
+
+int startProtocolServer(
+        ProtocolPipelineFunction pipelineFunction,
+        CProtocolSocket *socket,
+        RESOLVE_ENDPOINT_RESULT configValue
+)
+{
+    // Create protocol
+    std::string protocolName = configValue.name;
+
+    // Setting up Protocol Pipeline
+    if (!(*socket).SetPipeline(pipelineFunction))
+    {
+        cout << "Failed to set " << protocolName << " Pipeline ..!" << endl;
+        return -2;
+    }
+    CProtocolHandler *protocolHandler = (CProtocolHandler *) configValue.handler;
+    if (!(*socket).SetHandler(protocolHandler))
+    {
+        cout << "Failed to set " << protocolName << " Handler ..!" << endl;
+        return -2;
+    }
+
+//    if (!(*socket).SetConfigValues(configValue))
+//    {
+//        cout << "Failed to set " << protocolName << " Config values ..!" << endl;
+//        return -2;
+//    }
+
+    if (!(*socket).Start())
+    {
+        cout << "Failed To Start " << protocolName << " Proxy Server ..!" << endl;
         return -3;
     }
 

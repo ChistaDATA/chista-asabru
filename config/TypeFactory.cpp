@@ -1,7 +1,6 @@
 #include <cstdlib>
 #include <string>
 #include "TypeFactory.h"
-#include "CProxyHandler.h"
 
 void TypeFactory::updateLibs()
 {

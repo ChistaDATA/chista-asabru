@@ -32,7 +32,7 @@ private:
     ConfigSingleton &operator=(const ConfigSingleton &) = delete;
     PROXY_CONFIG m_ProxyConfig;
     XMLError LoadProxyConfigurations(std::string filePath);
-    TypeFactory *typeFactory = new TypeFactory();
+
 
 public:
     static bool initialized;
@@ -45,6 +45,7 @@ public:
     RESOLVE_ENDPOINT_RESULT Resolve(RESOLVE_CONFIG config);
     std::vector<RESOLVE_ENDPOINT_RESULT> LoadProxyConfigurations();
     void DownloadConfigFile(std::string url, std::string outputFilePath);
+    TypeFactory *typeFactory = new TypeFactory();
 };
 
 #endif
