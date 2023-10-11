@@ -41,3 +41,8 @@ do
     cd $root_dir
   fi
 done
+
+# Build chista-asabru project
+# cd ./build
+# cmake ..
+# make

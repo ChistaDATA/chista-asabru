@@ -8,6 +8,7 @@
 #include <set>
 #include <cstring>
 #include "config_types.h"
+#include "../config/ConfigTypes.h"
 
 using namespace std;
 

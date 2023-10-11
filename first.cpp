@@ -15,25 +15,17 @@
 
 using namespace std;
 
-/* Proxy pipelines map */
-typedef void *(*PipelineFunction)(CProxySocket *ptr, void *lptr);
-typedef std::map<string, PipelineFunction> PipelineFunctionMap;
-
-typedef void *(*ProtocolPipelineFunction)(CProtocolSocket *ptr, void *lptr);
-typedef std::map<string, ProtocolPipelineFunction> ProtocolPipelineFunctionMap;
-
 /* Proxy sockets map */
 typedef std::map<string, CProxySocket *> ProxySocketsMap;
+typedef std::map<string, CProtocolSocket *> ProtocolSocketsMap;
 
 int startProxyServer(
-    PipelineFunction pipelineFunction,
     CProxySocket *socket,
     RESOLVE_ENDPOINT_RESULT configValues);
 
 int startProtocolServer(
-    ProtocolPipelineFunction pipelineFunction,
     CProtocolSocket *socket,
-    RESOLVE_ENDPOINT_RESULT configValue);
+    RESOLVED_PROTOCOL_CONFIG configValue);
 
 // int updateProxyConfig(CProxySocket *socket, RESOLVE_ENDPOINT_RESULT configValue)
 // {
@@ -64,49 +56,7 @@ typedef struct
     int port;
 } NODE_PING_INFO;
 
-void PerformLogic() {}
-
-void *ClickHousePipeline(CProxySocket *ptr, void *lptr);
-void *ClickHouseSSLPipeline(CProxySocket *ptr, void *lptr);
-void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr);
-void *MySQLPipeline(CProxySocket *ptr, void *lptr);
-void *PassthroughPipeLine(CProtocolSocket *ptr, void *lptr);
-
-void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr);
-
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
-
-//////////////////////////////////////////////////
-// A Simple Ping Client to Test Cluster Simulator
-//
-
-#if 0
-int main(int argc, char **argv )
-{
-
-     if ( argc != 2) {
-	fprintf(stdout,"Failed to Start the app\n");
-	return -1;
-    }
-    int rc = atoi(argv[1]);
-    cout << "Received from Command line " << rc << endl;
-    CPing ps("localhost",7086);
-    NODE_PING_INFO  pdu{"localhost", rc};
-    if ( !ps.Open() ) {
-                 fprintf(stdout, "Failed to Open The Client\n" );
-                 return 0;
-    }
-    while (1) {
-           sleep(10);
-           PerformLogic();
-           ps.SendSignal(&pdu,sizeof(pdu));
-    }
-
-    ps.Close();
-    return 0;
-}
-
-#endif
 
 /**
  * Error handler
@@ -134,26 +84,14 @@ int main(int argc, char **argv)
     // install our error handler
     signal(SIGSEGV, errorHandler);
     signal(SIGPIPE, errorHandler);
-    std::vector<RESOLVE_ENDPOINT_RESULT> configValues = configSingleton.LoadProxyConfigurations();
-
-    // Create Parsers
-    // CHttpParser *httpParser = new CHttpParser();
-
-    // Create PipelineFunction mappings
-    PipelineFunctionMap pipelineFunctionMap;
-    pipelineFunctionMap["ClickHousePipeline"] = ClickHousePipeline;
-    pipelineFunctionMap["ClickHouseSSLPipeline"] = ClickHouseSSLPipeline;
-    pipelineFunctionMap["PostgreSQLPipeline"] = PostgreSQLPipeline;
-    pipelineFunctionMap["MySQLPipeline"] = MySQLPipeline;
+    std::vector<RESOLVE_ENDPOINT_RESULT> configValues = configSingleton.ResolveProxyServerConfigurations();
 
     // Create Proxy sockets mapping
     ProxySocketsMap proxySocketsMap;
     for (auto value : configValues)
     {
         proxySocketsMap[value.name] = new CProxySocket(value.proxyPort);
-        pipelineFunctionMap[value.name] = pipelineFunctionMap[value.pipeline];
         int proxy = startProxyServer(
-            pipelineFunctionMap[value.name],
             proxySocketsMap[value.name],
             value);
         if (proxy < 0)
@@ -190,31 +128,29 @@ int main(int argc, char **argv)
     httpProtocolHandler->RegisterHttpRequestHandler("/hello.html", simple_http_server::HttpMethod::HEAD, send_html);
     httpProtocolHandler->RegisterHttpRequestHandler("/hello.html", simple_http_server::HttpMethod::GET, send_html);
 
-    ProtocolPipelineFunctionMap protocolPipelineFunctionMap;
-    protocolPipelineFunctionMap["ProtocolPipeline"] = ProtocolPipeline;
-    RESOLVE_ENDPOINT_RESULT protocolConfigValue = {
-        .name = "Test",
-        .ipaddress = "0.0.0.0",
-        .handler = httpProtocolHandler};
-
-    int protocolServer = startProtocolServer(protocolPipelineFunctionMap["ProtocolPipeline"],
-                                             new CProtocolSocket(8080),
-                                             protocolConfigValue);
-
-    if (protocolServer < 0)
-        return protocolServer;
+    ProtocolSocketsMap protocolSocketsMap;
+    std::vector<RESOLVED_PROTOCOL_CONFIG> protocolServerConfigValues = configSingleton.ResolveProtocolServerConfigurations();
+    for (auto value : protocolServerConfigValues)
+    {
+        protocolSocketsMap[value.protocol_name] = new CProtocolSocket(value.protocol_port);
+        int protocolServer = startProtocolServer(
+            protocolSocketsMap[value.protocol_name],
+            value);
+        if (protocolServer < 0)
+            return protocolServer;
+    }
 
     // RESOLVE_ENDPOINT_RESULT newConfigValue = configValues[1];
     // newConfigValue.ipaddress = "ssl-test.sandbox.chistadata.io";
     // newConfigValue.handler = configSingleton.typeFactory->GetType("CHttpsHandler");
     // updateProxyConfig(proxySocketsMap["ch_http_service1"], newConfigValue);
 
-    while (1);
+    while (1)
+        ;
     return 0;
 }
 
 int startProxyServer(
-    PipelineFunction pipelineFunction,
     CProxySocket *socket,
     RESOLVE_ENDPOINT_RESULT configValue)
 {
@@ -222,6 +158,7 @@ int startProxyServer(
     std::string proxyName = configValue.name;
 
     // Setting up ClickHouse Proxy
+    PipelineFunction<CProxySocket> pipelineFunction = configValue.pipeline;
     if (!(*socket).SetPipeline(pipelineFunction))
     {
         cout << "Failed to set " << proxyName << " Pipeline ..!" << endl;
@@ -233,8 +170,16 @@ int startProxyServer(
         cout << "Failed to set " << proxyName << " Handler ..!" << endl;
         return -2;
     }
-
-    if (!(*socket).SetConfigValues(configValue))
+    TARGET_ENDPOINT_CONFIG targetEndpointConfig = {
+        .name = configValue.name,
+        .ipaddress = configValue.ipaddress,
+        .proxyPort = configValue.proxyPort,
+        .port = configValue.port,
+        .r_w = configValue.r_w,
+        .alias = configValue.alias,
+        .reserved = configValue.reserved
+    };
+    if (!(*socket).SetConfigValues(targetEndpointConfig))
     {
         cout << "Failed to set " << proxyName << " Config values ..!" << endl;
         return -2;
@@ -250,14 +195,14 @@ int startProxyServer(
 }
 
 int startProtocolServer(
-    ProtocolPipelineFunction pipelineFunction,
     CProtocolSocket *socket,
-    RESOLVE_ENDPOINT_RESULT configValue)
+    RESOLVED_PROTOCOL_CONFIG configValue)
 {
     // Create protocol
-    std::string protocolName = configValue.name;
+    std::string protocolName = configValue.protocol_name;
 
     // Setting up Protocol Pipeline
+    PipelineFunction<CProtocolSocket> pipelineFunction = configValue.pipeline;
     if (!(*socket).SetPipeline(pipelineFunction))
     {
         cout << "Failed to set " << protocolName << " Pipeline ..!" << endl;
