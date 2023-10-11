@@ -54,6 +54,7 @@ add_executable(Chista_Asabru
 
         config/ConfigSingleton.cpp
         config/TypeFactory.cpp
+        config/PipelineFactory.cpp
 
         test/ProxyInfo.h 
         test/ProxyInfo.cpp

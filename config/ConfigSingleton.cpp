@@ -5,20 +5,21 @@
 /**
  * Function to load the config.xml file from a URL
  */
-void ConfigSingleton::DownloadConfigFile(std::string url, std::string outputFilePath) {
+void ConfigSingleton::DownloadConfigFile(std::string url, std::string outputFilePath)
+{
     // giving system command and storing return value
     std::string command = "/opt/bin/curl " + url + " --output " + outputFilePath;
     int returnCode = system(command.c_str());
- 
+
     // checking if the command was executed successfully
-    if (returnCode == 0) {
+    if (returnCode == 0)
+    {
         std::cout << "File downloaded successfully!" << std::endl;
     }
-    else {
+    else
+    {
         std::cerr << "Failed to download file :" << returnCode << endl;
-            
     }
- 
 
     // if (downloadFileWithCurl(url, outputFilePath)) {
     //     std::cout << "File downloaded successfully!" << std::endl;
@@ -31,7 +32,7 @@ void ConfigSingleton::DownloadConfigFile(std::string url, std::string outputFile
  * Function to load the proxy configuration
  * @param filePath the file path to the config.xml file
  */
-XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
+XMLError ConfigSingleton::LoadConfigurations(std::string filePath)
 {
     XMLDocument xmlDoc;
     XMLError eResult = xmlDoc.LoadFile(filePath.c_str());
@@ -43,8 +44,22 @@ XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
         return XML_ERROR_FILE_READ_ERROR;
     }
 
-    PROXY_CONFIG proxyConfig;
+    /**
+     * Get Protocol Server configurations
+     */
+    LoadProtocolServerConfigurations(pRoot);
 
+    /**
+     * Get proxy configurations
+     */
+    LoadProxyServerConfigurations(pRoot);
+
+    return XML_SUCCESS;
+}
+
+XMLError ConfigSingleton::LoadProxyServerConfigurations(XMLNode *pRoot)
+{
+    PROXY_CONFIG proxyConfig;
     // Get 'clusters'
     XMLElement *pClusters = pRoot->FirstChildElement("CLUSTERS");
     if (NULL != pClusters)
@@ -104,7 +119,7 @@ XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
                             if (NULL != pProxyPort)
                             {
                                 auto proxyPort = 0;
-                                eResult = pProxyPort->QueryIntText(&proxyPort);
+                                XMLError eResult = pProxyPort->QueryIntText(&proxyPort);
                                 service.proxyPort = proxyPort;
                                 XMLCheckResult(eResult);
                             }
@@ -113,7 +128,7 @@ XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
                             if (NULL != pPort)
                             {
                                 auto port = 0;
-                                eResult = pPort->QueryIntText(&port);
+                                XMLError eResult = pPort->QueryIntText(&port);
                                 service.port = port;
                                 XMLCheckResult(eResult);
                             }
@@ -157,10 +172,9 @@ XMLError ConfigSingleton::LoadProxyConfigurations(std::string filePath)
     }
 
     m_ProxyConfig = proxyConfig;
-    return XML_SUCCESS;
 }
 
-std::vector<RESOLVE_ENDPOINT_RESULT> ConfigSingleton::LoadProxyConfigurations()
+std::vector<RESOLVE_ENDPOINT_RESULT> ConfigSingleton::ResolveProxyServerConfigurations()
 {
     std::vector<RESOLVE_ENDPOINT_RESULT> results;
     std::vector<CLUSTER> clusters = m_ProxyConfig.clusters;
@@ -181,7 +195,7 @@ std::vector<RESOLVE_ENDPOINT_RESULT> ConfigSingleton::LoadProxyConfigurations()
                 memset(result.Buffer, 0, sizeof result.Buffer);
 
                 // Resolve the Pipeline
-                result.pipeline = service.pipeline;
+                result.pipeline = pipelineFactory->GetProxyPipeline(service.pipeline);
                 // Resolve the Handler class
                 result.handler = typeFactory->GetType(service.handler);
 
@@ -250,4 +264,63 @@ RESOLVE_ENDPOINT_RESULT ConfigSingleton::Resolve(RESOLVE_CONFIG config)
     result.handler = typeFactory->GetType(service.handler);
 
     return result;
+}
+
+XMLError ConfigSingleton::LoadProtocolServerConfigurations(XMLNode *root)
+{
+    std::vector<PROTOCOL_SERVER_CONFIG> result;
+    XMLElement *protocol_server_config = root->FirstChildElement("protocol-server-config");
+
+    XMLElement *protocol_server = protocol_server_config->FirstChildElement("protocol-server");
+    if (protocol_server == nullptr)
+    {
+        return XML_ERROR_PARSING_ELEMENT;
+    }
+    while (protocol_server)
+    {
+        PROTOCOL_SERVER_CONFIG config;
+        config.protocol_name = protocol_server->Attribute("protocol");
+
+        XMLElement *protocolPortElement = protocol_server->FirstChildElement("protocol-port");
+        if (NULL != protocolPortElement)
+        {
+            config.protocol_port = stoi(protocolPortElement->GetText());
+        }
+
+        XMLElement *pipelineElement = protocol_server->FirstChildElement("pipeline");
+        if (NULL != pipelineElement)
+        {
+            config.pipeline = pipelineElement->GetText();
+        }
+
+        XMLElement *handlerElement = protocol_server->FirstChildElement("handler");
+        if (NULL != handlerElement)
+        {
+            config.handler = handlerElement->GetText();
+        }
+        result.push_back(config);
+
+        protocol_server = protocol_server->NextSiblingElement("protocol-server");
+    }
+    m_ProtocolServerConfig = result;
+}
+
+std::vector<RESOLVED_PROTOCOL_CONFIG> ConfigSingleton::ResolveProtocolServerConfigurations()
+{
+    std::vector<RESOLVED_PROTOCOL_CONFIG> results;
+    for (PROTOCOL_SERVER_CONFIG protocol_server : m_ProtocolServerConfig)
+    {
+        cout << protocol_server.protocol_name << " " << protocol_server.protocol_port << endl;
+        RESOLVED_PROTOCOL_CONFIG result;
+        result.protocol_name = protocol_server.protocol_name;
+        result.protocol_port = protocol_server.protocol_port;
+        // Resolve the Pipeline
+        result.pipeline = pipelineFactory->GetProtocolPipeline(protocol_server.pipeline);
+        // Resolve the Handler class
+        result.handler = typeFactory->GetType(protocol_server.handler);
+
+        results.push_back(result);
+    }
+
+    return results;
 }

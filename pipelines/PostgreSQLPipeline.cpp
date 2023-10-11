@@ -30,7 +30,7 @@ void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr)
      * Get the configuration data for the target database clusters ( eg. clickhouse )
      * Config given in config.xml
      */
-    RESOLVE_ENDPOINT_RESULT result = ptr->GetConfigValues();
+    TARGET_ENDPOINT_CONFIG result = ptr->GetConfigValues();
     END_POINT *target_endpoint = new END_POINT{result.ipaddress, result.port, result.r_w, result.alias, result.reserved, "  "}; // Resolve("firstcluster", "127.0.0.1" , 9000, pd );
     if (target_endpoint == 0)
     {

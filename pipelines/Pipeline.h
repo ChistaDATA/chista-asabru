@@ -8,6 +8,7 @@
 #include "../config/ConfigSingleton.h"
 #include "ProtocolHelper.h"
 #include "Socket.h"
+#include "CServerSocket.h"
 
 typedef struct
 {
