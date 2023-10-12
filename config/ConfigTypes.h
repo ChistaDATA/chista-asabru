@@ -6,21 +6,21 @@
 
 typedef struct
 {
-    int proxyPort;
     int port;
     std::string protocol;
     std::string name;
-    std::string handler;
-    std::string pipeline;
+    std::string host;
 } SERVICE;
 
 typedef struct
 {
     std::string endPointName;
+    int proxyPort;
     bool readWrite;
-    std::string host;
     std::vector<SERVICE> services;
     std::string ipaddress;
+    std::string handler;
+    std::string pipeline;
 } REMOTE_END_POINT;
 
 typedef struct
@@ -63,17 +63,12 @@ typedef struct
 
 typedef struct
 {
-    std::string name;       // name of the proxy server
-    std::string ipaddress;  // ip address of the Remote Endpoint
-    int proxyPort;          // port at which the proxy listens
-    int port;               // target port to which proxy connects
-    int r_w;                //  Read Endpoint or Write EndPoint
-    std::string alias;      //  unused
-    float reserved;         //  unused
-    char Buffer[255];       // unused
-    void *handler;
+    std::string name; // name of the proxy server
+    int proxyPort;    // port at which the proxy listens
     PipelineFunction<CProxySocket> pipeline;
-} RESOLVE_ENDPOINT_RESULT;
+    void *handler; // handler for this endpoint
+    std::vector<RESOLVED_SERVICE> services;
+} RESOLVED_PROXY_CONFIG;
 
 typedef struct
 {

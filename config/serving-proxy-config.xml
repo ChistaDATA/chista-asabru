@@ -1,0 +1,37 @@
+<clickhouse-proxy-v2>
+ 
+	<protocol-server-config>
+		<protocol-server protocol="HTTP">
+			<protocol-port>8083</protocol-port>
+			<pipeline>ProtocolPipeline</pipeline>
+			<handler>CHttpProtocolHandler</handler>
+		</protocol-server>
+	</protocol-server-config>
+ 
+	<CLUSTERS>
+		<CLUSTER name ="cluster1">
+			<END_POINTS>
+				<END_POINT name="ch_wire_http_node1">
+					<READ_WRITE>yes</READ_WRITE>
+					<HOST>localhost</HOST>
+					<SERVICES>
+						<SERVICE name="ch_wire_service1">
+							<PROXY_PORT>9103</PROXY_PORT>
+							<PORT>9000</PORT>
+							<PROTOCOL>CH_WIRE</PROTOCOL>
+							<PIPELINE>ClickHousePipeline</PIPELINE>
+							<HANDLER>CHWirePTHandler</HANDLER>
+						</SERVICE>
+						<SERVICE name="ch_http_service1">
+							<PROXY_PORT>9113</PROXY_PORT>
+							<PORT>8123</PORT>
+							<PROTOCOL>CH_HTTP</PROTOCOL>
+							<PIPELINE>ClickHousePipeline</PIPELINE>
+							<HANDLER>CHttpHandler</HANDLER>
+						</SERVICE>
+					</SERVICES>                                 
+                </END_POINT>
+			</END_POINTS>
+		</CLUSTER>
+	</CLUSTERS>
+</clickhouse-proxy-v2>

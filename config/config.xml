@@ -13,10 +13,10 @@
 			<END_POINTS>
 				<END_POINT name="ch_wire_http_node1">
 					<READ_WRITE>yes</READ_WRITE>
-					<HOST>localhost</HOST>
+					<PROXY_PORT>9100</PROXY_PORT>
 					<SERVICES>
 						<SERVICE name="ch_wire_service1">
-							<PROXY_PORT>9100</PROXY_PORT>
+							<HOST>localhost</HOST>
 							<PORT>9000</PORT>
 							<PROTOCOL>CH_WIRE</PROTOCOL>
 							<PIPELINE>ClickHousePipeline</PIPELINE>
