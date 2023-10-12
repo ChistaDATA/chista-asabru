@@ -21,7 +21,7 @@ typedef std::map<string, CProtocolSocket *> ProtocolSocketsMap;
 
 int startProxyServer(
     CProxySocket *socket,
-    RESOLVE_ENDPOINT_RESULT configValues);
+    RESOLVED_PROXY_CONFIG configValues);
 
 int startProtocolServer(
     CProtocolSocket *socket,
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
     // install our error handler
     signal(SIGSEGV, errorHandler);
     signal(SIGPIPE, errorHandler);
-    std::vector<RESOLVE_ENDPOINT_RESULT> configValues = configSingleton.ResolveProxyServerConfigurations();
+    std::vector<RESOLVED_PROXY_CONFIG> configValues = configSingleton.ResolveProxyServerConfigurations();
 
     // Create Proxy sockets mapping
     ProxySocketsMap proxySocketsMap;
@@ -152,7 +152,7 @@ int main(int argc, char **argv)
 
 int startProxyServer(
     CProxySocket *socket,
-    RESOLVE_ENDPOINT_RESULT configValue)
+    RESOLVED_PROXY_CONFIG configValue)
 {
     // Create proxies
     std::string proxyName = configValue.name;
@@ -170,15 +170,13 @@ int startProxyServer(
         cout << "Failed to set " << proxyName << " Handler ..!" << endl;
         return -2;
     }
+
     TARGET_ENDPOINT_CONFIG targetEndpointConfig = {
         .name = configValue.name,
-        .ipaddress = configValue.ipaddress,
         .proxyPort = configValue.proxyPort,
-        .port = configValue.port,
-        .r_w = configValue.r_w,
-        .alias = configValue.alias,
-        .reserved = configValue.reserved
+        .services = configValue.services
     };
+
     if (!(*socket).SetConfigValues(targetEndpointConfig))
     {
         cout << "Failed to set " << proxyName << " Config values ..!" << endl;

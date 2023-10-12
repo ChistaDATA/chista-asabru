@@ -1,26 +1,5 @@
 version: "3.8"
 services:
-  asabru-proxy:  
-    # platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    ports:
-      - "9100:9100"
-      - "9110:9110" 
-      - "9120:9120" 
-      - "9130:9130" 
-      - "9140:9140" 
-      - "9150:9150" 
-      - "9160:9160" 
-      - "9170:9170" 
-    environment:
-      CONFIG_FILE_URL: https://pastebin.com/raw/n3ihR1M2
-      CONFIG_FILE_PATH: /tmp/config.xml
-    # network_mode: "host"
-    links:
-      - "clickhouse-1:database"
-
   clickhouse-1:
     image: clickhouse/clickhouse-server:22.6
     expose:
@@ -41,7 +20,92 @@ services:
     #   - /Users/midhundarvin/software/openssl/server.key:/etc/clickhouse-server/server.key
     #   - /Users/midhundarvin/software/openssl/dhparam.pem:/etc/clickhouse-server/dhparam.pem
     #   - /Users/midhundarvin/software/openssl/config.xml:/etc/clickhouse-server/config.xml
-  
+
+  intercepting-proxy:
+    # platform: linux/amd64
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "9100:9100"
+      - "9110:9110"
+      - "9120:9120"
+      - "9130:9130"
+      - "9140:9140"
+      - "9150:9150"
+      - "9160:9160"
+      - "9170:9170"
+    environment:
+      CONFIG_FILE_URL: https://pastebin.com/raw/2Ts9aeN7
+      CONFIG_FILE_PATH: /tmp/config.xml
+    # network_mode: "host"
+    links:
+      - "clickhouse-1:database"
+      - "serving-proxy-1:cluster-1"
+      - "serving-proxy-2:cluster-2"
+      - "serving-proxy-3:cluster-3"
+      - "serving-proxy-4:cluster-4"
+
+  serving-proxy-1:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    expose:
+      - "9100"
+      - "9110"
+    ports:
+      - "9111:9110"
+    environment:
+      CONFIG_FILE_URL: https://pastebin.com/raw/NSufsj00
+      CONFIG_FILE_PATH: /tmp/config.xml
+    links:
+      - "clickhouse-1:database"
+
+  serving-proxy-2:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    expose:
+      - "9100"
+      - "9110"
+    ports:
+      - "9112:9110"
+    environment:
+      CONFIG_FILE_URL: https://pastebin.com/raw/NSufsj00
+      CONFIG_FILE_PATH: /tmp/config.xml
+    links:
+      - "clickhouse-1:database"
+
+  serving-proxy-3:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    expose:
+      - "9100"
+      - "9110"
+    ports:
+      - "9113:9110"
+    environment:
+      CONFIG_FILE_URL: https://pastebin.com/raw/NSufsj00
+      CONFIG_FILE_PATH: /tmp/config.xml
+    links:
+      - "clickhouse-1:database"
+
+  serving-proxy-4:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    expose:
+      - "9100"
+      - "9110"
+    ports:
+      - "9114:9110"
+    environment:
+      CONFIG_FILE_URL: https://pastebin.com/raw/NSufsj00
+      CONFIG_FILE_PATH: /tmp/config.xml
+    links:
+      - "clickhouse-1:database"
+
   # postgres-1:
   #   image: postgres:14.4
   #   ports:
@@ -57,4 +121,3 @@ services:
 
 volumes:
   pg_data:
-      

@@ -43,6 +43,8 @@ do
 done
 
 # Build chista-asabru project
+# rm -rf build
+# mkdir build
 # cd ./build
 # cmake ..
 # make

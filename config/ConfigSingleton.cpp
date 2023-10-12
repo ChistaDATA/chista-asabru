@@ -92,12 +92,29 @@ XMLError ConfigSingleton::LoadProxyServerConfigurations(XMLNode *pRoot)
                         endPoint.readWrite = pEndPoint->GetText();
                     }
 
-                    XMLElement *pHost = pEndPoint->FirstChildElement("HOST");
-                    if (NULL != pHost)
+                    XMLElement *pProxyPort = pEndPoint->FirstChildElement("PROXY_PORT");
+                    if (NULL != pProxyPort)
                     {
-                        auto hostName = "";
-                        hostName = pHost->GetText();
-                        endPoint.host = hostName;
+                        auto proxyPort = 0;
+                        XMLError eResult = pProxyPort->QueryIntText(&proxyPort);
+                        endPoint.proxyPort = proxyPort;
+                        XMLCheckResult(eResult);
+                    }
+
+                    XMLElement *handlerElement = pEndPoint->FirstChildElement("HANDLER");
+                    if (NULL != handlerElement)
+                    {
+                        auto handler = "";
+                        handler = handlerElement->GetText();
+                        endPoint.handler = handler;
+                    }
+
+                    XMLElement *pipelineElement = pEndPoint->FirstChildElement("PIPELINE");
+                    if (NULL != pipelineElement)
+                    {
+                        auto pipeline = "";
+                        pipeline = pipelineElement->GetText();
+                        endPoint.pipeline = pipeline;
                     }
 
                     XMLElement *pServices = pEndPoint->FirstChildElement("SERVICES");
@@ -115,13 +132,12 @@ XMLError ConfigSingleton::LoadProxyServerConfigurations(XMLNode *pRoot)
                             auto serviceName = pService->Attribute("name");
                             service.name = serviceName;
 
-                            XMLElement *pProxyPort = pService->FirstChildElement("PROXY_PORT");
-                            if (NULL != pProxyPort)
+                            XMLElement *pHost = pService->FirstChildElement("HOST");
+                            if (NULL != pHost)
                             {
-                                auto proxyPort = 0;
-                                XMLError eResult = pProxyPort->QueryIntText(&proxyPort);
-                                service.proxyPort = proxyPort;
-                                XMLCheckResult(eResult);
+                                auto hostName = "";
+                                hostName = pHost->GetText();
+                                service.host = hostName;
                             }
 
                             XMLElement *pPort = pService->FirstChildElement("PORT");
@@ -141,22 +157,6 @@ XMLError ConfigSingleton::LoadProxyServerConfigurations(XMLNode *pRoot)
                                 service.protocol = protocol;
                             }
 
-                            XMLElement *handlerElement = pService->FirstChildElement("HANDLER");
-                            if (NULL != handlerElement)
-                            {
-                                auto handler = "";
-                                handler = handlerElement->GetText();
-                                service.handler = handler;
-                            }
-
-                            XMLElement *pipelineElement = pService->FirstChildElement("PIPELINE");
-                            if (NULL != pipelineElement)
-                            {
-                                auto pipeline = "";
-                                pipeline = pipelineElement->GetText();
-                                service.pipeline = pipeline;
-                            }
-
                             endPoint.services.emplace_back(service);
                             // read next sibling element
                             pService = pService->NextSiblingElement("SERVICE");
@@ -174,96 +174,40 @@ XMLError ConfigSingleton::LoadProxyServerConfigurations(XMLNode *pRoot)
     m_ProxyConfig = proxyConfig;
 }
 
-std::vector<RESOLVE_ENDPOINT_RESULT> ConfigSingleton::ResolveProxyServerConfigurations()
+std::vector<RESOLVED_PROXY_CONFIG> ConfigSingleton::ResolveProxyServerConfigurations()
 {
-    std::vector<RESOLVE_ENDPOINT_RESULT> results;
+    std::vector<RESOLVED_PROXY_CONFIG> results;
     std::vector<CLUSTER> clusters = m_ProxyConfig.clusters;
     for (auto cluster : clusters)
     {
         for (auto endpoint : cluster.endPoints)
         {
+            RESOLVED_PROXY_CONFIG result;
+            result.name = endpoint.endPointName;
+            result.proxyPort = endpoint.proxyPort;
+
             for (auto service : endpoint.services)
             {
-                RESOLVE_ENDPOINT_RESULT result;
-                result.name = service.name;
-                result.ipaddress = endpoint.host;
-                result.proxyPort = service.proxyPort;
-                result.port = service.port;
-                result.r_w = endpoint.readWrite;
-                result.alias = "";
-                result.reserved = 0;
-                memset(result.Buffer, 0, sizeof result.Buffer);
-
-                // Resolve the Pipeline
-                result.pipeline = pipelineFactory->GetProxyPipeline(service.pipeline);
-                // Resolve the Handler class
-                result.handler = typeFactory->GetType(service.handler);
-
-                results.push_back(result);
+                RESOLVED_SERVICE resolvedService;
+                resolvedService.ipaddress = service.host;
+                resolvedService.port = service.port;
+                resolvedService.r_w = endpoint.readWrite;
+                resolvedService.alias = "";
+                resolvedService.reserved = 0;
+                memset(resolvedService.Buffer, 0, sizeof resolvedService.Buffer);
+                result.services.push_back(resolvedService);
             }
+
+            // Resolve the Pipeline
+            result.pipeline = pipelineFactory->GetProxyPipeline(endpoint.pipeline);
+            // Resolve the Handler class
+            result.handler = typeFactory->GetType(endpoint.handler);
+
+            results.push_back(result);
         }
     }
 
     return results;
-}
-
-RESOLVE_ENDPOINT_RESULT ConfigSingleton::Resolve(RESOLVE_CONFIG config)
-{
-    RESOLVE_ENDPOINT_RESULT result;
-    CLUSTER cluster;
-    auto size = m_ProxyConfig.clusters.size();
-    // if (size == 0) { cout << "Cluster Name not found" << endl; return ; }
-
-    // Get the cluster
-    for (int i = 0; i < size; i++)
-    {
-        if (m_ProxyConfig.clusters[i].clusterName == config.clusterName)
-        {
-            cluster = m_ProxyConfig.clusters[i];
-            break;
-        }
-    }
-
-    REMOTE_END_POINT endpoint;
-    size = cluster.endPoints.size();
-    // if (size == 0) { cout << "Remote End Point Name not found" << endl; return; }
-    // Get the end point corresponding to the cluster
-
-    for (int i = 0; i < size; i++)
-    {
-        if (cluster.endPoints[i].endPointName == config.endPointName)
-        {
-            endpoint = cluster.endPoints[i];
-            break;
-        }
-    }
-
-    SERVICE service;
-    size = endpoint.services.size();
-    // if (size == 0) { cout << "Service Name not found" << endl; return; }
-
-    for (int i = 0; i < size; i++)
-    {
-        if (endpoint.services[i].name == config.serviceName)
-        {
-            service = endpoint.services[i];
-            break;
-        }
-    }
-
-    result.port = service.port;
-    result.ipaddress = endpoint.host;
-    result.r_w = endpoint.readWrite;
-    result.alias = "";
-    result.reserved = 0;
-    memset(result.Buffer, 0, sizeof result.Buffer);
-
-    /**
-     * Resolve the Handler class
-     */
-    result.handler = typeFactory->GetType(service.handler);
-
-    return result;
 }
 
 XMLError ConfigSingleton::LoadProtocolServerConfigurations(XMLNode *root)

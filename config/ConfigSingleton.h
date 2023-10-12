@@ -44,9 +44,7 @@ public:
         return instance;
     }
 
-    RESOLVE_ENDPOINT_RESULT Resolve(RESOLVE_CONFIG config);
-
-    std::vector<RESOLVE_ENDPOINT_RESULT> ResolveProxyServerConfigurations();
+    std::vector<RESOLVED_PROXY_CONFIG> ResolveProxyServerConfigurations();
     std::vector<RESOLVED_PROTOCOL_CONFIG> ResolveProtocolServerConfigurations();
 
     void DownloadConfigFile(std::string url, std::string outputFilePath);

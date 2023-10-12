@@ -21,10 +21,10 @@ command_to_run="./Chista_Asabru"
 
 # Array of URLs
 URLS=(
-    "https://pastebin.com/raw/jc6gAYsU"
-    "https://pastebin.com/raw/9QfKvxNg"
-    "https://pastebin.com/raw/1NU0jE9f"
-    "https://pastebin.com/raw/9knH00QF"
+    "https://pastebin.com/raw/jauuQcFL"
+    "https://pastebin.com/raw/F3B2XFXL"
+    "https://pastebin.com/raw/C3Fy5qG9"
+    "https://pastebin.com/raw/BWv2jXWE"
 )
 
 # Loop through URLs and open Terminal windows
