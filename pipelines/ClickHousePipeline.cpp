@@ -107,9 +107,14 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
 
         if (!still_connected)
         {
+            // Close the client socket
+            client_socket->Close();
             break;
         }
     }
+
+    // Close the server socket
+    target_socket->Close();
 #ifdef WINDOWS_OS
     return 0;
 #else

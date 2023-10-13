@@ -9,7 +9,7 @@ static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 
 void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr)
 {
-    std::cout <<"Starting ProtocolPipeline \n";
+    std::cout << "Starting ProtocolPipeline \n";
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
 
@@ -62,6 +62,8 @@ void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr)
 
         if (!still_connected)
         {
+            // Close the client socket
+            client_socket->Close();
             break;
         }
     }

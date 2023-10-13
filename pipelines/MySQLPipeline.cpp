@@ -84,6 +84,8 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr)
             }
             if (!still_connected)
             {
+                // Close the client socket
+                client_socket->Close();
                 break;
             }
         }
