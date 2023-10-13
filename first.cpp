@@ -101,11 +101,12 @@ int main(int argc, char **argv)
     CHttpProtocolHandler *httpProtocolHandler = (CHttpProtocolHandler *)configSingleton.typeFactory->GetType("CHttpProtocolHandler");
 
     // Register a few endpoints for demo and benchmarking
-    auto say_hello = [](const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse
+    auto update_configuration = [](const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse
     {
+        configSingleton.LoadConfigurationsFromString(request.content());
         simple_http_server::HttpResponse response(simple_http_server::HttpStatusCode::Ok);
         response.SetHeader("Content-Type", "text/plain");
-        response.SetContent("Hello, world\n");
+        response.SetContent("Configuration Updated Successfully!\n");
         return response;
     };
     auto send_html = [](const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse
@@ -123,10 +124,8 @@ int main(int argc, char **argv)
         return response;
     };
 
-    httpProtocolHandler->RegisterHttpRequestHandler("/", simple_http_server::HttpMethod::HEAD, say_hello);
-    httpProtocolHandler->RegisterHttpRequestHandler("/", simple_http_server::HttpMethod::GET, say_hello);
-    httpProtocolHandler->RegisterHttpRequestHandler("/hello.html", simple_http_server::HttpMethod::HEAD, send_html);
-    httpProtocolHandler->RegisterHttpRequestHandler("/hello.html", simple_http_server::HttpMethod::GET, send_html);
+    httpProtocolHandler->RegisterHttpRequestHandler("/configuration", simple_http_server::HttpMethod::POST, update_configuration);
+    httpProtocolHandler->RegisterHttpRequestHandler("/", simple_http_server::HttpMethod::GET, send_html);
 
     ProtocolSocketsMap protocolSocketsMap;
     std::vector<RESOLVED_PROTOCOL_CONFIG> protocolServerConfigValues = configSingleton.ResolveProtocolServerConfigurations();

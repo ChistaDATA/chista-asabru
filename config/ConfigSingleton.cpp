@@ -29,16 +29,33 @@ void ConfigSingleton::DownloadConfigFile(std::string url, std::string outputFile
 }
 
 /**
- * Function to load the proxy configuration
+ * Function to load the proxy configuration from a file
  * @param filePath the file path to the config.xml file
  */
-XMLError ConfigSingleton::LoadConfigurations(std::string filePath)
+XMLError ConfigSingleton::LoadConfigurationsFromFile(std::string filePath)
 {
     XMLDocument xmlDoc;
     XMLError eResult = xmlDoc.LoadFile(filePath.c_str());
     XMLCheckResult(eResult);
 
-    XMLNode *pRoot = xmlDoc.FirstChildElement("clickhouse-proxy-v2");
+    return ParseConfiguration(&xmlDoc);
+}
+
+/**
+ * Function to load the proxy configuration from a string
+ * @param xml_string the xml string that contains the configuration 
+ */
+XMLError ConfigSingleton::LoadConfigurationsFromString(std::string xml_string)
+{
+    XMLDocument xmlDoc;
+    XMLError eResult = xmlDoc.Parse(xml_string.c_str());
+    XMLCheckResult(eResult);
+
+    return ParseConfiguration(&xmlDoc);
+}
+
+XMLError ConfigSingleton::ParseConfiguration(XMLDocument * xmlDoc) {
+    XMLNode *pRoot = xmlDoc->FirstChildElement("clickhouse-proxy-v2");
     if (pRoot == nullptr)
     {
         return XML_ERROR_FILE_READ_ERROR;
@@ -54,6 +71,7 @@ XMLError ConfigSingleton::LoadConfigurations(std::string filePath)
      */
     LoadProxyServerConfigurations(pRoot);
 
+    cout << "Configuration parsed successfully!" << endl;
     return XML_SUCCESS;
 }
 
