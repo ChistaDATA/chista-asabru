@@ -26,14 +26,15 @@ class ConfigSingleton
 private:
     ConfigSingleton() {
         DownloadConfigFile(std::getenv("CONFIG_FILE_URL"), std::getenv("CONFIG_FILE_PATH"));
-        LoadConfigurations(std::getenv("CONFIG_FILE_PATH"));
+        LoadConfigurationsFromFile(std::getenv("CONFIG_FILE_PATH"));
     };
     ~ConfigSingleton() = default;
     ConfigSingleton(const ConfigSingleton &) = delete;
     ConfigSingleton &operator=(const ConfigSingleton &) = delete;
     PROXY_CONFIG m_ProxyConfig;
     std::vector<PROTOCOL_SERVER_CONFIG> m_ProtocolServerConfig;
-    XMLError LoadConfigurations(std::string filePath);
+    XMLError LoadConfigurationsFromFile(std::string filePath);
+    XMLError ParseConfiguration(XMLDocument *xmlDoc);
     XMLError LoadProtocolServerConfigurations(XMLNode *root);
     XMLError LoadProxyServerConfigurations(XMLNode *pRoot);
 public:
@@ -44,6 +45,7 @@ public:
         return instance;
     }
 
+    XMLError LoadConfigurationsFromString(std::string xml_string);
     std::vector<RESOLVED_PROXY_CONFIG> ResolveProxyServerConfigurations();
     std::vector<RESOLVED_PROTOCOL_CONFIG> ResolveProtocolServerConfigurations();
 
