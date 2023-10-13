@@ -11,31 +11,11 @@
 #include "CProxySocket.h"
 #include "CHttpProtocolHandler.h"
 
-// #include <chrono>
-
 using namespace std;
 
 /* Proxy sockets map */
 typedef std::map<string, CProxySocket *> ProxySocketsMap;
 typedef std::map<string, CProtocolSocket *> ProtocolSocketsMap;
-
-int startProxyServer(
-    CProxySocket *socket,
-    RESOLVED_PROXY_CONFIG configValues);
-
-int startProtocolServer(
-    CProtocolSocket *socket,
-    RESOLVED_PROTOCOL_CONFIG configValue);
-
-// int updateProxyConfig(CProxySocket *socket, RESOLVE_ENDPOINT_RESULT configValue)
-// {
-//     using namespace std::this_thread; // sleep_for, sleep_until
-//     using namespace std::chrono;      // nanoseconds, system_clock, seconds
-
-//     sleep_until(system_clock::now() + seconds(10));
-
-//     socket->SetConfigValues(configValue);
-// };
 
 /**
  * Struct to contain proxy configurations
@@ -57,6 +37,56 @@ typedef struct
 } NODE_PING_INFO;
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
+
+int startProxyServer(
+    CProxySocket *socket,
+    RESOLVED_PROXY_CONFIG configValues);
+
+int startProtocolServer(
+    CProtocolSocket *socket,
+    RESOLVED_PROTOCOL_CONFIG configValue);
+
+int updateProxyConfig(CProxySocket *socket, RESOLVED_PROXY_CONFIG configValue)
+{
+    TARGET_ENDPOINT_CONFIG targetEndpointConfig = {
+        .name = configValue.name,
+        .proxyPort = configValue.proxyPort,
+        .services = configValue.services};
+    socket->SetConfigValues(targetEndpointConfig);
+};
+
+int initProxyServers(ProxySocketsMap *proxySocketsMap)
+{
+    std::vector<RESOLVED_PROXY_CONFIG> configValues = configSingleton.ResolveProxyServerConfigurations();
+
+    for (auto value : configValues)
+    {
+        (*proxySocketsMap)[value.name] = new CProxySocket(value.proxyPort);
+        int proxy = startProxyServer(
+            (*proxySocketsMap)[value.name],
+            value);
+        if (proxy < 0)
+            return proxy;
+    }
+    return 0;
+}
+
+std::string updateProxyServers(ProxySocketsMap *proxySocketsMap)
+{
+    std::vector<RESOLVED_PROXY_CONFIG> configValues = configSingleton.ResolveProxyServerConfigurations();
+    try
+    {
+        for (auto value : configValues)
+        {
+            updateProxyConfig((*proxySocketsMap)[value.name], value);
+        }
+    } catch(std::exception &e) {
+        cout << e.what() << endl;
+        return "Error occurred when updating the configurations : " + std::string(e.what());
+    }
+
+    return "Configuration Updated Successfully!\n";
+}
 
 /**
  * Error handler
@@ -84,29 +114,27 @@ int main(int argc, char **argv)
     // install our error handler
     signal(SIGSEGV, errorHandler);
     signal(SIGPIPE, errorHandler);
-    std::vector<RESOLVED_PROXY_CONFIG> configValues = configSingleton.ResolveProxyServerConfigurations();
 
     // Create Proxy sockets mapping
     ProxySocketsMap proxySocketsMap;
-    for (auto value : configValues)
+
+    int returnValue = initProxyServers(&proxySocketsMap);
+    if (returnValue < 0)
     {
-        proxySocketsMap[value.name] = new CProxySocket(value.proxyPort);
-        int proxy = startProxyServer(
-            proxySocketsMap[value.name],
-            value);
-        if (proxy < 0)
-            return proxy;
+        cout << "Error occurred during initializing proxy servers!";
+        exit(1);
     }
 
     CHttpProtocolHandler *httpProtocolHandler = (CHttpProtocolHandler *)configSingleton.typeFactory->GetType("CHttpProtocolHandler");
 
     // Register a few endpoints for demo and benchmarking
-    auto update_configuration = [](const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse
+    auto update_configuration = [&proxySocketsMap](const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse
     {
         configSingleton.LoadConfigurationsFromString(request.content());
+        std::string response_content = updateProxyServers(&proxySocketsMap);
         simple_http_server::HttpResponse response(simple_http_server::HttpStatusCode::Ok);
         response.SetHeader("Content-Type", "text/plain");
-        response.SetContent("Configuration Updated Successfully!\n");
+        response.SetContent(response_content);
         return response;
     };
     auto send_html = [](const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse
@@ -139,11 +167,6 @@ int main(int argc, char **argv)
             return protocolServer;
     }
 
-    // RESOLVE_ENDPOINT_RESULT newConfigValue = configValues[1];
-    // newConfigValue.ipaddress = "ssl-test.sandbox.chistadata.io";
-    // newConfigValue.handler = configSingleton.typeFactory->GetType("CHttpsHandler");
-    // updateProxyConfig(proxySocketsMap["ch_http_service1"], newConfigValue);
-
     while (1)
         ;
     return 0;
@@ -173,8 +196,7 @@ int startProxyServer(
     TARGET_ENDPOINT_CONFIG targetEndpointConfig = {
         .name = configValue.name,
         .proxyPort = configValue.proxyPort,
-        .services = configValue.services
-    };
+        .services = configValue.services};
 
     if (!(*socket).SetConfigValues(targetEndpointConfig))
     {
