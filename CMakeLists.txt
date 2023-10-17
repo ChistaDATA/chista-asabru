@@ -47,14 +47,15 @@ set ( PROJECT_LINK_LIBS
 )
 
 # Collect all source files
-file(GLOB_RECURSE PIPELINE_FILES "${CMAKE_SOURCE_DIR}/pipelines/*.cpp")
+file(GLOB_RECURSE PIPELINE_FILES "${CMAKE_SOURCE_DIR}/src/pipelines/*.cpp")
+file(COPY src/public DESTINATION .)
 
 add_executable(Chista_Asabru
-        first.cpp
+        src/main.cpp
 
-        config/ConfigSingleton.cpp
-        config/TypeFactory.cpp
-        config/PipelineFactory.cpp
+        src/config/ConfigSingleton.cpp
+        src/config/TypeFactory.cpp
+        src/config/PipelineFactory.cpp
 
         test/ProxyInfo.h 
         test/ProxyInfo.cpp

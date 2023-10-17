@@ -1,19 +1,18 @@
 
 #include "CProtocolSocket.h"
 #include "CProxySocket.h"
-#include "../test/ProxyInfo.h"
 #include "CClientSocket.h"
 #include "../config/ConfigSingleton.h"
 #include "ProtocolHelper.h"
 #include "Socket.h"
 #include "SocketSelect.h"
 #include "Pipeline.h"
-#include "CHttpParser.h"
 #include <utility>
+#include "CHttpParser.h"
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 
-void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
+void *MySQLPipeline(CProxySocket *ptr, void *lptr)
 {
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
@@ -53,21 +52,12 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
 
     while (1)
     {
-        SocketSelect *sel;
         try
         {
-            sel = new SocketSelect(client_socket, target_socket, NonBlockingSocket);
-        }
-        catch (std::exception &e)
-        {
-            cout << e.what() << endl;
-            cout << "error occurred while creating socket select " << endl;
-        }
+            SocketSelect sel(client_socket, target_socket, NonBlockingSocket);
+            bool still_connected = true;
 
-        bool still_connected = true;
-        try
-        {
-            if (sel->Readable(client_socket))
+            if (sel.Readable(client_socket))
             {
                 cout << "client socket is readable, reading bytes : " << endl;
                 std::string bytes = client_socket->ReceiveBytes();
@@ -79,15 +69,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
                 if (bytes.empty())
                     still_connected = false;
             }
-        }
-        catch (std::exception &e)
-        {
-            cout << "Error while sending to target " << e.what() << endl;
-        }
-
-        try
-        {
-            if (sel->Readable(target_socket))
+            if (sel.Readable(target_socket))
             {
                 cout << "target socket is readable, reading bytes : " << endl;
                 std::string bytes = target_socket->ReceiveBytes();
@@ -99,25 +81,24 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
                 if (bytes.empty())
                     still_connected = false;
             }
+            if (!still_connected)
+            {
+                // Close the client socket
+                client_socket->Close();
+                break;
+            }
         }
         catch (std::exception &e)
         {
-            cout << "Error while sending to client " << e.what() << endl;
-        }
-
-        if (!still_connected)
-        {
-            // Close the client socket
-            client_socket->Close();
+            cout << e.what() << endl;
             break;
         }
     }
-
-    // Close the server socket
-    target_socket->Close();
 #ifdef WINDOWS_OS
     return 0;
 #else
     return nullptr;
 #endif
+
+    return 0;
 }

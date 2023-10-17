@@ -1,5 +1,4 @@
 #include "CProtocolSocket.h"
-#include "../test/ProxyInfo.h"
 #include "../config/ConfigSingleton.h"
 #include "Socket.h"
 #include "SocketSelect.h"

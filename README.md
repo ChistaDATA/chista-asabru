@@ -55,11 +55,13 @@ sudo chmod u+x ./build_libs.sh
 export CONFIG_FILE_URL=<url-to-config>;
 export CONFIG_FILE=<path-to-config>;
 export PLUGINS_FOLDER_PATH=<path-to-plugins-folder>;
+export PUBLIC_FOLDER_PATH=<path-to-public-folder>;
 
 Eg.
 export CONFIG_FILE_URL=https://pastebin.com/raw/RcyrYLMc;
 export CONFIG_FILE_PATH=/tmp/config.xml;
 export PLUGINS_FOLDER_PATH=/Users/midhundarvin/workplace/chistadata/chista-asabru/lib/asabru-handlers/build;
+export PUBLIC_FOLDER_PATH=/Users/midhundarvin/workplace/chistadata/chista-asabru/bin/public;
 ```
 
 ##### Build the asabru app from  the root of the repository
