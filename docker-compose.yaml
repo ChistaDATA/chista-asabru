@@ -2,11 +2,6 @@ version: "3.8"
 services:
   clickhouse-1:
     image: clickhouse/clickhouse-server:22.6
-    expose:
-      - "9000"
-      - "9440"
-      - "8123"
-      - "8443"
     ports:
       - "9000:9000"
       - "9440:9440"

@@ -1,19 +1,18 @@
 
 #include "CProtocolSocket.h"
 #include "CProxySocket.h"
-#include "../test/ProxyInfo.h"
 #include "CClientSocket.h"
 #include "../config/ConfigSingleton.h"
 #include "ProtocolHelper.h"
 #include "Socket.h"
 #include "SocketSelect.h"
 #include "Pipeline.h"
-#include <utility>
 #include "CHttpParser.h"
+#include <utility>
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 
-void *MySQLPipeline(CProxySocket *ptr, void *lptr)
+void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
 {
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
@@ -53,12 +52,21 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr)
 
     while (1)
     {
+        SocketSelect *sel;
         try
         {
-            SocketSelect sel(client_socket, target_socket, NonBlockingSocket);
-            bool still_connected = true;
+            sel = new SocketSelect(client_socket, target_socket, NonBlockingSocket);
+        }
+        catch (std::exception &e)
+        {
+            cout << e.what() << endl;
+            cout << "error occurred while creating socket select " << endl;
+        }
 
-            if (sel.Readable(client_socket))
+        bool still_connected = true;
+        try
+        {
+            if (sel->Readable(client_socket))
             {
                 cout << "client socket is readable, reading bytes : " << endl;
                 std::string bytes = client_socket->ReceiveBytes();
@@ -70,7 +78,15 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr)
                 if (bytes.empty())
                     still_connected = false;
             }
-            if (sel.Readable(target_socket))
+        }
+        catch (std::exception &e)
+        {
+            cout << "Error while sending to target " << e.what() << endl;
+        }
+
+        try
+        {
+            if (sel->Readable(target_socket))
             {
                 cout << "target socket is readable, reading bytes : " << endl;
                 std::string bytes = target_socket->ReceiveBytes();
@@ -82,24 +98,25 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr)
                 if (bytes.empty())
                     still_connected = false;
             }
-            if (!still_connected)
-            {
-                // Close the client socket
-                client_socket->Close();
-                break;
-            }
         }
         catch (std::exception &e)
         {
-            cout << e.what() << endl;
+            cout << "Error while sending to client " << e.what() << endl;
+        }
+
+        if (!still_connected)
+        {
+            // Close the client socket
+            client_socket->Close();
             break;
         }
     }
+
+    // Close the server socket
+    target_socket->Close();
 #ifdef WINDOWS_OS
     return 0;
 #else
     return nullptr;
 #endif
-
-    return 0;
 }

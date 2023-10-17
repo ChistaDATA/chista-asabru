@@ -9,7 +9,16 @@ This module has the automation test code to validate the functionality and perfo
 ## Pre-requisites
 * Python3.9+
 	- clickhouse-driver
+	- pyyaml
 	- requests
+
+Install Pip : https://pip.pypa.io/en/stable/installation/
+
+```
+pip install clickhouse-driver
+pip install pyyaml
+pip install requests
+```
 
 ## Steps
 1. Build and run the Asabru server

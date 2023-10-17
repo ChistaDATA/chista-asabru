@@ -5,6 +5,17 @@
 #include <thread>
 #include <list>
 #include <map>
+#include <iostream>
+#include <fstream>
+#include <string>
+/*for getting file size using stat()*/
+#include <sys/stat.h>
+
+/*for sendfile()*/
+// #include <sys/sendfile.h>
+
+/*for O_RDONLY*/
+#include <fcntl.h>
 
 #include "config/ConfigSingleton.h"
 #include "CProtocolSocket.h"
@@ -80,7 +91,9 @@ std::string updateProxyServers(ProxySocketsMap *proxySocketsMap)
         {
             updateProxyConfig((*proxySocketsMap)[value.name], value);
         }
-    } catch(std::exception &e) {
+    }
+    catch (std::exception &e)
+    {
         cout << e.what() << endl;
         return "Error occurred when updating the configurations : " + std::string(e.what());
     }
@@ -140,13 +153,28 @@ int main(int argc, char **argv)
     auto send_html = [](const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse
     {
         simple_http_server::HttpResponse response(simple_http_server::HttpStatusCode::Ok);
-        std::string content;
-        content += "<!doctype html>\n";
-        content += "<html>\n<body>\n\n";
-        content += "<h1>Hello, world in an Html page</h1>\n";
-        content += "<p>A Paragraph</p>\n\n";
-        content += "</body>\n</html>\n";
+        std::string content = "";
 
+        /*
+            char header[] =
+            "HTTP/1.1 200 Ok\r\n"
+            "Content-Type: text/html\r\n\r\n";
+        */
+
+        // write(fd, head, strlen(head));
+        std::string publicFolderPath = std::getenv("PUBLIC_FOLDER_PATH");
+        std::string file_path = publicFolderPath + "/index.html";
+        std::ifstream myfile(file_path);
+
+        std::string temp;
+        if (myfile.is_open())
+        { // always check whether the file is open
+            while (myfile) // equivalent to myfile.good()
+            {
+                std::getline(myfile, temp);
+                content += temp;
+            }
+        }
         response.SetHeader("Content-Type", "text/html");
         response.SetContent(content);
         return response;
