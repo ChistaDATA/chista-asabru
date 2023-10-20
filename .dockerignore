@@ -1,0 +1,5 @@
+automation_testing
+build
+cmake-build-debug
+debug
+.vscode

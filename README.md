@@ -51,17 +51,35 @@ sudo chmod u+x ./build_libs.sh
 ./build_libs.sh
 ```
 ##### Set environment variables
+The asabru proxy configuration is based on an xml file. This file can be fetched from remote or from local
+
+Remote configuration
 ```
 export CONFIG_FILE_URL=<url-to-config>;
-export CONFIG_FILE=<path-to-config>;
-export PLUGINS_FOLDER_PATH=<path-to-plugins-folder>;
-export PUBLIC_FOLDER_PATH=<path-to-public-folder>;
+export CONFIG_FILE_PATH=<path-to-config>;
 
 Eg.
 export CONFIG_FILE_URL=https://pastebin.com/raw/RcyrYLMc;
 export CONFIG_FILE_PATH=/tmp/config.xml;
+```
+
+Local configuration (skip setting the CONFIG_FILE_URL environment variable)
+```
+export CONFIG_FILE_PATH=<path-to-config>;
+
+Eg.
+export CONFIG_FILE_PATH=/Users/midhundarvin/workplace/chistadata/chista-asabru/build/config.xml
+```
+
+The plugins folder path is the directory where plugins have been build and the public folder path is the folder where HTTP protocol handler
+serves static files.
+```
+export PLUGINS_FOLDER_PATH=<path-to-plugins-folder>;
+export PUBLIC_FOLDER_PATH=<path-to-public-folder>;
+
+Eg.
 export PLUGINS_FOLDER_PATH=/Users/midhundarvin/workplace/chistadata/chista-asabru/lib/asabru-handlers/build;
-export PUBLIC_FOLDER_PATH=/Users/midhundarvin/workplace/chistadata/chista-asabru/bin/public;
+export PUBLIC_FOLDER_PATH=/Users/midhundarvin/workplace/chistadata/chista-asabru/build/public;
 ```
 
 ##### Build the asabru app from  the root of the repository

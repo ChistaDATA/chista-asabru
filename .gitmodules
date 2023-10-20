@@ -3,7 +3,7 @@
 	url = https://github.com/leethomason/tinyxml2.git
 [submodule "lib/libuv"]
 	path = lib/libuv
-	url = https://github.com/libuv/libuv.git
+	url = git@github.com:libuv/libuv.git
 [submodule "asabru-parsers"]
 	path = lib/asabru-parsers
 	url = git@github.com:ChistaDATA/asabru-parsers.git
@@ -11,7 +11,7 @@
 [submodule "asabru-engine"]
 	path = lib/asabru-engine
 	url = git@github.com:ChistaDATA/asabru-engine.git
-	branch = thread-per-client
+	branch = main
 [submodule "asabru-commons"]
 	path = lib/asabru-commons
 	url = git@github.com:ChistaDATA/asabru-commons.git
@@ -19,4 +19,4 @@
 [submodule "lib/asabru-handlers"]
 	path = lib/asabru-handlers
 	url = git@github.com:ChistaDATA/asabru-handlers.git
-	branch = thread-per-client
+	branch = main

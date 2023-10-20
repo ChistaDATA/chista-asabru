@@ -217,6 +217,7 @@ std::vector<RESOLVED_PROXY_CONFIG> ConfigSingleton::ResolveProxyServerConfigurat
             }
 
             // Resolve the Pipeline
+            result.pipelineName = endpoint.pipeline;
             result.pipeline = pipelineFactory->GetProxyPipeline(endpoint.pipeline);
             // Resolve the Handler class
             result.handler = typeFactory->GetType(endpoint.handler);
