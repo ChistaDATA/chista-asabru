@@ -7,6 +7,8 @@ services:
       - "9440:9440"
       - "8123:8123"
       - "8443:8443"
+    networks:
+      - backend
     ## Uncomment the below lines to setup TLS for wire level protocol
     ## Reference : https://www.bytebase.com/blog/how-to-configure-clickhouse-ssl-connection/
     # volumes:
@@ -32,7 +34,8 @@ services:
       - "9160:9160"
       - "9170:9170"
     environment:
-      CONFIG_FILE_URL: https://pastebin.com/raw/2Ts9aeN7
+#      CONFIG_FILE_URL: https://pastebin.com/raw/2Ts9aeN7 # Thread per client version
+      CONFIG_FILE_URL: https://pastebin.com/raw/72vCDJvm # libuv version
       CONFIG_FILE_PATH: /tmp/config.xml
     # network_mode: "host"
     links:
@@ -41,6 +44,8 @@ services:
       - "serving-proxy-2:cluster-2"
       - "serving-proxy-3:cluster-3"
       - "serving-proxy-4:cluster-4"
+    networks:
+      - backend
 
   serving-proxy-1:
     build:
@@ -56,6 +61,8 @@ services:
       CONFIG_FILE_PATH: /tmp/config.xml
     links:
       - "clickhouse-1:database"
+    networks:
+      - backend
 
   serving-proxy-2:
     build:
@@ -71,6 +78,8 @@ services:
       CONFIG_FILE_PATH: /tmp/config.xml
     links:
       - "clickhouse-1:database"
+    networks:
+      - backend
 
   serving-proxy-3:
     build:
@@ -86,6 +95,8 @@ services:
       CONFIG_FILE_PATH: /tmp/config.xml
     links:
       - "clickhouse-1:database"
+    networks:
+      - backend
 
   serving-proxy-4:
     build:
@@ -101,6 +112,8 @@ services:
       CONFIG_FILE_PATH: /tmp/config.xml
     links:
       - "clickhouse-1:database"
+    networks:
+      - backend
 
   # postgres-1:
   #   image: postgres:14.4
@@ -117,3 +130,9 @@ services:
 
 volumes:
   pg_data:
+
+networks:
+  backend:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1400

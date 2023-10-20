@@ -25,7 +25,9 @@ class ConfigSingleton
 {
 private:
     ConfigSingleton() {
-        DownloadConfigFile(std::getenv("CONFIG_FILE_URL"), std::getenv("CONFIG_FILE_PATH"));
+        if (std::getenv("CONFIG_FILE_URL")) {
+            DownloadConfigFile(std::getenv("CONFIG_FILE_URL"), std::getenv("CONFIG_FILE_PATH"));
+        }
         LoadConfigurationsFromFile(std::getenv("CONFIG_FILE_PATH"));
     };
     ~ConfigSingleton() = default;
