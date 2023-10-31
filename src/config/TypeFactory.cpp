@@ -4,7 +4,10 @@
 
 void TypeFactory::updateLibs()
 {
-    std::cout << "Checking for new libs" << std::endl;
+    if (!std::getenv("PLUGINS_FOLDER_PATH")) {
+        throw std::runtime_error("PLUGINS_FOLDER_PATH environment variable is missing");
+    }
+    std::cout << "Checking for new libraries :" << std::endl;
     std::string pluginsFolderPath = std::getenv("PLUGINS_FOLDER_PATH");
 
 #if __APPLE__

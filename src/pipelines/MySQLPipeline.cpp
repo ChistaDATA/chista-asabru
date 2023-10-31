@@ -48,9 +48,11 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr)
     EXECUTION_CONTEXT exec_context;
 
     ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
+    ProtocolHelper::SetKeepAlive(client_socket->GetSocket(), 1);
     ProtocolHelper::SetReadTimeOut(target_socket->GetSocket(), 1);
+    ProtocolHelper::SetKeepAlive(target_socket->GetSocket(), 1);
 
-    while (1)
+    while (true)
     {
         try
         {

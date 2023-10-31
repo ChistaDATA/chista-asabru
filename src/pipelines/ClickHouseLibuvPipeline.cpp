@@ -138,7 +138,7 @@ void *ClickHouseLibuvPipeline(LibuvProxySocket *ptr, void *lptr) {
         {
             std::cout << "Unable to get host endpoint by name " << std::endl;
             error = strerror(errno);
-            throw error;
+            throw std::runtime_error(error);
         }
     }
     catch (std::exception &e)

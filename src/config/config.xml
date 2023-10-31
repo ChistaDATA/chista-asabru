@@ -28,7 +28,7 @@
 					<READ_WRITE>yes</READ_WRITE>
 					<PROXY_PORT>9110</PROXY_PORT>
 					<PROTOCOL>CH_HTTP</PROTOCOL>
-					<PIPELINE>ClickHouseLibuvPipeline</PIPELINE>
+					<PIPELINE>ClickHousePipeline</PIPELINE>
 					<HANDLER>CHttpHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_http_service1">
@@ -54,12 +54,12 @@
 					<READ_WRITE>no</READ_WRITE>
 					<PROXY_PORT>9130</PROXY_PORT>
 					<PROTOCOL>CH_TLS_HTTP</PROTOCOL>
-					<PIPELINE>ClickHouseTLSPipeline</PIPELINE>
+					<PIPELINE>ClickHousePipeline</PIPELINE>
 					<HANDLER>CHttpsHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_tls_http_service1">
 							<HOST>localhost</HOST>
-							<PORT>8123</PORT>
+							<PORT>8443</PORT>
 						</SERVICE>
 					</SERVICES>
 				</END_POINT>
