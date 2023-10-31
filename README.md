@@ -96,7 +96,7 @@ export SSL_CERT_PASSPHRASE = <passphrase>
 Eg.
 export SSL_CERT_FILE_PATH = /Users/josephabraham/ChistaV2/ssl_test1/cert.pem
 export SSL_KEY_FILE_PATH = /Users/josephabraham/ChistaV2/ssl_test1/key.pem
-export SSL_CERT_PASSPHRASE = "mypassword"
+export SSL_CERT_PASSPHRASE = mypassword
 ```
 
 
