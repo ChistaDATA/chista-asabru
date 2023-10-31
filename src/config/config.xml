@@ -54,12 +54,12 @@
 					<READ_WRITE>no</READ_WRITE>
 					<PROXY_PORT>9130</PROXY_PORT>
 					<PROTOCOL>CH_TLS_HTTP</PROTOCOL>
-					<PIPELINE>ClickHousePipeline</PIPELINE>
+					<PIPELINE>ClickHouseTLSPipeline</PIPELINE>
 					<HANDLER>CHttpsHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_tls_http_service1">
 							<HOST>localhost</HOST>
-							<PORT>8443</PORT>
+							<PORT>8123</PORT>
 						</SERVICE>
 					</SERVICES>
 				</END_POINT>
