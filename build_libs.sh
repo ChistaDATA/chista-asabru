@@ -29,9 +29,9 @@ for dir in "${list_of_directories[@]}"; do
     make clean
 
     if [[ $dir == "./lib/libuv" ]]; then
-      cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_TESTING=OFF # -DCMAKE_BUILD_TYPE=Debug
+      cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_TESTING=OFF  -DCMAKE_BUILD_TYPE=Debug
     else
-      cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON # -DCMAKE_BUILD_TYPE=Debug
+      cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON  -DCMAKE_BUILD_TYPE=Debug
     fi
 
     make

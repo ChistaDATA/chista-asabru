@@ -82,6 +82,21 @@ export PLUGINS_FOLDER_PATH=/Users/midhundarvin/workplace/chistadata/chista-asabr
 export PUBLIC_FOLDER_PATH=/Users/midhundarvin/workplace/chistadata/chista-asabru/build/public;
 ```
 
+Running Proxy using SSL clients requires setting the following configuration
+```
+export SSL_CERT_FILE_PATH = <path-to-SSL-certificate-directory>
+export SSL_KEY_FILE_PATH = <path-to -SSL-key-directory>
+
+If a passphrase is set , give the passphrase also
+
+export SSL_CERT_PASSPHRASE = <passphrase>
+
+Eg.
+export SSL_CERT_FILE_PATH = /Users/josephabraham/ChistaV2/ssl_test1/cert.pem
+export SSL_KEY_FILE_PATH = /Users/josephabraham/ChistaV2/ssl_test1/key.pem
+export SSL_CERT_PASSPHRASE = "mypassword"
+```
+
 ##### Build the asabru app from  the root of the repository
 
 ```
