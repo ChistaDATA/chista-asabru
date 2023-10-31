@@ -82,7 +82,9 @@ export PLUGINS_FOLDER_PATH=/Users/midhundarvin/workplace/chistadata/chista-asabr
 export PUBLIC_FOLDER_PATH=/Users/midhundarvin/workplace/chistadata/chista-asabru/build/public;
 ```
 
-Running Proxy using SSL clients requires setting the following configuration
+Running Proxy using SSL clients requires setting the following SSL configuration.
+Please see the [**documentation** ](https://tecadmin.net/step-by-step-guide-to-creating-self-signed-ssl-certificates/) on how to create a self-signed certificates for testing
+
 ```
 export SSL_CERT_FILE_PATH = <path-to-SSL-certificate-directory>
 export SSL_KEY_FILE_PATH = <path-to -SSL-key-directory>
@@ -96,6 +98,10 @@ export SSL_CERT_FILE_PATH = /Users/josephabraham/ChistaV2/ssl_test1/cert.pem
 export SSL_KEY_FILE_PATH = /Users/josephabraham/ChistaV2/ssl_test1/key.pem
 export SSL_CERT_PASSPHRASE = "mypassword"
 ```
+
+
+
+
 
 ##### Build the asabru app from  the root of the repository
 
