@@ -25,6 +25,9 @@ class ConfigSingleton
 {
 private:
     ConfigSingleton() {
+        if(!std::getenv("CONFIG_FILE_PATH")) {
+            throw std::runtime_error("CONFIG_FILE_PATH environment variable is missing!");
+        }
         if (std::getenv("CONFIG_FILE_URL")) {
             DownloadConfigFile(std::getenv("CONFIG_FILE_URL"), std::getenv("CONFIG_FILE_PATH"));
         }
