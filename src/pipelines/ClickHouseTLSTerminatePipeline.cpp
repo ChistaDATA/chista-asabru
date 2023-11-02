@@ -5,7 +5,6 @@
 #include "Socket.h"
 #include "SSLSocket.h"
 #include "SocketSelect.h"
-#include "CHttpParser.h"
 
 #include <utility>
 
@@ -19,10 +18,10 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
 
     // Check if handler is defined
     CProxyHandler *proxy_handler = ptr->GetHandler();
-    if (proxy_handler == 0)
+    if (proxy_handler == nullptr)
     {
         cout << "The handler is not defined. Exiting!" << endl;
-        return 0;
+        return nullptr;
     }
 
     /**
@@ -49,7 +48,9 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
     EXECUTION_CONTEXT exec_context;
 
     ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
+    ProtocolHelper::SetKeepAlive(client_socket->GetSocket(), 1);
     ProtocolHelper::SetReadTimeOut(target_socket->GetSocket(), 1);
+    ProtocolHelper::SetKeepAlive(target_socket->GetSocket(), 1);
 
     while (true)
     {
