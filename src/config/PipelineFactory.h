@@ -8,19 +8,11 @@
 #include "CProxySocket.h"
 #include "CProtocolSocket.h"
 #include "LibuvProxySocket.h"
+#include "../pipelines/Pipeline.h"
 
 typedef std::map<string, PipelineFunction<CProtocolSocket>> ProtocolPipelineFunctionMap;
 typedef std::map<string, PipelineFunction<CProxySocket>> ProxyPipelineFunctionMap;
 typedef std::map<string, PipelineFunction<LibuvProxySocket>> LibuvProxyPipelineFunctionMap;
-
-void *ClickHousePipeline(CProxySocket *ptr, void *lptr);
-void *ClickHouseLibuvPipeline(LibuvProxySocket *ptr, void *lptr);
-void *ClickHouseSSLPipeline(CProxySocket *ptr, void *lptr);
-void *ClickHouseTLSPipeline(CProxySocket *ptr, void *lptr);
-void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr);
-void *MySQLPipeline(CProxySocket *ptr, void *lptr);
-void *PassthroughPipeLine(CProtocolSocket *ptr, void *lptr);
-void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr);
 
 class PipelineFactory
 {
@@ -33,8 +25,8 @@ public:
     {
         // Create PipelineFunction mappings
         proxyPipelineFunctionMap["ClickHousePipeline"] = ClickHousePipeline;
-        proxyPipelineFunctionMap["ClickHouseSSLPipeline"] = ClickHouseSSLPipeline;
-        proxyPipelineFunctionMap["ClickHouseTLSPipeline"] = ClickHouseTLSPipeline;
+        proxyPipelineFunctionMap["ClickHouseTLSStartPipeline"] = ClickHouseTLSStartPipeline;
+        proxyPipelineFunctionMap["ClickHouseTLSTerminatePipeline"] = ClickHouseTLSTerminatePipeline;
         proxyPipelineFunctionMap["PostgreSQLPipeline"] = PostgreSQLPipeline;
         proxyPipelineFunctionMap["MySQLPipeline"] = MySQLPipeline;
 

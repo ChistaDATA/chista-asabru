@@ -200,9 +200,9 @@ void handle_client(int client_socket, std::string server_host, int server_port)
 
     // Parse the request to determine the host and port
     request = std::string(buffer, bytes_received);
-    std::cout << "=============== Request =================" << std::endl;
-    std::cout << request << std::endl;
-    std::cout << "=====================================" << std::endl;
+//    std::cout << "=============== Request =================" << std::endl;
+//    std::cout << request << std::endl;
+//    std::cout << "=====================================" << std::endl;
 
     /*
      * Create an SSL_CTX which we can use to create SSL objects from. We
@@ -347,9 +347,9 @@ void handle_client(int client_socket, std::string server_host, int server_port)
     printf("\n");
 
     std::cout << "Sending data to client : " << std::endl;
-    std::cout << "=============== Response =================" << std::endl;
-    std::cout << response << std::endl;
-    std::cout << "==========================================" << std::endl;
+//    std::cout << "=============== Response =================" << std::endl;
+//    std::cout << response << std::endl;
+//    std::cout << "==========================================" << std::endl;
     send(client_socket, response.c_str(), response.length(), 0);
 
     /*
@@ -395,7 +395,14 @@ end:
     // return res;
 }
 
-void *ClickHouseSSLPipeline(CProxySocket *ptr, void *lptr)
+/**
+ * This pipeline connects a user client ( TCP ) to a TLS endpoint target
+ *
+ * @param ptr CProxySocket pointer
+ * @param lptr client data
+ * @return
+ */
+void *ClickHouseTLSStartPipeline(CProxySocket *ptr, void *lptr)
 {
     std::cout << "ClickHouseSSLPipeline::start" << std::endl;
     CLIENT_DATA clientData;
