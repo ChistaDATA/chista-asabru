@@ -11,7 +11,7 @@
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 
-void *ClickHouseTLSPipeline(CProxySocket *ptr, void *lptr)
+void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
 {
     std::cout << "ClickHouseTLSPipeline::start" << std::endl;
     CLIENT_DATA clientData;
@@ -51,7 +51,7 @@ void *ClickHouseTLSPipeline(CProxySocket *ptr, void *lptr)
     ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
     ProtocolHelper::SetReadTimeOut(target_socket->GetSocket(), 1);
 
-    while (1)
+    while (true)
     {
         SocketSelect *sel;
 
