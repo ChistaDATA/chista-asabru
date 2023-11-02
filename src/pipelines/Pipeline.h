@@ -7,6 +7,7 @@
 #include "CClientSocket.h"
 #include "ProtocolHelper.h"
 #include "Socket.h"
+#include "LibuvProxySocket.h"
 #include "CServerSocket.h"
 
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr);

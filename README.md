@@ -132,7 +132,9 @@ docker build --no-cache --progress=plain -t asabru-proxy .
 ### Run Docker Image
 
 ```
-docker run -it -e CONFIG_FILE_URL=<config-file-url> asabru-proxy
+docker run -it -e CONFIG_FILE_URL=<config-file-url> CONFIG_FILE_PATH=<config-file-path> asabru-proxy
+
+Eg. docker run -it -e CONFIG_FILE_URL=https://pastebin.com/raw/qAPt4KNQ CONFIG_FILE_PATH=/tmp/config.xml asabru-proxy
 ```
 
 ### Run with Docker compose
@@ -155,4 +157,6 @@ configurations from that location and start the server.
 Run the clickhouse client in SSL mode
 ```
 ./clickhouse client --config <your-config-path>/clickhouse-client-ssl.xml --host 127.0.0.1 --port 9120
+
+Eg. ./clickhouse client --config /Users/midhundarvin/software/openssl/clickhouse-client-ssl.xml --host 127.0.0.1 --port 9120
 ```
