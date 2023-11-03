@@ -1,18 +1,21 @@
 #include "CProtocolSocket.h"
 #include "CProxySocket.h"
 #include "CClientSocket.h"
-#include "../config/ConfigSingleton.h"
 #include "Socket.h"
 #include "SSLSocket.h"
 #include "SocketSelect.h"
 
 #include <utility>
 
-static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
-
+/**
+ * TLS Termination pipeline :
+ * The proxy serves a TLS certificate and connection to the client is
+ * via TLS. The TLS connection is terminated here and the decrypted
+ * packets are transferred to the target endpoint via TCP/HTTP.
+ */
 void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
 {
-    std::cout << "ClickHouseTLSPipeline::start" << std::endl;
+    std::cout << "ClickHouseTLSTerminatePipeline::start" << std::endl;
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
 
@@ -41,8 +44,7 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
     cout << "Resolved (Target) Host: " << target_endpoint->ipaddress << endl
          << "Resolved (Target) Port: " << target_endpoint->port << endl;
 
-    Socket *client_socket = (Socket *)clientData.client_socket;
-    SSLSocket *ssl_client= new SSLSocket(client_socket->GetSocket());
+    SSLSocket *client_socket= new SSLSocket(((Socket *)clientData.client_socket)->GetSocket());
     CClientSocket *target_socket = new CClientSocket(target_endpoint->ipaddress, target_endpoint->port);
 
     EXECUTION_CONTEXT exec_context;
@@ -72,7 +74,7 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
             if (sel->Readable(client_socket))
             {
                 cout << "client socket is readable, reading bytes : " << endl;
-                std::string bytes = ssl_client->ReceiveBytes();
+                std::string bytes = client_socket->ReceiveBytes();
 
                 cout << "Calling Proxy Upstream Handler.." << endl;
                 std::string response = proxy_handler->HandleUpstreamData((void *)bytes.c_str(), bytes.size(), &exec_context);
@@ -96,7 +98,7 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
 
                 cout << "Calling Proxy Downstream Handler.." << endl;
                 std::string response = proxy_handler->HandleDownStreamData((void *)bytes.c_str(), bytes.size(), &exec_context);
-                ssl_client->SendBytes((char *)response.c_str(), response.size());
+                client_socket->SendBytes((char *)response.c_str(), response.size());
 
                 if (bytes.empty())
                     still_connected = false;
@@ -110,13 +112,14 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
         if (!still_connected)
         {
             // Close the client socket
-            ssl_client->Close();
+            client_socket->Close();
             break;
         }
     }
 
     // Close the server socket
     target_socket->Close();
+    std::cout << "ClickHouseTLSTerminatePipeline::end" << std::endl;
 #ifdef WINDOWS_OS
     return 0;
 #else

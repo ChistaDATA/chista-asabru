@@ -27,6 +27,7 @@ public:
         proxyPipelineFunctionMap["ClickHousePipeline"] = ClickHousePipeline;
         proxyPipelineFunctionMap["ClickHouseTLSStartPipeline"] = ClickHouseTLSStartPipeline;
         proxyPipelineFunctionMap["ClickHouseTLSTerminatePipeline"] = ClickHouseTLSTerminatePipeline;
+        proxyPipelineFunctionMap["ClickHouseTLSExchangePipeline"] = ClickHouseTLSExchangePipeline;
         proxyPipelineFunctionMap["PostgreSQLPipeline"] = PostgreSQLPipeline;
         proxyPipelineFunctionMap["MySQLPipeline"] = MySQLPipeline;
 
