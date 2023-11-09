@@ -1,6 +1,7 @@
 #include "ConfigSingleton.h"
 #include "TypeFactory.h"
 #include "Utils.h"
+#include "CommandDispatcher.h"
 
 /**
  * Function to load the config.xml file from a URL
@@ -220,7 +221,8 @@ std::vector<RESOLVED_PROXY_CONFIG> ConfigSingleton::ResolveProxyServerConfigurat
             result.pipelineName = endpoint.pipeline;
             result.pipeline = pipelineFactory->GetProxyPipeline(endpoint.pipeline);
             // Resolve the Handler class
-            result.handler = typeFactory->GetType(endpoint.handler);
+            CommandDispatcher::RegisterCommand<BaseHandler>(endpoint.handler);
+            result.handler = CommandDispatcher::GetCommand<BaseHandler>(endpoint.handler);
 
             results.push_back(result);
         }
@@ -261,8 +263,34 @@ XMLError ConfigSingleton::LoadProtocolServerConfigurations(XMLNode *root)
         {
             config.handler = handlerElement->GetText();
         }
-        result.push_back(config);
 
+        XMLElement *routesElement = protocol_server->FirstChildElement("routes");
+        XMLElement *routeElement = routesElement->FirstChildElement("route");
+        std::vector<Route> routes;
+        while (routeElement) {
+            Route r;
+            XMLElement *pathElement = routeElement->FirstChildElement("path");
+            if (NULL != pathElement)
+            {
+                r.path = pathElement->GetText();
+            }
+
+            XMLElement *methodElement = routeElement->FirstChildElement("method");
+            if (NULL != methodElement)
+            {
+                r.method = methodElement->GetText();
+            }
+
+            XMLElement *requestHandlerElement = routeElement->FirstChildElement("request_handler");
+            if (NULL != requestHandlerElement)
+            {
+                r.request_handler = requestHandlerElement->GetText();
+            }
+            routes.push_back(r);
+            routeElement = routeElement->NextSiblingElement("route");
+        }
+        config.routes = routes;
+        result.push_back(config);
         protocol_server = protocol_server->NextSiblingElement("protocol-server");
     }
     m_ProtocolServerConfig = result;
@@ -280,8 +308,10 @@ std::vector<RESOLVED_PROTOCOL_CONFIG> ConfigSingleton::ResolveProtocolServerConf
         // Resolve the Pipeline
         result.pipeline = pipelineFactory->GetProtocolPipeline(protocol_server.pipeline);
         // Resolve the Handler class
-        result.handler = typeFactory->GetType(protocol_server.handler);
+        CommandDispatcher::RegisterCommand<BaseHandler>(protocol_server.handler);
+        result.handler = CommandDispatcher::GetCommand<BaseHandler>(protocol_server.handler);
 
+        result.routes = protocol_server.routes;
         results.push_back(result);
     }
 

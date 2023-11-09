@@ -98,10 +98,11 @@ export SSL_CERT_FILE_PATH = /Users/josephabraham/ChistaV2/ssl_test1/cert.pem
 export SSL_KEY_FILE_PATH = /Users/josephabraham/ChistaV2/ssl_test1/key.pem
 export SSL_CERT_PASSPHRASE = mypassword
 ```
-
-
-
-
+If you are connecting to a target server with a self-signed certificate, add this environment
+variable
+```
+export SSL_VERIFY_CERT=false
+```
 
 ##### Build the asabru app from  the root of the repository
 
@@ -132,9 +133,9 @@ docker build --no-cache --progress=plain -t asabru-proxy .
 ### Run Docker Image
 
 ```
-docker run -it -e CONFIG_FILE_URL=<config-file-url> CONFIG_FILE_PATH=<config-file-path> asabru-proxy
+docker run -it -d -p 9000-9999:9000-9999 -e CONFIG_FILE_URL=<config-file-url> -e CONFIG_FILE_PATH=<config-file-path> --name asabru-proxy asabru-proxy
 
-Eg. docker run -it -e CONFIG_FILE_URL=https://pastebin.com/raw/qAPt4KNQ CONFIG_FILE_PATH=/tmp/config.xml asabru-proxy
+Eg. docker run -it -d -p 9000-9999:9000-9999 -e CONFIG_FILE_URL=https://pastebin.com/raw/qAPt4KNQ -e CONFIG_FILE_PATH=/tmp/config.xml --name asabru-proxy asabru-proxy
 ```
 
 ### Run with Docker compose

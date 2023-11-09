@@ -9,8 +9,6 @@
 #include "CHttpParser.h"
 #include <utility>
 
-static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
-
 void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
 {
     CLIENT_DATA clientData;

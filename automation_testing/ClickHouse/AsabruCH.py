@@ -54,7 +54,7 @@ class AsabruCH:
         if self.database_name not in databases:
 
             client.execute(f'CREATE DATABASE {self.database_name}')
-            print('Database {self.database_name} created')
+            print('Database ' + self.database_name + ' created')
 
         client.execute(f'DROP TABLE IF EXISTS {self.database_name}.cell_towers')
         client.disconnect()
@@ -85,7 +85,7 @@ class AsabruCH:
             os.system(f'clickhouse client --host {self.ch_host} --user {self.ch_user} --password {self.ch_password} --port {self.port} --query "INSERT INTO {self.database_name}.cell_towers FORMAT CSVWithNames" < cell_towers.csv')
         else:
             # os.system(f'clickhouse client --secure --host {self.ch_host} --user {self.ch_user} --password {self.ch_password} --port {self.port} --query "INSERT INTO {self.database_name}.cell_towers FORMAT CSVWithNames" < cell_towers.csv')
-            os.system(f'clickhouse client --secure --host {self.ch_host} --port {self.port} --config {self.client_config} --query "INSERT INTO {self.database_name}.cell_towers FORMAT CSVWithNames" < cell_towers.csv')
+            os.system(f'clickhouse client --secure --accept-invalid-certificate --host {self.ch_host} --port {self.port} --user {self.ch_user} --password {self.ch_password} --query "INSERT INTO {self.database_name}.cell_towers FORMAT CSVWithNames" < cell_towers.csv')
 
         print('Successfully loaded the data in to the table')
 
