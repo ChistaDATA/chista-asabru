@@ -10,8 +10,6 @@
 #include <utility>
 #include "CHttpParser.h"
 
-static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
-
 void *MySQLPipeline(CProxySocket *ptr, void *lptr)
 {
     CLIENT_DATA clientData;

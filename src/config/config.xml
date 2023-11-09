@@ -5,6 +5,18 @@
 			<protocol-port>8080</protocol-port>
 			<pipeline>ProtocolPipeline</pipeline>
 			<handler>CHttpProtocolHandler</handler>
+			<routes>
+				<route>
+					<path>/configuration</path>
+					<method>POST</method>
+					<request_handler>UpdateConfigurationCommand</request_handler>
+				</route>
+				<route>
+					<path>/</path>
+					<method>GET</method>
+					<request_handler>SendHtmlCommand</request_handler>
+				</route>
+			</routes>
 		</protocol-server>
 	</protocol-server-config>
 
@@ -28,7 +40,7 @@
 					<READ_WRITE>yes</READ_WRITE>
 					<PROXY_PORT>9110</PROXY_PORT>
 					<PROTOCOL>CH_HTTP</PROTOCOL>
-					<PIPELINE>ClickHousePipeline</PIPELINE>
+					<PIPELINE>ClickHouseTLSTerminatePipeline</PIPELINE>
 					<HANDLER>CHttpHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_http_service1">
@@ -54,7 +66,7 @@
 					<READ_WRITE>no</READ_WRITE>
 					<PROXY_PORT>9130</PROXY_PORT>
 					<PROTOCOL>CH_TLS_HTTP</PROTOCOL>
-					<PIPELINE>ClickHousePipeline</PIPELINE>
+					<PIPELINE>ClickHouseTLSExchangePipeline</PIPELINE>
 					<HANDLER>CHttpsHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_tls_http_service1">

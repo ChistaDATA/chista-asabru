@@ -12,6 +12,7 @@ RUN apt-get update -y \
     libuv1-dev \
     ccache \
     python3 \
+    python3-dev \
     bash
 
 RUN apt-get install -y \

@@ -4,8 +4,6 @@
 #include "SocketSelect.h"
 #include <utility>
 
-static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
-
 void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr)
 {
     std::cout << "Starting ProtocolPipeline \n";

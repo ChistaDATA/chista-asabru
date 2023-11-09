@@ -33,10 +33,17 @@ typedef struct {
 } PROXY_CONFIG;
 
 typedef struct {
+    std::string path;
+    std::string method;
+    std::string request_handler;
+} Route;
+
+typedef struct {
     std::string protocol_name;
     int protocol_port;
     std::string pipeline;
     std::string handler;
+    vector<Route> routes;
 } PROTOCOL_SERVER_CONFIG;
 
 typedef struct {
@@ -44,6 +51,7 @@ typedef struct {
     int protocol_port;
     PipelineFunction<CProtocolSocket> pipeline;
     void *handler;
+    vector<Route> routes;
 } RESOLVED_PROTOCOL_CONFIG;
 
 typedef struct {

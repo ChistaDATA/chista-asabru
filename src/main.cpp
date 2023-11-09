@@ -6,14 +6,8 @@
 #include <list>
 #include <map>
 #include <iostream>
-#include <fstream>
 #include <string>
-/*for getting file size using stat()*/
-#include <sys/stat.h>
-
-/*for sendfile()*/
-// #include <sys/sendfile.h>
-
+#include <utility>
 /*for O_RDONLY*/
 #include <fcntl.h>
 
@@ -21,32 +15,11 @@
 #include "CProtocolSocket.h"
 #include "CProxySocket.h"
 #include "LibuvServerSocket.h"
-#include "CHttpProtocolHandler.h"
+#include "protocol-handlers/CHttpProtocolHandler.h"
+#include "BaseComputationCommand.h"
+#include "CommandDispatcher.h"
 
 using namespace std;
-
-/* Proxy sockets map */
-typedef std::map<string, CProxySocket *> ProxySocketsMap;
-typedef std::map<string, CProtocolSocket *> ProtocolSocketsMap;
-
-/**
- * Struct to contain proxy configurations
- */
-typedef struct {
-    string proxyName;
-    RESOLVE_CONFIG resolveConfig;
-} PROXY_INIT_CONFIG;
-
-/**
- * Struct to contain database endpoint
- * and port information
- */
-typedef struct {
-    char node_end_point[40];
-    int port;
-} NODE_PING_INFO;
-
-static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 
 int startProxyServer(
         CProxySocket *socket,
@@ -72,7 +45,63 @@ int updateProxyConfig(CProxySocket *socket, RESOLVED_PROXY_CONFIG configValue) {
     return 0;
 };
 
-int initProxyServers(ProxySocketsMap *proxySocketsMap) {
+std::string updateProxyServers() {
+    std::vector<RESOLVED_PROXY_CONFIG> configValues = configSingleton.ResolveProxyServerConfigurations();
+    try {
+        for (auto value: configValues) {
+            updateProxyConfig(configSingleton.proxySocketsMap[value.name], value);
+        }
+    }
+    catch (std::exception &e) {
+        cout << e.what() << endl;
+        return "Error occurred when updating the configurations : " + std::string(e.what());
+    }
+    return "Configuration Updated Successfully!\n";
+}
+
+std::string updateConfiguration(std::string content) {
+    configSingleton.LoadConfigurationsFromString(std::move(content));
+    std::string response_content = updateProxyServers();
+    return response_content;
+}
+
+int initProtocolServers() {
+    std::vector<RESOLVED_PROTOCOL_CONFIG> protocolServerConfigValues = configSingleton.ResolveProtocolServerConfigurations();
+    for (const auto& value: protocolServerConfigValues) {
+        auto httpProtocolHandler = (CHttpProtocolHandler *) value.handler;
+        for (const auto& route: value.routes) {
+            httpProtocolHandler->RegisterHttpRequestHandler(
+                    route.path,
+                    HttpMethodEnumMap.find(route.method)->second,
+                    [route](const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse {
+                        std::cout << "Starting request handler lambda :" << std::endl;
+
+                        ComputationContext context;
+                        /**
+                         * Set necessary shared variables and functions
+                         */
+                        context.Put("request", &request);
+                        context.Put("update_configuration", updateConfiguration);
+
+                        CommandDispatcher::Dispatch(route.request_handler, &context);
+                        auto response = std::any_cast<simple_http_server::HttpResponse *>(context.Get("response"));
+                        std::cout << (int) (response->status_code()) << std::endl;
+                        return *response;
+                    }
+            );
+        }
+        configSingleton.protocolSocketsMap[value.protocol_name] = new CProtocolSocket(value.protocol_port);
+        int protocolServer = startProtocolServer(
+                configSingleton.protocolSocketsMap[value.protocol_name],
+                value);
+        if (protocolServer < 0)
+            return protocolServer;
+    }
+
+    return 1;
+}
+
+int initProxyServers() {
     std::vector<RESOLVED_PROXY_CONFIG> configValues = configSingleton.ResolveProxyServerConfigurations();
     PipelineFactory pipelineFactory;
     for (auto value: configValues) {
@@ -84,9 +113,9 @@ int initProxyServers(ProxySocketsMap *proxySocketsMap) {
             if (proxy < 0)
                 return proxy;
         } else {
-            (*proxySocketsMap)[value.name] = new CProxySocket(value.proxyPort);
+            configSingleton.proxySocketsMap[value.name] = new CProxySocket(value.proxyPort);
             int proxy = startProxyServer(
-                    (*proxySocketsMap)[value.name],
+                    configSingleton.proxySocketsMap[value.name],
                     value);
             if (proxy < 0)
                 return proxy;
@@ -95,21 +124,6 @@ int initProxyServers(ProxySocketsMap *proxySocketsMap) {
 
     }
     return 0;
-}
-
-std::string updateProxyServers(ProxySocketsMap *proxySocketsMap) {
-    std::vector<RESOLVED_PROXY_CONFIG> configValues = configSingleton.ResolveProxyServerConfigurations();
-    try {
-        for (auto value: configValues) {
-            updateProxyConfig((*proxySocketsMap)[value.name], value);
-        }
-    }
-    catch (std::exception &e) {
-        cout << e.what() << endl;
-        return "Error occurred when updating the configurations : " + std::string(e.what());
-    }
-
-    return "Configuration Updated Successfully!\n";
 }
 
 /**
@@ -142,75 +156,22 @@ void errorHandler(int sig) {
 int main(int argc, char **argv) {
     // install our error handler
     signal(SIGSEGV, errorHandler);
-    signal(SIGPIPE, errorHandler);
+    /* ignore SIGPIPE so that server can continue running when client pipe closes abruptly */
+    signal(SIGPIPE, SIG_IGN);
 
-    // Create Proxy sockets mapping
-    ProxySocketsMap proxySocketsMap;
-
-    int returnValue = initProxyServers(&proxySocketsMap);
+    int returnValue = initProxyServers();
     if (returnValue < 0) {
         cout << "Error occurred during initializing proxy servers!";
         exit(1);
     }
 
-    CHttpProtocolHandler *httpProtocolHandler = (CHttpProtocolHandler *) configSingleton.typeFactory->GetType(
-            "CHttpProtocolHandler");
-
-    // Register a few endpoints for demo and benchmarking
-    auto update_configuration = [&proxySocketsMap](
-            const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse {
-        configSingleton.LoadConfigurationsFromString(request.content());
-        std::string response_content = updateProxyServers(&proxySocketsMap);
-        simple_http_server::HttpResponse response(simple_http_server::HttpStatusCode::Ok);
-        response.SetHeader("Content-Type", "text/plain");
-        response.SetContent(response_content);
-        return response;
-    };
-    auto send_html = [](const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse {
-        simple_http_server::HttpResponse response(simple_http_server::HttpStatusCode::Ok);
-        std::string content = "";
-
-        /*
-            char header[] =
-            "HTTP/1.1 200 Ok\r\n"
-            "Content-Type: text/html\r\n\r\n";
-        */
-
-        // write(fd, head, strlen(head));
-        std::string publicFolderPath = std::getenv("PUBLIC_FOLDER_PATH");
-        std::string file_path = publicFolderPath + "/index.html";
-        std::ifstream myfile(file_path);
-
-        std::string temp;
-        if (myfile.is_open()) { // always check whether the file is open
-            while (myfile) // equivalent to myfile.good()
-            {
-                std::getline(myfile, temp);
-                content += temp;
-                content += "\n";
-            }
-        }
-        response.SetHeader("Content-Type", "text/html");
-        response.SetContent(content);
-        return response;
-    };
-
-    httpProtocolHandler->RegisterHttpRequestHandler("/configuration", simple_http_server::HttpMethod::POST,
-                                                    update_configuration);
-    httpProtocolHandler->RegisterHttpRequestHandler("/", simple_http_server::HttpMethod::GET, send_html);
-
-    ProtocolSocketsMap protocolSocketsMap;
-    std::vector<RESOLVED_PROTOCOL_CONFIG> protocolServerConfigValues = configSingleton.ResolveProtocolServerConfigurations();
-    for (auto value: protocolServerConfigValues) {
-        protocolSocketsMap[value.protocol_name] = new CProtocolSocket(value.protocol_port);
-        int protocolServer = startProtocolServer(
-                protocolSocketsMap[value.protocol_name],
-                value);
-        if (protocolServer < 0)
-            return protocolServer;
+    returnValue = initProtocolServers();
+    if (returnValue < 0) {
+        cout << "Error occurred during initializing protocol servers!";
+        exit(1);
     }
 
-    while (1);
+    while (true);
     return 0;
 }
 

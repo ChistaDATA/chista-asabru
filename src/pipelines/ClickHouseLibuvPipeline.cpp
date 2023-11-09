@@ -10,8 +10,6 @@
 #include "Pipeline.h"
 #include "uv.h"
 
-static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
-
 namespace clickhouse_pipeline {
     // Callback function for memory allocation when reading data
     void on_alloc(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf) {

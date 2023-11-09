@@ -12,6 +12,10 @@
 
 using namespace tinyxml2;
 
+/* Proxy sockets map */
+typedef std::map<string, CProxySocket *> ProxySocketsMap;
+typedef std::map<string, CProtocolSocket *> ProtocolSocketsMap;
+
 #ifndef XMLCheckResult
 #define XMLCheckResult(a_eResult)         \
     if (a_eResult != XML_SUCCESS)         \
@@ -55,8 +59,11 @@ public:
     std::vector<RESOLVED_PROTOCOL_CONFIG> ResolveProtocolServerConfigurations();
 
     void DownloadConfigFile(std::string url, std::string outputFilePath);
-    TypeFactory *typeFactory = new TypeFactory();
     PipelineFactory * pipelineFactory = new PipelineFactory();
+    // Create Proxy sockets mapping
+    ProxySocketsMap proxySocketsMap;
+    ProtocolSocketsMap protocolSocketsMap;
 };
 
+static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
 #endif
