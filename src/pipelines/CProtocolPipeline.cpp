@@ -45,9 +45,11 @@ void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr)
                 cout << "client socket is readable, reading bytes : " << endl;
                 std::string bytes = client_socket->ReceiveBytes();
 
-                cout << "Calling Protocol Handler.." << endl;
-                response = protocol_handler->HandleData((void *)bytes.c_str(), bytes.size(), &exec_context);
-                client_socket->SendBytes((char *)response.c_str(), response.size());
+                if (!bytes.empty()) {
+                    cout << "Calling Protocol Handler.." << endl;
+                    response = protocol_handler->HandleData((void *)bytes.c_str(), bytes.size(), &exec_context);
+                    client_socket->SendBytes((char *)response.c_str(), response.size());
+                }
                 if (bytes.empty())
                     still_connected = false;
             }

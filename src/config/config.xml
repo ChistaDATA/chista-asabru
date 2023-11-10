@@ -16,6 +16,11 @@
 					<method>GET</method>
 					<request_handler>SendHtmlCommand</request_handler>
 				</route>
+				<route>
+					<path>/python</path>
+					<method>GET</method>
+					<request_handler>PythonCommand</request_handler>
+				</route>
 			</routes>
 		</protocol-server>
 	</protocol-server-config>

@@ -1,39 +1,30 @@
-// #include <execinfo.h>
-#include <csignal>
-#include <cstdlib>
-#include <cstring>
-#include <thread>
-#include <list>
-#include <map>
-#include <iostream>
-#include <string>
-#include <utility>
-/*for O_RDONLY*/
-#include <fcntl.h>
+#include "main.h"
 
-#include "config/ConfigSingleton.h"
-#include "CProtocolSocket.h"
-#include "CProxySocket.h"
-#include "LibuvServerSocket.h"
-#include "protocol-handlers/CHttpProtocolHandler.h"
-#include "BaseComputationCommand.h"
-#include "CommandDispatcher.h"
+/**
+ * Database Proxy main function
+ * @arg port number
+ */
+int main(int argc, char **argv) {
+    // install our error handler
+    signal(SIGSEGV, errorHandler);
+    /* ignore SIGPIPE so that server can continue running when client pipe closes abruptly */
+    signal(SIGPIPE, SIG_IGN);
 
-using namespace std;
+    int returnValue = initProxyServers();
+    if (returnValue < 0) {
+        cout << "Error occurred during initializing proxy servers!";
+        exit(1);
+    }
 
-int startProxyServer(
-        CProxySocket *socket,
-        RESOLVED_PROXY_CONFIG configValues);
+    returnValue = initProtocolServers();
+    if (returnValue < 0) {
+        cout << "Error occurred during initializing protocol servers!";
+        exit(1);
+    }
 
-int startLibuvProxyServer(
-        LibuvProxySocket *socket,
-        PipelineFunction<LibuvProxySocket> pipelineFunction,
-        RESOLVED_PROXY_CONFIG configValue
-);
-
-int startProtocolServer(
-        CProtocolSocket *socket,
-        RESOLVED_PROTOCOL_CONFIG configValue);
+    while (true);
+    return 0;
+}
 
 int updateProxyConfig(CProxySocket *socket, RESOLVED_PROXY_CONFIG configValue) {
     TARGET_ENDPOINT_CONFIG targetEndpointConfig = {
@@ -147,32 +138,6 @@ void errorHandler(int sig) {
     system(pstackCommand.c_str());
     // backtrace_symbols_fd(array, size, STDERR_FILENO);
     exit(1);
-}
-
-/**
- * Database Proxy main function
- * @arg port number
- */
-int main(int argc, char **argv) {
-    // install our error handler
-    signal(SIGSEGV, errorHandler);
-    /* ignore SIGPIPE so that server can continue running when client pipe closes abruptly */
-    signal(SIGPIPE, SIG_IGN);
-
-    int returnValue = initProxyServers();
-    if (returnValue < 0) {
-        cout << "Error occurred during initializing proxy servers!";
-        exit(1);
-    }
-
-    returnValue = initProtocolServers();
-    if (returnValue < 0) {
-        cout << "Error occurred during initializing protocol servers!";
-        exit(1);
-    }
-
-    while (true);
-    return 0;
 }
 
 int startLibuvProxyServer(

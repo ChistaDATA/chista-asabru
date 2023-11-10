@@ -14,12 +14,18 @@ add_definitions(-DPLUGINS_FOLDER_PATH= "$ENV{PLUGINS_FOLDER_PATH}")
 add_definitions(-DCONFIG_FILE= "$ENV{CONFIG_FILE}")
 add_definitions(-DCONFIG_FILE_URL= "$ENV{CONFIG_FILE_URL}")
 
-# set(OPENSSL_INCLUDE_DIR /opt/homebrew/Cellar/openssl@3/3.1.2/include)
-
 # Find OpenSSL library
 find_package(OpenSSL REQUIRED)
 
-# add_subdirectory(lib)
+# Find Python
+find_package(Python COMPONENTS Interpreter Development)
+if (Python_FOUND)
+    message(STATUS "Python found: ${Python_EXECUTABLE}")
+else()
+    message(FATAL_ERROR "Python not found.")
+endif()
+include_directories(${Python_INCLUDE_DIRS})
+
 add_subdirectory(lib/tinyxml2)
 add_subdirectory(lib/asabru-commons)
 add_subdirectory(lib/asabru-parsers)
@@ -29,15 +35,12 @@ include_directories(lib/libuv/include)
 include_directories(lib/asabru-commons/src)
 include_directories(lib/asabru-commons/src/config)
 include_directories(lib/asabru-commons/src/util)
-# include_directories(lib/asabru-commons/src/ssl)
 include_directories(lib/asabru-parsers/src)
 include_directories(lib/asabru-handlers/src)
 include_directories(lib/asabru-engine/src/socket)
 include_directories(lib/asabru-engine/src/decoder)
 include_directories(lib/asabru-engine/src/interface)
 include_directories(lib/asabru-engine/src/libuv-socket)
-# Add the SSL library include directory
-# include_directories(${OPENSSL_INCLUDE_DIR})
 
 #For the shared library:
 set(PROJECT_LINK_LIBS
@@ -53,6 +56,7 @@ file(COPY src/public DESTINATION .)
 file(COPY src/config/config.xml DESTINATION .)
 
 add_executable(Chista_Asabru
+        src/main.h
         src/main.cpp
 
         src/config/ConfigSingleton.cpp
@@ -67,6 +71,7 @@ add_executable(Chista_Asabru
 target_link_libraries(
         Chista_Asabru
         OpenSSL::SSL
+        ${Python_LIBRARIES}
         ${CMAKE_SOURCE_DIR}/lib/tinyxml2/build/libtinyxml2.a
         ${CMAKE_SOURCE_DIR}/lib/libuv/build/libuv.a
         ${CMAKE_SOURCE_DIR}/lib/asabru-commons/build/lib/libasabru_commons.a
