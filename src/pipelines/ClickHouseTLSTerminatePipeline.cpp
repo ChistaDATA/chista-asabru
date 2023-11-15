@@ -4,7 +4,7 @@
 #include "Socket.h"
 #include "SSLSocket.h"
 #include "SocketSelect.h"
-
+#include "Logger.h"
 #include <utility>
 
 /**
@@ -15,7 +15,8 @@
  */
 void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
 {
-    std::cout << "ClickHouseTLSTerminatePipeline::start" << std::endl;
+    Logger *logger = Logger::getInstance();
+    logger->Log("ClickHouseTLSTerminatePipeline", "INFO", "::start");
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
 
@@ -23,7 +24,7 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
     CProxyHandler *proxy_handler = ptr->GetHandler();
     if (proxy_handler == nullptr)
     {
-        cout << "The handler is not defined. Exiting!" << endl;
+        logger->Log("ClickHouseTLSTerminatePipeline", "ERROR", "The handler is not defined. Exiting!");
         return nullptr;
     }
 
@@ -36,13 +37,9 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
     int current_service_index = clientData.current_service_index % services_count;
     RESOLVED_SERVICE currentService = targetEndpointConfig.services[current_service_index];
     END_POINT *target_endpoint = new END_POINT{currentService.ipaddress, currentService.port, currentService.r_w, currentService.alias, currentService.reserved, "  "};
-    if (target_endpoint == 0)
-    {
-        cout << "Failed to retrieve target database configuration. Exiting!" << endl;
-        return 0;
-    }
-    cout << "Resolved (Target) Host: " << target_endpoint->ipaddress << endl
-         << "Resolved (Target) Port: " << target_endpoint->port << endl;
+
+    logger->Log("ClickHouseTLSTerminatePipeline", "INFO", "Resolved (Target) Host: " + target_endpoint->ipaddress);
+    logger->Log("ClickHouseTLSTerminatePipeline", "INFO", "Resolved (Target) Port: " + std::to_string(target_endpoint->port));
 
     SSLSocket *client_socket= new SSLSocket(((Socket *)clientData.client_socket)->GetSocket());
     CClientSocket *target_socket = new CClientSocket(target_endpoint->ipaddress, target_endpoint->port);
@@ -65,7 +62,7 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
         catch (std::exception &e)
         {
             cout << e.what() << endl;
-            cout << "error occurred while creating socket select " << endl;
+            logger->Log("ClickHouseTLSTerminatePipeline", "ERROR", "error occurred while creating socket select " + std::string(e.what()));
         }
 
         bool still_connected = true;
@@ -86,7 +83,7 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
         }
         catch (std::exception &e)
         {
-            cout << "Error while sending to target " << e.what() << endl;
+            logger->Log("ClickHouseTLSTerminatePipeline", "ERROR", "Error while sending to target " + std::string(e.what()));
         }
 
         try
@@ -106,7 +103,7 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
         }
         catch (std::exception &e)
         {
-            cout << "Error while sending to client " << e.what() << endl;
+            logger->Log("ClickHouseTLSTerminatePipeline", "ERROR", "Error while sending to client " + std::string(e.what()));
         }
 
         if (!still_connected)
@@ -119,7 +116,7 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
 
     // Close the server socket
     target_socket->Close();
-    std::cout << "ClickHouseTLSTerminatePipeline::end" << std::endl;
+    logger->Log("ClickHouseTLSTerminatePipeline", "INFO", "::end");
 #ifdef WINDOWS_OS
     return 0;
 #else

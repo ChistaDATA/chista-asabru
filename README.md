@@ -104,6 +104,20 @@ variable
 export SSL_VERIFY_CERT=false
 ```
 
+**Logging**
+
+The proxy currently supports logging to these outputs
+- text file (FILE)
+- sqlite database (DB)
+- network tcp channel (NET)
+
+For configuration, set the env variable `LOGGER_TYPE` to any of the above.
+```
+export LOGGER_TYPE=FILE
+```
+
+The text file will be generated in the build folder with the current date appended for the logs.
+
 ##### Build the asabru app from  the root of the repository
 
 ```

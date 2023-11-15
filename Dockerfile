@@ -13,6 +13,8 @@ RUN apt-get update -y \
     ccache \
     python3 \
     python3-dev \
+    sqlite3 \
+    libsqlite3-dev \
     bash
 
 RUN apt-get install -y \
@@ -45,13 +47,6 @@ RUN apt-get update -y \
   && apt-get upgrade -y \
   && apt-get install -y \
     build-essential \
-    libtool \
-    libssl-dev \
-    automake \
-    dpkg \
-    cmake \
-    libuv1-dev \
-    ccache \
     python3 \
     bash
 
