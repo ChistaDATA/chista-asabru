@@ -1,4 +1,5 @@
 #include "main.h"
+#include "Logger.h"
 
 /**
  * Database Proxy main function
@@ -10,15 +11,21 @@ int main(int argc, char **argv) {
     /* ignore SIGPIPE so that server can continue running when client pipe closes abruptly */
     signal(SIGPIPE, SIG_IGN);
 
+    /**
+    * Creating via Logger singleton class will start a thread, that
+    * listens for log inputs and outputs them asyncronously
+    */
+    Logger *logger = Logger::getInstance();
+
     int returnValue = initProxyServers();
     if (returnValue < 0) {
-        cout << "Error occurred during initializing proxy servers!";
+        logger->Log("main", "ERROR", "Error occurred during initializing proxy servers!");
         exit(1);
     }
 
     returnValue = initProtocolServers();
     if (returnValue < 0) {
-        cout << "Error occurred during initializing protocol servers!";
+        logger->Log("main", "ERROR", "Error occurred during initializing protocol servers!");
         exit(1);
     }
 
@@ -111,8 +118,6 @@ int initProxyServers() {
             if (proxy < 0)
                 return proxy;
         }
-
-
     }
     return 0;
 }

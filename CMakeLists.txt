@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 set(CMAKE_C_COMPILER "/usr/bin/gcc")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-
+include(CMakePrintHelpers)
 project(Chista_Asabru VERSION 1.0)
 
 # Get the value of an environment variable and set it as a preprocessor definition
@@ -26,21 +26,35 @@ else()
 endif()
 include_directories(${Python_INCLUDE_DIRS})
 
+# Find SqlLite3
+find_package (SQLite3 REQUIRED)
+include_directories(${SQLite3_INCLUDE_DIRS})
+
 add_subdirectory(lib/tinyxml2)
 add_subdirectory(lib/asabru-commons)
 add_subdirectory(lib/asabru-parsers)
 add_subdirectory(lib/asabru-engine)
 include_directories(lib/tinyxml2)
 include_directories(lib/libuv/include)
-include_directories(lib/asabru-commons/src)
-include_directories(lib/asabru-commons/src/config)
-include_directories(lib/asabru-commons/src/util)
 include_directories(lib/asabru-parsers/src)
 include_directories(lib/asabru-handlers/src)
-include_directories(lib/asabru-engine/src/socket)
-include_directories(lib/asabru-engine/src/decoder)
-include_directories(lib/asabru-engine/src/interface)
-include_directories(lib/asabru-engine/src/libuv-socket)
+
+
+MACRO(HEADER_DIRECTORIES search_path return_list)
+    FILE(GLOB_RECURSE new_list ${search_path})
+    SET(dir_list "")
+    FOREACH(file_path ${new_list})
+        GET_FILENAME_COMPONENT(dir_path ${file_path} PATH)
+        SET(dir_list ${dir_list} ${dir_path})
+    ENDFOREACH()
+    LIST(REMOVE_DUPLICATES dir_list)
+    SET(${return_list} ${dir_list})
+ENDMACRO()
+
+HEADER_DIRECTORIES("lib/asabru-commons/src/*.h" header_dir_list)
+include_directories(${header_dir_list})
+HEADER_DIRECTORIES("lib/asabru-engine/src/*.h" header_dir_list)
+include_directories(${header_dir_list})
 
 #For the shared library:
 set(PROJECT_LINK_LIBS
@@ -72,6 +86,7 @@ target_link_libraries(
         Chista_Asabru
         OpenSSL::SSL
         ${Python_LIBRARIES}
+        ${SQLite3_LIBRARIES}
         ${CMAKE_SOURCE_DIR}/lib/tinyxml2/build/libtinyxml2.a
         ${CMAKE_SOURCE_DIR}/lib/libuv/build/libuv.a
         ${CMAKE_SOURCE_DIR}/lib/asabru-commons/build/lib/libasabru_commons.a

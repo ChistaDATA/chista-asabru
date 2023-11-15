@@ -3,15 +3,16 @@
 #include "CProxySocket.h"
 #include "CClientSocket.h"
 #include "../config/ConfigSingleton.h"
-#include "ProtocolHelper.h"
 #include "Socket.h"
 #include "SocketSelect.h"
 #include "Pipeline.h"
 #include "CHttpParser.h"
+#include "Logger.h"
 #include <utility>
 
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
 {
+    Logger *logger = Logger::getInstance();
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
 
@@ -19,7 +20,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
     CProxyHandler *proxy_handler = ptr->GetHandler();
     if (proxy_handler == nullptr)
     {
-        cout << "The handler is not defined. Exiting!" << endl;
+        logger->Log("ClickHousePipeline", "ERROR", "The handler is not defined. Exiting!");
         return nullptr;
     }
 
@@ -33,8 +34,8 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
     RESOLVED_SERVICE currentService = targetEndpointConfig.services[current_service_index];
     auto *target_endpoint = new END_POINT{currentService.ipaddress, currentService.port, currentService.r_w, currentService.alias, currentService.reserved, "  "};
 
-    cout << "Resolved (Target) Host: " << target_endpoint->ipaddress << endl
-         << "Resolved (Target) Port: " << target_endpoint->port << endl;
+    logger->Log("ClickHousePipeline", "INFO", "Resolved (Target) Host: " + target_endpoint->ipaddress);
+    logger->Log("ClickHousePipeline", "INFO", "Resolved (Target) Port: " + std::to_string(target_endpoint->port));
 
     auto *client_socket = (Socket *)clientData.client_socket;
     CClientSocket *target_socket;
@@ -42,6 +43,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         target_socket = new CClientSocket(target_endpoint->ipaddress, target_endpoint->port);
     } catch (std::exception &e) {
         cout << e.what() << endl;
+        logger->Log("ClickHousePipeline", "ERROR", e.what());
         client_socket->Close();
         return nullptr;
     }
