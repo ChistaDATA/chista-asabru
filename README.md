@@ -22,6 +22,14 @@ Run the following command to create a symlink
 ln -s /usr/bin/curl /opt/bin/curl
 ```
 
+Python ( minimum version 3.11 )
+
+```
+brew install python
+```
+
+Refer this to upgrade python version on mac : https://stackoverflow.com/questions/42896116/undeclared-identifier-pyunicode-decodefsdefault/77458658#77458658
+
 ### Submodules
 
 This `chista-asabru` project consists of the following sub-modules :
