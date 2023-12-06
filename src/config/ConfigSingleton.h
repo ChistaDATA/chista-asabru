@@ -58,7 +58,7 @@ public:
     std::vector<RESOLVED_PROXY_CONFIG> ResolveProxyServerConfigurations();
     std::vector<RESOLVED_PROTOCOL_CONFIG> ResolveProtocolServerConfigurations();
 
-    void DownloadConfigFile(std::string url, std::string outputFilePath);
+    void DownloadConfigFile(const std::string& url, const std::string& outputFilePath);
     PipelineFactory * pipelineFactory = new PipelineFactory();
     // Create Proxy sockets mapping
     ProxySocketsMap proxySocketsMap;

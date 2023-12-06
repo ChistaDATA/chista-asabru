@@ -32,19 +32,21 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
     int services_count = targetEndpointConfig.services.size();
     int current_service_index = clientData.current_service_index % services_count;
     RESOLVED_SERVICE currentService = targetEndpointConfig.services[current_service_index];
-    auto *target_endpoint = new END_POINT{currentService.ipaddress, currentService.port, currentService.r_w, currentService.alias, currentService.reserved, "  "};
+    END_POINT target_endpoint {
+        currentService.ipaddress, currentService.port, currentService.r_w, currentService.alias, currentService.reserved, "  "};
 
-    logger->Log("ClickHousePipeline", "INFO", "Resolved (Target) Host: " + target_endpoint->ipaddress);
-    logger->Log("ClickHousePipeline", "INFO", "Resolved (Target) Port: " + std::to_string(target_endpoint->port));
+    logger->Log("ClickHousePipeline", "INFO", "Resolved (Target) Host: " + target_endpoint.ipaddress);
+    logger->Log("ClickHousePipeline", "INFO", "Resolved (Target) Port: " + std::to_string(target_endpoint.port));
 
     auto *client_socket = (Socket *)clientData.client_socket;
     CClientSocket *target_socket;
     try {
-        target_socket = new CClientSocket(target_endpoint->ipaddress, target_endpoint->port);
+        target_socket = new CClientSocket(target_endpoint.ipaddress, target_endpoint.port);
     } catch (std::exception &e) {
         cout << e.what() << endl;
         logger->Log("ClickHousePipeline", "ERROR", e.what());
         client_socket->Close();
+        delete client_socket;
         return nullptr;
     }
 
@@ -87,6 +89,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         catch (std::exception &e)
         {
             cout << "Error while sending to target " << e.what() << endl;
+            still_connected = false;
         }
 
         try
@@ -107,18 +110,24 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         catch (std::exception &e)
         {
             cout << "Error while sending to client " << e.what() << endl;
+            still_connected = false;
         }
 
         if (!still_connected)
         {
+            // Delete Select from memory
+            delete sel;
+
             // Close the client socket
             client_socket->Close();
+            delete client_socket;
             break;
         }
     }
 
     // Close the server socket
     target_socket->Close();
+    delete target_socket;
 #ifdef WINDOWS_OS
     return 0;
 #else

@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <string>
 #include "TypeFactory.h"
+#include "BaseHandler.h"
 #include "BaseComputationCommand.h"
 
 template<> BaseHandler *TypeFactory::GetType<BaseHandler>(const std::string type)
