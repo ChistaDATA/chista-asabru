@@ -18,7 +18,7 @@
 				</route>
 				<route>
 					<path>/python</path>
-					<method>GET</method>
+					<method>POST</method>
 					<request_handler>PythonCommand</request_handler>
 				</route>
 			</routes>
@@ -45,7 +45,7 @@
 					<READ_WRITE>yes</READ_WRITE>
 					<PROXY_PORT>9110</PROXY_PORT>
 					<PROTOCOL>CH_HTTP</PROTOCOL>
-					<PIPELINE>ClickHouseTLSTerminatePipeline</PIPELINE>
+					<PIPELINE>ClickHousePipeline</PIPELINE>
 					<HANDLER>CHttpHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_http_service1">
@@ -62,7 +62,7 @@
 					<HANDLER>CHWirePTHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_tls_wire_service1">
-							<HOST>localhost</HOST>
+							<HOST>a8eaf1295ea0c47d4891275c309da5bb-907491465.us-east-1.elb.amazonaws.com</HOST>
 							<PORT>9440</PORT>
 						</SERVICE>
 					</SERVICES>

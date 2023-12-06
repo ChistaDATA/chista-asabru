@@ -6,7 +6,7 @@
 /**
  * Function to load the config.xml file from a URL
  */
-void ConfigSingleton::DownloadConfigFile(std::string url, std::string outputFilePath)
+void ConfigSingleton::DownloadConfigFile(const std::string& url, const std::string& outputFilePath)
 {
     // giving system command and storing return value
     std::string command = "/opt/bin/curl " + url + " --output " + outputFilePath;
