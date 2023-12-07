@@ -34,11 +34,11 @@ add_subdirectory(lib/tinyxml2)
 add_subdirectory(lib/asabru-commons)
 add_subdirectory(lib/asabru-parsers)
 add_subdirectory(lib/asabru-engine)
+
 include_directories(lib/tinyxml2)
 include_directories(lib/libuv/include)
 include_directories(lib/asabru-parsers/src)
 include_directories(lib/asabru-handlers/src)
-
 
 MACRO(HEADER_DIRECTORIES search_path return_list)
     FILE(GLOB_RECURSE new_list ${search_path})
@@ -74,7 +74,6 @@ add_executable(Chista_Asabru
         src/main.cpp
 
         src/config/ConfigSingleton.cpp
-        src/config/TypeFactory.cpp
         src/config/PipelineFactory.cpp
 
         test/ProxyInfo.h

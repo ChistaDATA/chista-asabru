@@ -1,5 +1,4 @@
 #include "ConfigSingleton.h"
-#include "TypeFactory.h"
 #include "Utils.h"
 #include "CommandDispatcher.h"
 
