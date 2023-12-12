@@ -20,3 +20,6 @@
 	path = lib/asabru-handlers
 	url = git@github.com:ChistaDATA/asabru-handlers.git
 	branch = main
+[submodule "lib/nlohmann_json"]
+	path = lib/nlohmann_json
+	url = git@github.com:nlohmann/json.git
