@@ -8,6 +8,7 @@
 #include "Pipeline.h"
 #include "CHttpParser.h"
 #include <utility>
+#include <memory>
 
 void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
 {
@@ -16,10 +17,10 @@ void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
 
     // Check if handler is defined
     CProxyHandler *proxy_handler = ptr->GetHandler();
-    if (proxy_handler == 0)
+    if (proxy_handler == nullptr)
     {
         cout << "The handler is not defined. Exiting!" << endl;
-        return 0;
+        return nullptr;
     }
 
     /**
@@ -30,17 +31,20 @@ void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
     int services_count = targetEndpointConfig.services.size();
     int current_service_index = clientData.current_service_index % services_count;
     RESOLVED_SERVICE currentService = targetEndpointConfig.services[current_service_index];
-    END_POINT *target_endpoint = new END_POINT{currentService.ipaddress, currentService.port, currentService.r_w, currentService.alias, currentService.reserved, "  "};
-    if (target_endpoint == 0)
-    {
-        cout << "Failed to retrieve target database configuration. Exiting!" << endl;
-        return 0;
-    }
-    cout << "Resolved (Target) Host: " << target_endpoint->ipaddress << endl
-         << "Resolved (Target) Port: " << target_endpoint->port << endl;
+    END_POINT target_endpoint{
+        currentService.ipaddress,
+        currentService.port,
+        currentService.r_w,
+        currentService.alias,
+        currentService.reserved,
+        "  "
+    };
+
+    cout << "Resolved (Target) Host: " << target_endpoint.ipaddress << endl
+         << "Resolved (Target) Port: " << target_endpoint.port << endl;
 
     Socket *client_socket = (Socket *)clientData.client_socket;
-    CClientSocket *target_socket = new CClientSocket(target_endpoint->ipaddress, target_endpoint->port);
+    std::unique_ptr<CClientSocket> target_socket = std::make_unique<CClientSocket>(target_endpoint.ipaddress, target_endpoint.port);
 
     EXECUTION_CONTEXT exec_context;
 
@@ -49,11 +53,11 @@ void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
     ProtocolHelper::SetReadTimeOut(target_socket->GetSocket(), 1);
     ProtocolHelper::SetKeepAlive(target_socket->GetSocket(), 1);
 
-    while (1)
+    while (true)
     {
         try
         {
-            SocketSelect sel(client_socket, target_socket, NonBlockingSocket);
+            SocketSelect sel(client_socket, target_socket.get(), NonBlockingSocket);
             bool still_connected = true;
 
             if (sel.Readable(client_socket))
@@ -68,7 +72,7 @@ void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
                 if (bytes.empty())
                     still_connected = false;
             }
-            if (sel.Readable(target_socket))
+            if (sel.Readable(target_socket.get()))
             {
                 cout << "target socket is readable, reading bytes : " << endl;
                 std::string bytes = target_socket->ReceiveBytes();
