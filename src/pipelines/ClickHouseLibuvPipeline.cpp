@@ -4,11 +4,7 @@
 
 #include "CProtocolSocket.h"
 #include "CProxySocket.h"
-#include "../config/ConfigSingleton.h"
-#include "ProtocolHelper.h"
-#include "LibuvServerSocket.h"
 #include "Pipeline.h"
-#include "uv.h"
 
 namespace clickhouse_pipeline {
     // Callback function for memory allocation when reading data
@@ -36,16 +32,6 @@ namespace clickhouse_pipeline {
 
         if (nread > 0) {
             std::cout << "nread : " << nread << endl;
-            // Forward data from source to target
-            // uv_write_t write_req;
-            // uv_buf_t write_buf = uv_buf_init(buf->base, nread);
-            // uv_write(&write_req, (uv_stream_t *)stream->data, &write_buf, 1, NULL);
-
-            // Forward data from source to target
-//            uv_write_t write_req;
-//            uv_buf_t write_buf = uv_buf_init(buf->base, nread);
-//            uv_write(&write_req, (uv_stream_t *)stream->data, &write_buf, 1, nullptr);
-//            free(buf->base);
 
             // Determine whether the stream is the client or target
             if (stream == (uv_stream_t *) &pair->client) {
@@ -122,17 +108,23 @@ void *ClickHouseLibuvPipeline(LibuvProxySocket *ptr, void *lptr) {
     int services_count = targetEndpointConfig.services.size();
     int current_service_index = clientData.current_service_index % services_count;
     RESOLVED_SERVICE currentService = targetEndpointConfig.services[current_service_index];
-    auto *target_endpoint = new END_POINT{currentService.ipaddress, currentService.port, currentService.r_w,
-                                               currentService.alias, currentService.reserved, "  "};
-    cout << "Resolved (Target) Host: " << target_endpoint->ipaddress << endl
-         << "Resolved (Target) Port: " << target_endpoint->port << endl;
+    END_POINT target_endpoint {
+        currentService.ipaddress,
+        currentService.port,
+        currentService.r_w,
+        currentService.alias,
+        currentService.reserved,
+        "  "
+    };
+    cout << "Resolved (Target) Host: " << target_endpoint.ipaddress << endl
+         << "Resolved (Target) Port: " << target_endpoint.port << endl;
 
     // Connect to target database
     std::string error;
     hostent *he;
     try
     {
-        if ((he = gethostbyname(target_endpoint->ipaddress.c_str())) == nullptr)
+        if ((he = gethostbyname(target_endpoint.ipaddress.c_str())) == nullptr)
         {
             std::cout << "Unable to get host endpoint by name " << std::endl;
             error = strerror(errno);
@@ -147,7 +139,7 @@ void *ClickHouseLibuvPipeline(LibuvProxySocket *ptr, void *lptr) {
     char * ip_address = inet_ntoa(*(struct in_addr *)he->h_addr);
     // Step 4
     std::cout << "IP address of " << he->h_name << " is: " << ip_address << std::endl;
-    std::cout << ip_address << ":" << target_endpoint->port << std::endl;
+    std::cout << ip_address << ":" << target_endpoint.port << std::endl;
 
     try {
         // Connect to the target server
@@ -163,7 +155,7 @@ void *ClickHouseLibuvPipeline(LibuvProxySocket *ptr, void *lptr) {
         connect_req->data = connection_data;
 
         struct sockaddr_in client_addr;
-        uv_ip4_addr(ip_address, target_endpoint->port, &client_addr);
+        uv_ip4_addr(ip_address, target_endpoint.port, &client_addr);
         uv_tcp_connect(connect_req, &pair->target, (const struct sockaddr *) &client_addr,
                        clickhouse_pipeline::on_target_connected);
     }
