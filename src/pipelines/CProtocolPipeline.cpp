@@ -18,13 +18,13 @@ void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr)
         return 0;
     }
 
-    Socket *client_socket = (Socket *)clientData.client_socket;
+    auto *client_socket = (Socket *)clientData.client_socket;
     EXECUTION_CONTEXT exec_context;
 
     ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
     std::string response;
 
-    while (1)
+    while (true)
     {
         SocketSelect *sel;
         try

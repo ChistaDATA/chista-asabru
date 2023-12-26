@@ -4,9 +4,6 @@
 #include <vector>
 #include <set>
 #include <cstring>
-
-using namespace std;
-
 #include "ProxyInfo.h"
 
 ///////////////////////////////////////////////

@@ -7,6 +7,9 @@
  * @arg port number
  */
 int main(int argc, char **argv) {
+    // initialize srand with a seed
+    srand(static_cast<unsigned>(time(nullptr)));
+
     // install our error handler
     signal(SIGSEGV, errorHandler);
     /* ignore SIGPIPE so that server can continue running when client pipe closes abruptly */

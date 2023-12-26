@@ -10,8 +10,6 @@
 #include "config_types.h"
 #include "../src/config/ConfigTypes.h"
 
-using namespace std;
-
 ///////////////////////////////////////////////////
 // Persistence - SQLite DB calls
 // Integrations
