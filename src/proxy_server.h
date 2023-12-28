@@ -11,6 +11,10 @@ int updateProxyConfig(CProxySocket *socket, RESOLVED_PROXY_CONFIG configValue) {
             .proxyPort = configValue.proxyPort,
             .services = configValue.services};
     socket->SetConfigValues(targetEndpointConfig);
+    socket->loadBalancer->removeAllServers();
+    for (const auto &service: targetEndpointConfig.services) {
+        socket->loadBalancer->addServer(service);
+    }
     return 0;
 };
 
@@ -26,6 +30,30 @@ std::string updateProxyServers() {
         return "Error occurred when updating the configurations : " + std::string(e.what());
     }
     return "Configuration Updated Successfully!\n";
+}
+
+std::string updateProxyEndPointService(const ENDPOINT_SERVICE_CONFIG& endpointServiceConfig) {
+    auto proxyConfig = configSingleton.getProxyConfig();
+
+    for (auto &cluster: proxyConfig.clusters) {
+        for (auto &endpoint: cluster.endPoints) {
+            if (endpoint.endPointName == endpointServiceConfig.name) {
+                if (endpointServiceConfig.operation == "add") {
+                    endpoint.services.push_back(endpointServiceConfig.service);
+                } else if (endpointServiceConfig.operation == "delete") {
+                    auto end_it = std::remove_if(endpoint.services.begin(), endpoint.services.end(),
+                                                 [&endpointServiceConfig](const SERVICE &service) {
+                                                     return service.name == endpointServiceConfig.name;
+                                                 });
+                    endpoint.services.erase(end_it, endpoint.services.end());
+                }
+                break;
+            }
+        }
+    }
+    configSingleton.setProxyConfig(proxyConfig);
+    return updateProxyServers();
+
 }
 
 int startLibuvProxyServer(

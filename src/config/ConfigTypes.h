@@ -88,3 +88,9 @@ typedef struct {
     std::string name;
     LOCAL_END_POINTS localEndpoints;
 } WORK_SPACE;
+
+typedef struct {
+    std::string name;
+    std::string operation;
+    SERVICE service;
+} ENDPOINT_SERVICE_CONFIG;

@@ -12,6 +12,11 @@
 					<request_handler>UpdateConfigurationCommand</request_handler>
 				</route>
 				<route>
+					<path>/updateService</path>
+					<method>POST</method>
+					<request_handler>UpdateEndPointServiceCommand</request_handler>
+				</route>
+				<route>
 					<path>/</path>
 					<method>GET</method>
 					<request_handler>SendHtmlCommand</request_handler>

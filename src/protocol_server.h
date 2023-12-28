@@ -7,8 +7,16 @@
 #include "config/ConfigSingleton.h"
 
 std::string updateConfiguration(std::string content) {
+    std::cout << "xml : " << content << std::endl;
     configSingleton.LoadConfigurationsFromString(std::move(content));
     std::string response_content = updateProxyServers();
+    return response_content;
+}
+
+std::string updateEndPointService(std::string content) {
+    std::cout << "xml : " << content << std::endl;
+    ENDPOINT_SERVICE_CONFIG endpointServiceConfig = configSingleton.LoadEndpointServiceFromString(std::move(content));
+    std::string response_content = updateProxyEndPointService(endpointServiceConfig);
     return response_content;
 }
 
@@ -55,6 +63,7 @@ int initProtocolServers() {
                          */
                         context.Put("request", &request);
                         context.Put("update_configuration", updateConfiguration);
+                        context.Put("update_endpoint_service",updateEndPointService);
 
                         CommandDispatcher::Dispatch(route.request_handler, &context);
                         auto response = std::any_cast<simple_http_server::HttpResponse *>(context.Get("response"));
