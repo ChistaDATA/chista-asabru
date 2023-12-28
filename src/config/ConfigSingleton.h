@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <utility>
 #include "TypeFactory.h"
 #include "tinyxml2.h"
 #include "CommonTypes.h"
@@ -42,10 +43,12 @@ private:
     ConfigSingleton &operator=(const ConfigSingleton &) = delete;
     PROXY_CONFIG m_ProxyConfig;
     std::vector<PROTOCOL_SERVER_CONFIG> m_ProtocolServerConfig;
+
     XMLError LoadConfigurationsFromFile(std::string filePath);
     XMLError ParseConfiguration(XMLDocument *xmlDoc);
     XMLError LoadProtocolServerConfigurations(XMLNode *root);
     XMLError LoadProxyServerConfigurations(XMLNode *pRoot);
+    ENDPOINT_SERVICE_CONFIG ParseEndPointServiceConfiguration(XMLDocument * xmlDoc);
 public:
     static bool initialized;
     static ConfigSingleton &getInstance()
@@ -54,7 +57,13 @@ public:
         return instance;
     }
 
+    PROXY_CONFIG getProxyConfig() { return m_ProxyConfig; }
+    void setProxyConfig(PROXY_CONFIG proxyConfig) {
+        m_ProxyConfig = std::move(proxyConfig);
+    }
+
     XMLError LoadConfigurationsFromString(std::string xml_string);
+    ENDPOINT_SERVICE_CONFIG LoadEndpointServiceFromString(std::string xml_string);
     std::vector<RESOLVED_PROXY_CONFIG> ResolveProxyServerConfigurations();
     std::vector<RESOLVED_PROTOCOL_CONFIG> ResolveProtocolServerConfigurations();
 

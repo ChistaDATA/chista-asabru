@@ -54,6 +54,22 @@ XMLError ConfigSingleton::LoadConfigurationsFromString(std::string xml_string)
     return ParseConfiguration(&xmlDoc);
 }
 
+/**
+ * Function to load the proxy endpoint services configuration from a string
+ * @param xml_string the xml string that contains the endpoint services configuration
+ */
+ENDPOINT_SERVICE_CONFIG ConfigSingleton::LoadEndpointServiceFromString(std::string xml_string)
+{
+    XMLDocument xmlDoc;
+    XMLError eResult = xmlDoc.Parse(xml_string.c_str());
+    if (eResult != tinyxml2::XML_SUCCESS)
+    {
+        throw std::runtime_error("Error parsing xml document.");
+    }
+
+    return ParseEndPointServiceConfiguration(&xmlDoc);
+}
+
 XMLError ConfigSingleton::ParseConfiguration(XMLDocument * xmlDoc) {
     XMLNode *pRoot = xmlDoc->FirstChildElement("clickhouse-proxy-v2");
     if (pRoot == nullptr)
@@ -315,4 +331,51 @@ std::vector<RESOLVED_PROTOCOL_CONFIG> ConfigSingleton::ResolveProtocolServerConf
     }
 
     return results;
+}
+
+ENDPOINT_SERVICE_CONFIG ConfigSingleton::ParseEndPointServiceConfiguration(XMLDocument *xmlDoc)
+{
+    ENDPOINT_SERVICE_CONFIG proxyEndpointServiceConfig;
+    XMLElement *pEndPoint = xmlDoc->FirstChildElement("end_point");
+    if (pEndPoint == nullptr)
+    {
+        throw std::runtime_error("Error Parsing XML Element.");
+    }
+    auto endPointName = pEndPoint->Attribute("name");
+    proxyEndpointServiceConfig.name = endPointName;
+
+    XMLElement *pOperation = pEndPoint->FirstChildElement("operation");
+    if (NULL != pOperation)
+    {
+        proxyEndpointServiceConfig.operation = pOperation->GetText();
+    }
+
+    XMLElement *pService = pEndPoint->FirstChildElement("service");
+    if (NULL != pService)
+    {
+        auto serviceName = pService->Attribute("name");
+        proxyEndpointServiceConfig.service.name = serviceName;
+    }
+
+  XMLElement *pHost = pService->FirstChildElement("host");
+  if (NULL != pHost)
+  {
+      auto hostName = "";
+      hostName = pHost->GetText();
+      proxyEndpointServiceConfig.service.host = hostName;
+  }
+
+  XMLElement *pPort = pService->FirstChildElement("port");
+  if (NULL != pPort)
+  {
+      auto port = 0;
+      XMLError eResult = pPort->QueryIntText(&port);
+      if (eResult != tinyxml2::XML_SUCCESS)
+      {
+          throw std::runtime_error("Port Must be an Integer value.");
+      }
+      proxyEndpointServiceConfig.service.port = port;
+  }
+  cout << "Service Configuration parsed successfully!" << endl;
+  return proxyEndpointServiceConfig;
 }
