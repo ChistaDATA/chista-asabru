@@ -39,16 +39,16 @@ int startLibuvProxyServer(
     if (!(*socket).
             SetPipeline(pipelineFunction)
             ) {
-        cout << "Failed to set " << proxyName << " Pipeline ..!" <<
-             endl;
+        std::cout << "Failed to set " << proxyName << " Pipeline ..!" <<
+                                                                      std::endl;
         return -2;
     }
     CProxyHandler *proxyHandler = (CProxyHandler *) configValue.handler;
     if (!(*socket).
             SetHandler(proxyHandler)
             ) {
-        cout << "Failed to set " << proxyName << " Handler ..!" <<
-             endl;
+        std::cout << "Failed to set " << proxyName << " Handler ..!" <<
+                                                                     std::endl;
         return -2;
     }
 
@@ -60,16 +60,16 @@ int startLibuvProxyServer(
     if (!(*socket).
             SetConfigValues(targetEndpointConfig)
             ) {
-        cout << "Failed to set " << proxyName << " Config values ..!" <<
-             endl;
+        std::cout << "Failed to set " << proxyName << " Config values ..!" <<
+                                                                           std::endl;
         return -2;
     }
 
     if (!(*socket).
             Start(proxyName)
             ) {
-        cout << "Failed To Start " << proxyName << " Proxy Server ..!" <<
-             endl;
+        std::cout << "Failed To Start " << proxyName << " Proxy Server ..!" <<
+                                                                            std::endl;
         return -3;
     }
 
@@ -86,12 +86,12 @@ int startProxyServer(
     // Setting up ClickHouse Proxy
     PipelineFunction<CProxySocket> pipelineFunction = configValue.pipeline;
     if (!(*socket).SetPipeline(pipelineFunction)) {
-        cout << "Failed to set " << proxyName << " Pipeline ..!" << endl;
+        std::cout << "Failed to set " << proxyName << " Pipeline ..!" << std::endl;
         return -2;
     }
     CProxyHandler *proxyHandler = (CProxyHandler *) configValue.handler;
     if (!(*socket).SetHandler(proxyHandler)) {
-        cout << "Failed to set " << proxyName << " Handler ..!" << endl;
+        std::cout << "Failed to set " << proxyName << " Handler ..!" << std::endl;
         return -2;
     }
 
@@ -101,12 +101,12 @@ int startProxyServer(
             .services = configValue.services};
 
     if (!(*socket).SetConfigValues(targetEndpointConfig)) {
-        cout << "Failed to set " << proxyName << " Config values ..!" << endl;
+        std::cout << "Failed to set " << proxyName << " Config values ..!" << std::endl;
         return -2;
     }
 
     if (!(*socket).Start(proxyName)) {
-        cout << "Failed To Start " << proxyName << " Proxy Server ..!" << endl;
+        std::cout << "Failed To Start " << proxyName << " Proxy Server ..!" << std::endl;
         return -3;
     }
 
@@ -116,7 +116,7 @@ int startProxyServer(
 int initProxyServers() {
     std::vector<RESOLVED_PROXY_CONFIG> configValues = configSingleton.ResolveProxyServerConfigurations();
     PipelineFactory pipelineFactory;
-    for (auto value: configValues) {
+    for (const auto& value: configValues) {
         if (value.pipelineName == "ClickHouseLibuvPipeline") {
             int proxy = startLibuvProxyServer(
                     new LibuvProxySocket(value.proxyPort),

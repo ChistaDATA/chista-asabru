@@ -13,8 +13,8 @@
 using namespace tinyxml2;
 
 /* Proxy sockets map */
-typedef std::map<string, CProxySocket *> ProxySocketsMap;
-typedef std::map<string, CProtocolSocket *> ProtocolSocketsMap;
+typedef std::map<std::string, CProxySocket *> ProxySocketsMap;
+typedef std::map<std::string, CProtocolSocket *> ProtocolSocketsMap;
 
 #ifndef XMLCheckResult
 #define XMLCheckResult(a_eResult)         \

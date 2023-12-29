@@ -22,15 +22,15 @@
 // The following struct represents an Endpoint and Proxies to
 // which it can map to
 typedef struct {
-    string key;   // ip address of the incoming request
+    std::string key;   // ip address of the incoming request
     int port;       // port at which incoming request is being listened
-    vector<END_POINT> proxies;  // potentially reachable clickhouse masters
+    std::vector<END_POINT> proxies;  // potentially reachable clickhouse masters
 } PROXY_ENTRY;
 
 ////////////////////////////////
 class MasterList {
-    vector<END_POINT> m_endpoints;
-    string m_ipaddress;
+    std::vector<END_POINT> m_endpoints;
+    std::string m_ipaddress;
     int m_port;
 public:
     MasterList() { }
@@ -38,12 +38,12 @@ public:
         m_endpoints.push_back(pt);
         return true;
     }
-    void Set( string ipaddress, int port ) {
+    void Set( std::string ipaddress, int port ) {
         m_ipaddress = ipaddress;
         m_port = port;
     }
-    vector<END_POINT>&  GetEndPoints() { return m_endpoints; }
-    string GetIpAddress() { return m_ipaddress; }
+    std::vector<END_POINT>&  GetEndPoints() { return m_endpoints; }
+    std::string GetIpAddress() { return m_ipaddress; }
     int GetPort( ) { return m_port; }
 
 };
@@ -51,31 +51,31 @@ public:
 //
 //
 class CProxyInfo {
-    map<string, PROXY_ENTRY>  proxy_map;
+    std::map<std::string, PROXY_ENTRY>  proxy_map;
     void LoadProxyMap();
 public:
     CProxyInfo();
     ~CProxyInfo();
-    bool DeleteMaster( string key , string addr );
-    bool FindMaster( string key, string addr );
-    bool AddProxyList( string key , int port, vector<END_POINT>& entries);
-    bool AddProxy(string key , int port, END_POINT entry );
+    bool DeleteMaster( std::string key , std::string addr );
+    bool FindMaster( std::string key, std::string addr );
+    bool AddProxyList( std::string key , int port, std::vector<END_POINT>& entries);
+    bool AddProxy(std::string key , int port, END_POINT entry );
     void DumpProxyMap( );
-    const END_POINT* Resolve( string ip , int port , int r_w  );
+    const END_POINT* Resolve( std::string ip , int port , int r_w  );
 };
 ////////////////////////////////////////////
 //
 //
 //
 class ClusterInfo {
-    map<string, CProxyInfo>  clusters;
+    std::map<std::string, CProxyInfo>  clusters;
 public:
     ClusterInfo();
     ~ClusterInfo();
-    bool AddCluster(string name);
-    bool  AddClusterNode( string cluster_name, string ipaddress , int port, vector<END_POINT>& masters );
-    bool SpitCluster(string cluster_name);
-    const END_POINT* Resolve( string cluster_name, string ip , int port , int r_w  );
+    bool AddCluster(std::string name);
+    bool  AddClusterNode( std::string cluster_name, std::string ipaddress , int port, std::vector<END_POINT>& masters );
+    bool SpitCluster(std::string cluster_name);
+    const END_POINT* Resolve( std::string cluster_name, std::string ip , int port , int r_w  );
 };
 
 #endif

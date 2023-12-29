@@ -3,7 +3,6 @@
 //
 
 #include "CProtocolSocket.h"
-#include "CProxySocket.h"
 #include "Pipeline.h"
 
 namespace clickhouse_pipeline {
@@ -11,44 +10,42 @@ namespace clickhouse_pipeline {
     void on_alloc(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf) {
         std::cout << "on_alloc" << std::endl;
         // Allocate a buffer for incoming data
-        std::cout << "suggested_size : " << suggested_size << endl;
+        std::cout << "suggested_size : " << suggested_size << std::endl;
         buf->base = (char *) malloc(suggested_size);
         buf->len = suggested_size;
     }
 
     // Callback function for when data is received
     void on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf) {
-        ConnectionData *connection_data = (ConnectionData *) stream->data;
+        auto *connection_data = (ConnectionData *) stream->data;
         ClientTargetPair *pair = connection_data->pair;
         EXECUTION_CONTEXT exec_context;
 
         if (nread < 0) {
             // Error or end of stream, close both client and target connections
-            uv_close((uv_handle_t *) &pair->client, NULL);
-            uv_close((uv_handle_t *) &pair->target, NULL);
+            uv_close((uv_handle_t *) &pair->client, nullptr);
+            uv_close((uv_handle_t *) &pair->target, nullptr);
             free(buf->base);
             return;
         }
 
         if (nread > 0) {
-            std::cout << "nread : " << nread << endl;
-
             // Determine whether the stream is the client or target
             if (stream == (uv_stream_t *) &pair->client) {
-                cout << "Calling Proxy Upstream Handler.." << endl;
-//                std::string response = connection_data->proxy_handler->HandleUpstreamData((void *)buf->base, nread, &exec_context);
+                std::cout << "Calling Proxy Upstream Handler.." << std::endl;
 
+                std::cout << "Buffer length " << std::string((char *) buf->base).size() << std::endl;
+                std::string response = connection_data->proxy_handler->HandleUpstreamData((void *)buf->base, nread, &exec_context);
                 // Data received from the client, forward it to the target server
                 auto *write_req = new uv_write_t;
-                uv_buf_t write_buf = uv_buf_init(buf->base, nread);
+                uv_buf_t write_buf = uv_buf_init((char *) response.c_str(), response.size());
                 uv_write(write_req, (uv_stream_t *) &pair->target, &write_buf, 1, nullptr);
             } else {
-                cout << "Calling Proxy Downstream Handler.." << endl;
-//                std::string response = connection_data->proxy_handler->HandleDownStreamData(buf->base, nread, &exec_context);
-
+                std::cout << "Calling Proxy Downstream Handler.." << std::endl;
+                std::string response = connection_data->proxy_handler->HandleDownStreamData(buf->base, nread, &exec_context);
                 // Data received from the target server, forward it to the client
                 auto *write_req = new uv_write_t;
-                uv_buf_t write_buf = uv_buf_init(buf->base, nread);
+                uv_buf_t write_buf = uv_buf_init((char *) response.c_str(), response.size());
                 uv_write(write_req, (uv_stream_t *) &pair->client, &write_buf, 1, nullptr);
             }
 
@@ -58,20 +55,15 @@ namespace clickhouse_pipeline {
 
     // Callback function when a connection is established to the target server
     void on_target_connected(uv_connect_t *req, int status) {
+        auto *connection_data = (ConnectionData *) req->data;
+        ClientTargetPair *pair = connection_data->pair;
+
         if (status < 0) {
             fprintf(stderr, "Target connection error: %s\n", uv_strerror(status));
-            try {
-                uv_close((uv_handle_t *) &req->handle, NULL);
-                free(req);
-            } catch (std::exception &e) {
-                std::cout << e.what() << std::endl;
-                std::cout << "Error when trying to close request" << std::endl;
-            }
-
+            uv_close((uv_handle_t *) &pair->client, nullptr);
+            free(req);
             return;
         }
-        ConnectionData *connection_data = (ConnectionData *) req->data;
-        ClientTargetPair *pair = connection_data->pair;
 
         // Associate the pair with the target socket
         pair->target.data = connection_data;
@@ -83,7 +75,7 @@ namespace clickhouse_pipeline {
 }
 
 void *ClickHouseLibuvPipeline(LibuvProxySocket *ptr, void *lptr) {
-    cout << "ClickHouseLibuvPipeline : " << endl;
+    std::cout << "ClickHouseLibuvPipeline : " << std::endl;
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
     ClientTargetPair *pair = clientData.client_target_pair;
@@ -93,9 +85,9 @@ void *ClickHouseLibuvPipeline(LibuvProxySocket *ptr, void *lptr) {
 
     // Check if handler is defined
     CProxyHandler *proxy_handler = ptr->GetHandler();
-    if (proxy_handler == 0) {
-        cout << "The handler is not defined. Exiting!" << endl;
-        return 0;
+    if (proxy_handler == nullptr) {
+        std::cout << "The handler is not defined. Exiting!" << std::endl;
+        return nullptr;
     }
 
     ConnectionData *connection_data;
@@ -112,8 +104,8 @@ void *ClickHouseLibuvPipeline(LibuvProxySocket *ptr, void *lptr) {
         currentService.reserved,
         "  "
     };
-    cout << "Resolved (Target) Host: " << target_endpoint.ipaddress << endl
-         << "Resolved (Target) Port: " << target_endpoint.port << endl;
+    std::cout << "Resolved (Target) Host: " << target_endpoint.ipaddress << std::endl
+         << "Resolved (Target) Port: " << target_endpoint.port << std::endl;
 
     // Connect to target database
     std::string error;
@@ -139,11 +131,11 @@ void *ClickHouseLibuvPipeline(LibuvProxySocket *ptr, void *lptr) {
 
     try {
         // Connect to the target server
-        uv_connect_t *connect_req = (uv_connect_t *) malloc(sizeof(uv_connect_t));
+        auto *connect_req = (uv_connect_t *) malloc(sizeof(uv_connect_t));
 
         if (!connect_req) {
             fprintf(stderr, "Memory allocation failed\n");
-            uv_close((uv_handle_t *) &pair->client, NULL);
+            uv_close((uv_handle_t *) &pair->client, nullptr);
             free(pair);
             return 0;
         }
@@ -156,8 +148,8 @@ void *ClickHouseLibuvPipeline(LibuvProxySocket *ptr, void *lptr) {
                        clickhouse_pipeline::on_target_connected);
     }
     catch (std::exception &e) {
-        cout << e.what() << endl;
-        cout << "Error when connecting to target socket" << endl;
+        std::cout << e.what() << std::endl;
+        std::cout << "Error when connecting to target socket" << std::endl;
     }
 
     // Associate the pair with the client socket

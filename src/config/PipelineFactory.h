@@ -10,9 +10,9 @@
 #include "LibuvProxySocket.h"
 #include "../pipelines/Pipeline.h"
 
-typedef std::map<string, PipelineFunction<CProtocolSocket>> ProtocolPipelineFunctionMap;
-typedef std::map<string, PipelineFunction<CProxySocket>> ProxyPipelineFunctionMap;
-typedef std::map<string, PipelineFunction<LibuvProxySocket>> LibuvProxyPipelineFunctionMap;
+typedef std::map<std::string, PipelineFunction<CProtocolSocket>> ProtocolPipelineFunctionMap;
+typedef std::map<std::string, PipelineFunction<CProxySocket>> ProxyPipelineFunctionMap;
+typedef std::map<std::string, PipelineFunction<LibuvProxySocket>> LibuvProxyPipelineFunctionMap;
 
 class PipelineFactory
 {

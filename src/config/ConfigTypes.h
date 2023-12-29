@@ -43,7 +43,7 @@ typedef struct {
     int protocol_port;
     std::string pipeline;
     std::string handler;
-    vector<Route> routes;
+    std::vector<Route> routes;
 } PROTOCOL_SERVER_CONFIG;
 
 typedef struct {
@@ -51,7 +51,7 @@ typedef struct {
     int protocol_port;
     PipelineFunction<CProtocolSocket> pipeline;
     void *handler;
-    vector<Route> routes;
+    std::vector<Route> routes;
 } RESOLVED_PROTOCOL_CONFIG;
 
 typedef struct {
