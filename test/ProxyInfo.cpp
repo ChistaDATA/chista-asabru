@@ -30,11 +30,11 @@ void CProxyInfo::LoadProxyMap(){
 CProxyInfo::CProxyInfo() {LoadProxyMap();}
 CProxyInfo::~CProxyInfo() { proxy_map.clear(); }
 
-bool  CProxyInfo::DeleteMaster( string key , string addr ) {
+bool  CProxyInfo::DeleteMaster( std::string key , std::string addr ) {
     auto p = proxy_map.find(key);
     if ( p == proxy_map.end() )  { return true; }
     PROXY_ENTRY& pe = p->second;
-    vector<END_POINT>::iterator it = pe.proxies.begin();
+    std::vector<END_POINT>::iterator it = pe.proxies.begin();
     while ( it != pe.proxies.end() ) {
         if ( it->ipaddress== addr )
         {
@@ -48,11 +48,11 @@ bool  CProxyInfo::DeleteMaster( string key , string addr ) {
 //////////////////////////////////////////////////////////
 //
 //
-bool CProxyInfo::FindMaster( string key, string addr ) {
+bool CProxyInfo::FindMaster( std::string key, std::string addr ) {
     auto p = proxy_map.find(key);
     if ( p == proxy_map.end() )  { return false; }
     PROXY_ENTRY& pe = p->second;
-    vector<END_POINT>::iterator it = pe.proxies.begin();
+    std::vector<END_POINT>::iterator it = pe.proxies.begin();
     while ( it != pe.proxies.end() ) {
         if ( it->ipaddress== addr )
         {
@@ -64,13 +64,13 @@ bool CProxyInfo::FindMaster( string key, string addr ) {
     return false;
 }
 
-bool CProxyInfo::AddProxyList( string key , int port, vector<END_POINT>& entries) {
+bool CProxyInfo::AddProxyList( std::string key , int port, std::vector<END_POINT>& entries) {
     for(auto lst : entries ) {
         AddProxy(key, port,lst);
     }
     return true;
 }
-bool CProxyInfo::AddProxy(string key , int port, END_POINT entry ) {
+bool CProxyInfo::AddProxy(std::string key , int port, END_POINT entry ) {
     auto p  = proxy_map.find(key);
     if ( p  == proxy_map.end())  {
         PROXY_ENTRY  pe_entry;
@@ -84,17 +84,17 @@ bool CProxyInfo::AddProxy(string key , int port, END_POINT entry ) {
     pe.proxies.push_back(entry);
     return true;
 }
-const END_POINT* CProxyInfo::Resolve(  string ip , int port , int r_w  ) {
+const END_POINT* CProxyInfo::Resolve(  std::string ip , int port , int r_w  ) {
     auto p = proxy_map.find(ip);
     if ( p == proxy_map.end() )  { return 0; }
     PROXY_ENTRY& pe = p->second;
-    vector<END_POINT>::iterator it = pe.proxies.begin();
+    std::vector<END_POINT>::iterator it = pe.proxies.begin();
     while ( it != pe.proxies.end() ) {
-        cout << "  = > " << ip << " port " << port  << "   " << it->ipaddress << " r/w " << r_w << endl;
+        std::cout << "  = > " << ip << " port " << port  << "   " << it->ipaddress << " r/w " << r_w << std::endl;
         if ( it->ipaddress== ip  )
         {
             END_POINT& ep = *it;
-            cout << "---------------------" << "<<<>>>" << endl;
+            std::cout << "---------------------" << "<<<>>>" << std::endl;
             if ( ep.r_w == r_w  )  { return &ep; } else { return 0; }
 
         }
@@ -106,10 +106,10 @@ const END_POINT* CProxyInfo::Resolve(  string ip , int port , int r_w  ) {
 
 void CProxyInfo::DumpProxyMap( ){
     for(auto &e : proxy_map)   {
-        cout << e.first << endl;
+        std::cout << e.first << std::endl;
         for(auto&f : e.second.proxies )
-            cout << "       " << f.ipaddress << "   " <<f.port <<  endl;
-        cout <<"=======================" << endl;
+            std::cout << "       " << f.ipaddress << "   " <<f.port <<  std::endl;
+        std::cout <<"=======================" << std::endl;
 
     }
 }
@@ -119,13 +119,13 @@ void CProxyInfo::DumpProxyMap( ){
 ClusterInfo::ClusterInfo() {}
 ClusterInfo::~ClusterInfo() { clusters.clear(); }
 
-bool ClusterInfo::AddCluster(string name) {
+bool ClusterInfo::AddCluster(std::string name) {
     auto it = clusters.find(name);
     if ( it  != clusters.end() ) { return false; }
     clusters[ name ] = CProxyInfo {};
     return true;
 }
-bool ClusterInfo::AddClusterNode( string cluster_name, string ipaddress , int port, vector<END_POINT>& masters ) {
+bool ClusterInfo::AddClusterNode( std::string cluster_name, std::string ipaddress , int port, std::vector<END_POINT>& masters ) {
     auto it = clusters.find(cluster_name);
     if ( it == clusters.end() ) { AddCluster(cluster_name);  }
     CProxyInfo& other = clusters[cluster_name];
@@ -133,19 +133,19 @@ bool ClusterInfo::AddClusterNode( string cluster_name, string ipaddress , int po
 
 }
 
-bool ClusterInfo::SpitCluster(string cluster_name) {
+bool ClusterInfo::SpitCluster(std::string cluster_name) {
     auto it = clusters.find(cluster_name);
-    if ( it == clusters.end() ) { cout << "Cluster does not Exists"  << endl; return false; }
+    if ( it == clusters.end() ) { std::cout << "Cluster does not Exists"  << std::endl; return false; }
     CProxyInfo& other = clusters[cluster_name];
     other.DumpProxyMap();
     return true;
 
 }
 
-const END_POINT* ClusterInfo::Resolve( string cluster_name, string ip , int port , int r_w  )  {
+const END_POINT* ClusterInfo::Resolve( std::string cluster_name, std::string ip , int port , int r_w  )  {
     auto it = clusters.find(cluster_name);
     if ( it == clusters.end() ) { return 0; }
-    cout << "Found Cluster " << endl;
+    std::cout << "Found Cluster " << std::endl;
     CProxyInfo& other = clusters[cluster_name];
     return other.Resolve(ip,port,r_w);
 }

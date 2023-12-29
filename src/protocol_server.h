@@ -21,17 +21,17 @@ int startProtocolServer(
     // Setting up Protocol Pipeline
     PipelineFunction<CProtocolSocket> pipelineFunction = configValue.pipeline;
     if (!(*socket).SetPipeline(pipelineFunction)) {
-        cout << "Failed to set " << protocolName << " Pipeline ..!" << endl;
+        std::cout << "Failed to set " << protocolName << " Pipeline ..!" << std::endl;
         return -2;
     }
     CProtocolHandler *protocolHandler = (CProtocolHandler *) configValue.handler;
     if (!(*socket).SetHandler(protocolHandler)) {
-        cout << "Failed to set " << protocolName << " Handler ..!" << endl;
+        std::cout << "Failed to set " << protocolName << " Handler ..!" << std::endl;
         return -2;
     }
 
     if (!(*socket).Start()) {
-        cout << "Failed To Start " << protocolName << " Proxy Server ..!" << endl;
+        std::cout << "Failed To Start " << protocolName << " Proxy Server ..!" << std::endl;
         return -3;
     }
 

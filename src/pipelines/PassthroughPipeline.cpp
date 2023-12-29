@@ -22,7 +22,7 @@ void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
     CProxyHandler *proxy_handler = ptr->GetHandler();
     if (proxy_handler == nullptr)
     {
-        cout << "The handler is not defined. Exiting!" << endl;
+        std::cout << "The handler is not defined. Exiting!" << std::endl;
         return nullptr;
     }
 
@@ -36,8 +36,8 @@ void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
         "  "
     };
 
-    cout << "Resolved (Target) Host: " << target_endpoint.ipaddress << endl
-         << "Resolved (Target) Port: " << target_endpoint.port << endl;
+    std::cout << "Resolved (Target) Host: " << target_endpoint.ipaddress << std::endl
+         << "Resolved (Target) Port: " << target_endpoint.port << std::endl;
 
     auto *client_socket = (Socket *)clientData.client_socket;
     std::unique_ptr<CClientSocket> target_socket = std::make_unique<CClientSocket>(target_endpoint.ipaddress, target_endpoint.port);
@@ -58,10 +58,10 @@ void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
 
             if (sel.Readable(client_socket))
             {
-                cout << "client socket is readable, reading bytes : " << endl;
+                std::cout << "client socket is readable, reading bytes : " << std::endl;
                 std::string bytes = client_socket->ReceiveBytes();
 
-                cout << "Calling Proxy Upstream Handler.." << endl;
+                std::cout << "Calling Proxy Upstream Handler.." << std::endl;
                 std::string response = proxy_handler->HandleUpstreamData((void *)bytes.c_str(), bytes.size(), &exec_context);
                 target_socket->SendBytes((char *)response.c_str(), response.size());
 
@@ -70,10 +70,10 @@ void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
             }
             if (sel.Readable(target_socket.get()))
             {
-                cout << "target socket is readable, reading bytes : " << endl;
+                std::cout << "target socket is readable, reading bytes : " << std::endl;
                 std::string bytes = target_socket->ReceiveBytes();
 
-                cout << "Calling Proxy Downstream Handler.." << endl;
+                std::cout << "Calling Proxy Downstream Handler.." << std::endl;
                 std::string response = proxy_handler->HandleDownStreamData((void *)bytes.c_str(), bytes.size(), &exec_context);
                 client_socket->SendBytes((char *)response.c_str(), response.size());
 
@@ -89,7 +89,7 @@ void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
         }
         catch (std::exception &e)
         {
-            cout << e.what() << endl;
+            std::cout << e.what() << std::endl;
             break;
         }
     }

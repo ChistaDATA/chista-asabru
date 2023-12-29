@@ -31,7 +31,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
     END_POINT target_endpoint {
         currentService.ipaddress, currentService.port, currentService.r_w, currentService.alias, currentService.reserved, "  "};
 
-    logger->Log("ClickHousePipeline", "INFO", "Resolved (Target) Host: " + target_endpoint.ipaddress);
+    logger->Log("ClickHousePipeline", "INFO",   "Resolved (Target) Host: " + target_endpoint.ipaddress);
     logger->Log("ClickHousePipeline", "INFO", "Resolved (Target) Port: " + std::to_string(target_endpoint.port));
 
     auto *client_socket = (Socket *)clientData.client_socket;
@@ -39,7 +39,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
     try {
         target_socket = new CClientSocket(target_endpoint.ipaddress, target_endpoint.port);
     } catch (std::exception &e) {
-        cout << e.what() << endl;
+        std::cout << e.what() << std::endl;
         logger->Log("ClickHousePipeline", "ERROR", e.what());
         client_socket->Close();
         delete client_socket;
@@ -62,8 +62,8 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         }
         catch (std::exception &e)
         {
-            cout << e.what() << endl;
-            cout << "error occurred while creating socket select " << endl;
+            std::cout << e.what() << std::endl;
+            std::cout << "error occurred while creating socket select " << std::endl;
         }
 
         bool still_connected = true;
@@ -71,10 +71,10 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         {
             if (sel->Readable(client_socket))
             {
-                cout << "client socket is readable, reading bytes : " << endl;
+                std::cout << "client socket is readable, reading bytes : " << std::endl;
                 std::string bytes = client_socket->ReceiveBytes();
 
-                cout << "Calling Proxy Upstream Handler.." << endl;
+                std::cout << "Calling Proxy Upstream Handler.." << std::endl;
                 std::string response = proxy_handler->HandleUpstreamData((void *)bytes.c_str(), bytes.size(), &exec_context);
                 target_socket->SendBytes((char *)response.c_str(), response.size());
 
@@ -84,7 +84,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         }
         catch (std::exception &e)
         {
-            cout << "Error while sending to target " << e.what() << endl;
+            std::cout << "Error while sending to target " << e.what() << std::endl;
             still_connected = false;
         }
 
@@ -92,10 +92,10 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         {
             if (sel->Readable(target_socket))
             {
-                cout << "target socket is readable, reading bytes : " << endl;
+                std::cout << "target socket is readable, reading bytes : " << std::endl;
                 std::string bytes = target_socket->ReceiveBytes();
 
-                cout << "Calling Proxy Downstream Handler.." << endl;
+                std::cout << "Calling Proxy Downstream Handler.." << std::endl;
                 std::string response = proxy_handler->HandleDownStreamData((void *)bytes.c_str(), bytes.size(), &exec_context);
                 client_socket->SendBytes((char *)response.c_str(), response.size());
 
@@ -105,7 +105,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         }
         catch (std::exception &e)
         {
-            cout << "Error while sending to client " << e.what() << endl;
+            std::cout << "Error while sending to client " << e.what() << std::endl;
             still_connected = false;
         }
 

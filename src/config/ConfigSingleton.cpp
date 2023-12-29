@@ -18,7 +18,7 @@ void ConfigSingleton::DownloadConfigFile(const std::string& url, const std::stri
     }
     else
     {
-        std::cerr << "Failed to download file :" << returnCode << endl;
+        std::cerr << "Failed to download file :" << returnCode << std::endl;
     }
 
     // if (downloadFileWithCurl(url, outputFilePath)) {
@@ -71,7 +71,7 @@ XMLError ConfigSingleton::ParseConfiguration(XMLDocument * xmlDoc) {
      */
     LoadProxyServerConfigurations(pRoot);
 
-    cout << "Configuration parsed successfully!" << endl;
+    std::cout << "Configuration parsed successfully!" << std::endl;
     return XML_SUCCESS;
 }
 
@@ -248,7 +248,7 @@ XMLError ConfigSingleton::LoadProtocolServerConfigurations(XMLNode *root)
         XMLElement *protocolPortElement = protocol_server->FirstChildElement("protocol-port");
         if (NULL != protocolPortElement)
         {
-            config.protocol_port = stoi(protocolPortElement->GetText());
+            config.protocol_port = std::stoi(protocolPortElement->GetText());
         }
 
         XMLElement *pipelineElement = protocol_server->FirstChildElement("pipeline");
@@ -300,7 +300,7 @@ std::vector<RESOLVED_PROTOCOL_CONFIG> ConfigSingleton::ResolveProtocolServerConf
     std::vector<RESOLVED_PROTOCOL_CONFIG> results;
     for (PROTOCOL_SERVER_CONFIG protocol_server : m_ProtocolServerConfig)
     {
-        cout << protocol_server.protocol_name << " " << protocol_server.protocol_port << endl;
+        std::cout << protocol_server.protocol_name << " " << protocol_server.protocol_port << std::endl;
         RESOLVED_PROTOCOL_CONFIG result;
         result.protocol_name = protocol_server.protocol_name;
         result.protocol_port = protocol_server.protocol_port;
