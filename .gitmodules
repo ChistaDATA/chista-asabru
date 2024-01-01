@@ -24,3 +24,7 @@
 	path = lib/nlohmann_json
 	url = git@github.com:ArthurSonzogni/nlohmann_json_cmake_fetchcontent.git
 	branch = develop
+[submodule "lib/zk-cluster-monitor-client"]
+	path = lib/zk-cluster-monitor-client
+	url = git@github.com:ChistaDATA/zk-cluster-monitor-client.git
+	branch = main
