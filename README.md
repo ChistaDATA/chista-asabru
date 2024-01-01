@@ -183,3 +183,10 @@ Run the clickhouse client in SSL mode
 
 Eg. ./clickhouse client --config /Users/midhundarvin/software/openssl/clickhouse-client-ssl.xml --host 127.0.0.1 --port 9120
 ```
+
+### Documentation
+
+https://solid-adventure-73een37.pages.github.io/#/
+
+Generate Documentation Website using : 
+https://docsify.js.org/#/quickstart

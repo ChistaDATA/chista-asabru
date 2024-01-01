@@ -14,7 +14,7 @@ std::string updateConfiguration(std::string content) {
 }
 
 std::string updateEndPointService(std::string content) {
-    std::cout << "xml : " << content << std::endl;
+    std::cout << "XML content : " << content << std::endl;
     ENDPOINT_SERVICE_CONFIG endpointServiceConfig = configSingleton.LoadEndpointServiceFromString(std::move(content));
     std::string response_content = updateProxyEndPointService(endpointServiceConfig);
     return response_content;
@@ -32,7 +32,7 @@ int startProtocolServer(
         std::cout << "Failed to set " << protocolName << " Pipeline ..!" << std::endl;
         return -2;
     }
-    CProtocolHandler *protocolHandler = (CProtocolHandler *) configValue.handler;
+    auto *protocolHandler = (CProtocolHandler *) configValue.handler;
     if (!(*socket).SetHandler(protocolHandler)) {
         std::cout << "Failed to set " << protocolName << " Handler ..!" << std::endl;
         return -2;

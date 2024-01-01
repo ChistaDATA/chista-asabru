@@ -32,7 +32,7 @@ std::string updateProxyServers() {
     return "Configuration Updated Successfully!\n";
 }
 
-std::string updateProxyEndPointService(const ENDPOINT_SERVICE_CONFIG& endpointServiceConfig) {
+std::string updateProxyEndPointService(const ENDPOINT_SERVICE_CONFIG &endpointServiceConfig) {
     auto proxyConfig = configSingleton.getProxyConfig();
 
     for (auto &cluster: proxyConfig.clusters) {
@@ -68,7 +68,7 @@ int startLibuvProxyServer(
             SetPipeline(pipelineFunction)
             ) {
         std::cout << "Failed to set " << proxyName << " Pipeline ..!" <<
-                                                                      std::endl;
+                  std::endl;
         return -2;
     }
     CProxyHandler *proxyHandler = (CProxyHandler *) configValue.handler;
@@ -76,7 +76,7 @@ int startLibuvProxyServer(
             SetHandler(proxyHandler)
             ) {
         std::cout << "Failed to set " << proxyName << " Handler ..!" <<
-                                                                     std::endl;
+                  std::endl;
         return -2;
     }
 
@@ -89,7 +89,7 @@ int startLibuvProxyServer(
             SetConfigValues(targetEndpointConfig)
             ) {
         std::cout << "Failed to set " << proxyName << " Config values ..!" <<
-                                                                           std::endl;
+                  std::endl;
         return -2;
     }
 
@@ -97,7 +97,7 @@ int startLibuvProxyServer(
             Start(proxyName)
             ) {
         std::cout << "Failed To Start " << proxyName << " Proxy Server ..!" <<
-                                                                            std::endl;
+                  std::endl;
         return -3;
     }
 
@@ -144,7 +144,7 @@ int startProxyServer(
 int initProxyServers() {
     std::vector<RESOLVED_PROXY_CONFIG> configValues = configSingleton.ResolveProxyServerConfigurations();
     PipelineFactory pipelineFactory;
-    for (const auto& value: configValues) {
+    for (const auto &value: configValues) {
         if (value.pipelineName == "ClickHouseLibuvPipeline") {
             int proxy = startLibuvProxyServer(
                     new LibuvProxySocket(value.proxyPort),

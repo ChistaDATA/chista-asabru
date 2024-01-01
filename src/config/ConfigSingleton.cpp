@@ -345,20 +345,20 @@ ENDPOINT_SERVICE_CONFIG ConfigSingleton::ParseEndPointServiceConfiguration(XMLDo
     proxyEndpointServiceConfig.name = endPointName;
 
     XMLElement *pOperation = pEndPoint->FirstChildElement("operation");
-    if (NULL != pOperation)
+    if (nullptr != pOperation)
     {
         proxyEndpointServiceConfig.operation = pOperation->GetText();
     }
 
     XMLElement *pService = pEndPoint->FirstChildElement("service");
-    if (NULL != pService)
+    if (nullptr != pService)
     {
         auto serviceName = pService->Attribute("name");
         proxyEndpointServiceConfig.service.name = serviceName;
     }
 
   XMLElement *pHost = pService->FirstChildElement("host");
-  if (NULL != pHost)
+  if (nullptr != pHost)
   {
       auto hostName = "";
       hostName = pHost->GetText();
@@ -366,7 +366,7 @@ ENDPOINT_SERVICE_CONFIG ConfigSingleton::ParseEndPointServiceConfiguration(XMLDo
   }
 
   XMLElement *pPort = pService->FirstChildElement("port");
-  if (NULL != pPort)
+  if (nullptr != pPort)
   {
       auto port = 0;
       XMLError eResult = pPort->QueryIntText(&port);
@@ -376,6 +376,6 @@ ENDPOINT_SERVICE_CONFIG ConfigSingleton::ParseEndPointServiceConfiguration(XMLDo
       }
       proxyEndpointServiceConfig.service.port = port;
   }
-  cout << "Service Configuration parsed successfully!" << endl;
+  std::cout << "Service Configuration parsed successfully!" << std::endl;
   return proxyEndpointServiceConfig;
 }
