@@ -15,21 +15,15 @@ int main(int argc, char **argv) {
     /* ignore SIGPIPE so that server can continue running when client pipe closes abruptly */
     signal(SIGPIPE, SIG_IGN);
 
-    /**
-    * Creating via Logger singleton class will start a thread, that
-    * listens for log inputs and outputs them asyncronously
-    */
-    Logger *logger = Logger::getInstance();
-
     int returnValue = initProxyServers();
     if (returnValue < 0) {
-        logger->Log("main", "ERROR", "Error occurred during initializing proxy servers!");
+        LOG_ERROR("Error occurred during initializing proxy servers!");
         exit(1);
     }
 
     returnValue = initProtocolServers();
     if (returnValue < 0) {
-        logger->Log("main", "ERROR", "Error occurred during initializing protocol servers!");
+        LOG_ERROR("Error occurred during initializing protocol servers!");
         exit(1);
     }
 

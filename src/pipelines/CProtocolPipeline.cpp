@@ -6,18 +6,17 @@
 
 void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr)
 {
-    std::cout << "Starting ProtocolPipeline \n";
+    LOG_INFO("Starting ProtocolPipeline");
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
 
     // Check if handler is defined
     CProtocolHandler *protocol_handler = ptr->GetHandler();
-    if (protocol_handler == 0)
+    if (protocol_handler == nullptr)
     {
-        std::cout << "The handler is not defined. Exiting!" << std::endl;
-        return 0;
+        LOG_ERROR("The handler is not defined. Exiting!");
+        return nullptr;
     }
-
     auto *client_socket = (Socket *)clientData.client_socket;
     EXECUTION_CONTEXT exec_context;
 
@@ -33,8 +32,8 @@ void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr)
         }
         catch (std::exception &e)
         {
-            std::cout << e.what() << std::endl;
-            std::cout << "error occurred while creating socket select " << std::endl;
+            LOG_ERROR(e.what());
+            LOG_ERROR("error occurred while creating socket select ");
         }
 
         bool still_connected = true;
@@ -42,11 +41,11 @@ void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr)
         {
             if (sel->Readable(client_socket))
             {
-                std::cout << "client socket is readable, reading bytes : " << std::endl;
+                LOG_INFO("client socket is readable, reading bytes : ");
                 std::string bytes = client_socket->ReceiveBytes();
 
                 if (!bytes.empty()) {
-                    std::cout << "Calling Protocol Handler.." << std::endl;
+                    LOG_INFO("Calling Protocol Handler..");
                     response = protocol_handler->HandleData((void *)bytes.c_str(), bytes.size(), &exec_context);
                     client_socket->SendBytes((char *)response.c_str(), response.size());
                 }
@@ -56,7 +55,8 @@ void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr)
         }
         catch (std::exception &e)
         {
-            std::cout << "Error while sending to target " << e.what() << std::endl;
+            LOG_ERROR("Error while sending to target :");
+            LOG_ERROR(e.what());
         }
 
         if (!still_connected)

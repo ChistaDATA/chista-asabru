@@ -12,7 +12,6 @@
 
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
 {
-    Logger *logger = Logger::getInstance();
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
 
@@ -23,7 +22,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
     CProxyHandler *proxy_handler = ptr->GetHandler();
     if (proxy_handler == nullptr)
     {
-        logger->Log("ClickHousePipeline", "ERROR", "The handler is not defined. Exiting!");
+        LOG_ERROR("The handler is not defined. Exiting!");
         return nullptr;
     }
 
@@ -31,8 +30,8 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
     END_POINT target_endpoint {
         currentService.ipaddress, currentService.port, currentService.r_w, currentService.alias, currentService.reserved, "  "};
 
-    logger->Log("ClickHousePipeline", "INFO",   "Resolved (Target) Host: " + target_endpoint.ipaddress);
-    logger->Log("ClickHousePipeline", "INFO", "Resolved (Target) Port: " + std::to_string(target_endpoint.port));
+    LOG_INFO("Resolved (Target) Host: " + target_endpoint.ipaddress);
+    LOG_INFO("Resolved (Target) Port: " + std::to_string(target_endpoint.port));
 
     auto *client_socket = (Socket *)clientData.client_socket;
     CClientSocket *target_socket;
@@ -40,7 +39,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         target_socket = new CClientSocket(target_endpoint.ipaddress, target_endpoint.port);
     } catch (std::exception &e) {
         std::cout << e.what() << std::endl;
-        logger->Log("ClickHousePipeline", "ERROR", e.what());
+        LOG_ERROR(e.what());
         client_socket->Close();
         delete client_socket;
         return nullptr;
@@ -62,8 +61,8 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         }
         catch (std::exception &e)
         {
-            std::cout << e.what() << std::endl;
-            std::cout << "error occurred while creating socket select " << std::endl;
+            LOG_ERROR(e.what());
+            LOG_ERROR("error occurred while creating socket select ");
         }
 
         bool still_connected = true;
@@ -71,10 +70,10 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         {
             if (sel->Readable(client_socket))
             {
-                std::cout << "client socket is readable, reading bytes : " << std::endl;
+                LOG_INFO("client socket is readable, reading bytes : ");
                 std::string bytes = client_socket->ReceiveBytes();
 
-                std::cout << "Calling Proxy Upstream Handler.." << std::endl;
+                LOG_INFO("Calling Proxy Upstream Handler..");
                 std::string response = proxy_handler->HandleUpstreamData((void *)bytes.c_str(), bytes.size(), &exec_context);
                 target_socket->SendBytes((char *)response.c_str(), response.size());
 
@@ -84,7 +83,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         }
         catch (std::exception &e)
         {
-            std::cout << "Error while sending to target " << e.what() << std::endl;
+            LOG_ERROR("Error while sending to target " + std::string(e.what()));
             still_connected = false;
         }
 
@@ -92,10 +91,10 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         {
             if (sel->Readable(target_socket))
             {
-                std::cout << "target socket is readable, reading bytes : " << std::endl;
+                LOG_INFO("target socket is readable, reading bytes : ");
                 std::string bytes = target_socket->ReceiveBytes();
 
-                std::cout << "Calling Proxy Downstream Handler.." << std::endl;
+                LOG_INFO("Calling Proxy Downstream Handler..");
                 std::string response = proxy_handler->HandleDownStreamData((void *)bytes.c_str(), bytes.size(), &exec_context);
                 client_socket->SendBytes((char *)response.c_str(), response.size());
 
@@ -105,7 +104,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         }
         catch (std::exception &e)
         {
-            std::cout << "Error while sending to client " << e.what() << std::endl;
+            LOG_ERROR("Error while sending to client " + std::string(e.what()));
             still_connected = false;
         }
 

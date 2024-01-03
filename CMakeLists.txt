@@ -10,9 +10,12 @@ project(Chista_Asabru VERSION 1.0)
 # Get the value of an environment variable and set it as a preprocessor definition
 # Use $ENV{VAR_NAME} to access the value of the environment variable VAR_NAME
 # and set it as a preprocessor definition
-add_definitions(-DPLUGINS_FOLDER_PATH= "$ENV{PLUGINS_FOLDER_PATH}")
+add_definitions(-DPLUGINS_FOLDER_PATH="$ENV{PLUGINS_FOLDER_PATH}")
 add_definitions(-DCONFIG_FILE= "$ENV{CONFIG_FILE}")
 add_definitions(-DCONFIG_FILE_URL= "$ENV{CONFIG_FILE_URL}")
+
+# Set DEBUG preprocessor flag
+add_compile_definitions(DEBUG)
 
 # Find OpenSSL library
 find_package(OpenSSL REQUIRED)

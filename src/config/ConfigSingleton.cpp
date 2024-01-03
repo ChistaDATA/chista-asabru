@@ -1,6 +1,7 @@
 #include "ConfigSingleton.h"
 #include "Utils.h"
 #include "CommandDispatcher.h"
+#include "Logger.h"
 
 /**
  * Function to load the config.xml file from a URL
@@ -14,18 +15,12 @@ void ConfigSingleton::DownloadConfigFile(const std::string& url, const std::stri
     // checking if the command was executed successfully
     if (returnCode == 0)
     {
-        std::cout << "File downloaded successfully!" << std::endl;
+        LOG_INFO("File downloaded successfully!");
     }
     else
     {
-        std::cerr << "Failed to download file :" << returnCode << std::endl;
+        LOG_ERROR("Failed to download file :" + std::to_string(returnCode) );
     }
-
-    // if (downloadFileWithCurl(url, outputFilePath)) {
-    //     std::cout << "File downloaded successfully!" << std::endl;
-    // } else {
-    //     std::cerr << "Failed to download file" << std::endl;
-    // }
 }
 
 /**
@@ -87,7 +82,7 @@ XMLError ConfigSingleton::ParseConfiguration(XMLDocument * xmlDoc) {
      */
     LoadProxyServerConfigurations(pRoot);
 
-    std::cout << "Configuration parsed successfully!" << std::endl;
+    LOG_INFO("Configuration parsed successfully!");
     return XML_SUCCESS;
 }
 
@@ -316,7 +311,6 @@ std::vector<RESOLVED_PROTOCOL_CONFIG> ConfigSingleton::ResolveProtocolServerConf
     std::vector<RESOLVED_PROTOCOL_CONFIG> results;
     for (PROTOCOL_SERVER_CONFIG protocol_server : m_ProtocolServerConfig)
     {
-        std::cout << protocol_server.protocol_name << " " << protocol_server.protocol_port << std::endl;
         RESOLVED_PROTOCOL_CONFIG result;
         result.protocol_name = protocol_server.protocol_name;
         result.protocol_port = protocol_server.protocol_port;
@@ -376,6 +370,6 @@ ENDPOINT_SERVICE_CONFIG ConfigSingleton::ParseEndPointServiceConfiguration(XMLDo
       }
       proxyEndpointServiceConfig.service.port = port;
   }
-  std::cout << "Service Configuration parsed successfully!" << std::endl;
+  LOG_INFO("Service Configuration parsed successfully!");
   return proxyEndpointServiceConfig;
 }

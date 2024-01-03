@@ -82,7 +82,7 @@ void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr)
         }
         catch (std::exception &e)
         {
-            std::cout << e.what() << std::endl;
+            LOG_ERROR(e.what());
             break;
         }
     }
