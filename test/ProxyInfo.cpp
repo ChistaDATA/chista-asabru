@@ -5,6 +5,7 @@
 #include <set>
 #include <cstring>
 #include "ProxyInfo.h"
+#include "Logger.h"
 
 ///////////////////////////////////////////////
 //  Load Proxy map
@@ -90,11 +91,9 @@ const END_POINT* CProxyInfo::Resolve(  std::string ip , int port , int r_w  ) {
     PROXY_ENTRY& pe = p->second;
     std::vector<END_POINT>::iterator it = pe.proxies.begin();
     while ( it != pe.proxies.end() ) {
-        std::cout << "  = > " << ip << " port " << port  << "   " << it->ipaddress << " r/w " << r_w << std::endl;
         if ( it->ipaddress== ip  )
         {
             END_POINT& ep = *it;
-            std::cout << "---------------------" << "<<<>>>" << std::endl;
             if ( ep.r_w == r_w  )  { return &ep; } else { return 0; }
 
         }
@@ -106,7 +105,6 @@ const END_POINT* CProxyInfo::Resolve(  std::string ip , int port , int r_w  ) {
 
 void CProxyInfo::DumpProxyMap( ){
     for(auto &e : proxy_map)   {
-        std::cout << e.first << std::endl;
         for(auto&f : e.second.proxies )
             std::cout << "       " << f.ipaddress << "   " <<f.port <<  std::endl;
         std::cout <<"=======================" << std::endl;
@@ -135,7 +133,10 @@ bool ClusterInfo::AddClusterNode( std::string cluster_name, std::string ipaddres
 
 bool ClusterInfo::SpitCluster(std::string cluster_name) {
     auto it = clusters.find(cluster_name);
-    if ( it == clusters.end() ) { std::cout << "Cluster does not Exists"  << std::endl; return false; }
+    if ( it == clusters.end() ) {
+        LOG_ERROR("Cluster does not Exists");
+        return false;
+    }
     CProxyInfo& other = clusters[cluster_name];
     other.DumpProxyMap();
     return true;
@@ -145,7 +146,7 @@ bool ClusterInfo::SpitCluster(std::string cluster_name) {
 const END_POINT* ClusterInfo::Resolve( std::string cluster_name, std::string ip , int port , int r_w  )  {
     auto it = clusters.find(cluster_name);
     if ( it == clusters.end() ) { return 0; }
-    std::cout << "Found Cluster " << std::endl;
+    LOG_INFO("Found Cluster ");
     CProxyInfo& other = clusters[cluster_name];
     return other.Resolve(ip,port,r_w);
 }

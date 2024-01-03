@@ -15,8 +15,7 @@
  */
 void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
 {
-    Logger *logger = Logger::getInstance();
-    logger->Log("ClickHouseTLSTerminatePipeline", "INFO", "::start");
+    LOG_INFO("::start");
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
 
@@ -34,8 +33,8 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
     RESOLVED_SERVICE currentService = loadBalancer->requestServer();
     END_POINT target_endpoint = END_POINT{currentService.ipaddress, currentService.port, currentService.r_w, currentService.alias, currentService.reserved, "  "};
 
-    logger->Log("ClickHouseTLSTerminatePipeline", "INFO", "Resolved (Target) Host: " + target_endpoint.ipaddress);
-    logger->Log("ClickHouseTLSTerminatePipeline", "INFO", "Resolved (Target) Port: " + std::to_string(target_endpoint.port));
+    LOG_INFO("Resolved (Target) Host: " + target_endpoint.ipaddress);
+    LOG_INFO("Resolved (Target) Port: " + std::to_string(target_endpoint.port));
 
     auto *client_socket= new SSLSocket(((Socket *)clientData.client_socket)->GetSocket());
     auto *target_socket = new CClientSocket(target_endpoint.ipaddress, target_endpoint.port);
@@ -58,7 +57,7 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
         catch (std::exception &e)
         {
             std::cout << e.what() << std::endl;
-            logger->Log("ClickHouseTLSTerminatePipeline", "ERROR", "error occurred while creating socket select " + std::string(e.what()));
+            LOG_ERROR("error occurred while creating socket select " + std::string(e.what()));
         }
 
         bool still_connected = true;
@@ -79,7 +78,7 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
         }
         catch (std::exception &e)
         {
-            logger->Log("ClickHouseTLSTerminatePipeline", "ERROR", "Error while sending to target " + std::string(e.what()));
+            LOG_ERROR("Error while sending to target " + std::string(e.what()));
         }
 
         try
@@ -99,7 +98,7 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
         }
         catch (std::exception &e)
         {
-            logger->Log("ClickHouseTLSTerminatePipeline", "ERROR", "Error while sending to client " + std::string(e.what()));
+            LOG_ERROR("Error while sending to client " + std::string(e.what()));
         }
 
         if (!still_connected)
@@ -112,7 +111,7 @@ void *ClickHouseTLSTerminatePipeline(CProxySocket *ptr, void *lptr)
 
     // Close the server socket
     target_socket->Close();
-    logger->Log("ClickHouseTLSTerminatePipeline", "INFO", "::end");
+    LOG_INFO("::end");
 #ifdef WINDOWS_OS
     return 0;
 #else

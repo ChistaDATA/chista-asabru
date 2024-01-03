@@ -26,7 +26,8 @@ std::string updateProxyServers() {
         }
     }
     catch (std::exception &e) {
-        std::cout << e.what() << std::endl;
+        LOG_ERROR("Error occurred when updating the configurations : ");
+        LOG_ERROR(e.what());
         return "Error occurred when updating the configurations : " + std::string(e.what());
     }
     return "Configuration Updated Successfully!\n";

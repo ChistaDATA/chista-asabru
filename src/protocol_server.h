@@ -7,14 +7,12 @@
 #include "config/ConfigSingleton.h"
 
 std::string updateConfiguration(std::string content) {
-    std::cout << "xml : " << content << std::endl;
     configSingleton.LoadConfigurationsFromString(std::move(content));
     std::string response_content = updateProxyServers();
     return response_content;
 }
 
 std::string updateEndPointService(std::string content) {
-    std::cout << "XML content : " << content << std::endl;
     ENDPOINT_SERVICE_CONFIG endpointServiceConfig = configSingleton.LoadEndpointServiceFromString(std::move(content));
     std::string response_content = updateProxyEndPointService(endpointServiceConfig);
     return response_content;
@@ -29,17 +27,17 @@ int startProtocolServer(
     // Setting up Protocol Pipeline
     PipelineFunction<CProtocolSocket> pipelineFunction = configValue.pipeline;
     if (!(*socket).SetPipeline(pipelineFunction)) {
-        std::cout << "Failed to set " << protocolName << " Pipeline ..!" << std::endl;
+        LOG_ERROR("Failed to set " + protocolName + " Pipeline ..!");
         return -2;
     }
     auto *protocolHandler = (CProtocolHandler *) configValue.handler;
     if (!(*socket).SetHandler(protocolHandler)) {
-        std::cout << "Failed to set " << protocolName << " Handler ..!" << std::endl;
+        LOG_ERROR("Failed to set " + protocolName + " Handler ..!");
         return -2;
     }
 
     if (!(*socket).Start()) {
-        std::cout << "Failed To Start " << protocolName << " Proxy Server ..!" << std::endl;
+        LOG_ERROR("Failed To Start " + protocolName + " Proxy Server ..!");
         return -3;
     }
 
@@ -55,7 +53,7 @@ int initProtocolServers() {
                     route.path,
                     HttpMethodEnumMap.find(route.method)->second,
                     [route](const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse {
-                        std::cout << "Starting request handler lambda :" << std::endl;
+                        LOG_INFO("Starting request handler lambda :");
 
                         ComputationContext context;
                         /**
