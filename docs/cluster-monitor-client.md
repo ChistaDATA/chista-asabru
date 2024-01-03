@@ -24,9 +24,9 @@ Following configuration variables are used for both the cluster monitor and clie
 - ZK_HOST - The external ZooKeeper server and its port are specified by the ZK_HOST environment variable.
 - MODE - This variable defines the mode in which the program runs and which can be set to either 'monitor' or 'client'.
 
-When the program works in Cluster Monitoring Mode (MODE='monitor')
+The program run in Cluster Monitoring Mode when MODE = 'monitor' and it will monitor the cluster nodes for any change like add or removal of nodes.
 
-The program runs as the Client Mode (MODE ='monitor') which will create the ephemeral zookeeper nodes.Zookeeper nodes are added in the Zookeeper ensemble from the dataplane side when clusters nodes are created.
+The program run in Client Mode when MODE ='client' and it will create the ephemeral zookeeper nodes.Zookeeper nodes are added in the Zookeeper ensemble from the dataplane side when clusters nodes are created.
 
 - ZK_ROOT_NODE - The root ZooKeeper node, on which the program listens for changes, is provided through the ZK_ROOT_NODE environment variable.
 
