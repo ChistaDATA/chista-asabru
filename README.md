@@ -32,9 +32,9 @@ Refer this to upgrade python version on mac : https://stackoverflow.com/question
 
 ### Submodules
 
-This `chista-asabru` project consists of the following sub-modules :
+This `chista-asabru` project consists of the following submodules :
 
-1. [asabru-engine](https://github.com/ChistaDATA/asabru-engine) : This is the core engine of project, which provides abstraction over platform depedent networking APIs.
+1. [asabru-engine](https://github.com/ChistaDATA/asabru-engine) : This is the core engine of project, which provides abstraction over platform dependent networking APIs.
 2. [asabru-commons](https://github.com/ChistaDATA/asabru-commons) : This repo contains the common utility classes for the chista database proxy.
 3. [asabru-parsers](https://github.com/ChistaDATA/asabru-parsers) : This repo contains the code for the ChistaDATA database proxy parsers.
 4. [asabru-handlers](https://github.com/ChistaDATA/asabru-handlers) : This repo contains the various handlers for the chista database proxy.
@@ -59,7 +59,7 @@ sudo chmod u+x ./build_libs.sh
 ./build_libs.sh
 ```
 ##### Set environment variables
-The asabru proxy configuration is based on an xml file. This file can be fetched from remote or from local
+The asabru proxy configuration is based on a xml file. This file can be fetched from remote or from local
 
 Remote configuration
 ```
@@ -168,7 +168,7 @@ Update the values for the environment variables in the docker-compose.yaml file 
 docker compose up -d --build
 ```
 
-### Useage
+### Usage
 
 The proxy configurations are given in the `config.xml` file, we need to set the config file path location in ENV variables. Proxy will fetch the 
 configurations from that location and start the server.
