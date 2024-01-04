@@ -3,9 +3,10 @@ import yaml
 import time
 from statistics import mean, median
 
+
 class AsabruPostgres:
-    def __init__(self, config_file='postgres_config.yaml', sql_file = 'postgres_sql.yaml') -> None:
-        
+    def __init__(self, config_file='postgres_config.yaml', sql_file='postgres_sql.yaml') -> None:
+
         with open(config_file, "r") as f:
             config = yaml.safe_load(f)
 
@@ -18,7 +19,7 @@ class AsabruPostgres:
         self.password = config['password']
         self.database = config['database']
         self.ca_cert = config['ca_cert']
-        self.ssl = True if config['ssl']=='True' else False
+        self.ssl = True if config['ssl'] == 'True' else False
 
         if self.ssl:
             print('SSL Enabled!')
@@ -26,18 +27,17 @@ class AsabruPostgres:
     def create_client(self):
 
         if self.ssl:
-            client = psycopg2.connect(database=self.database, user = self.user, password = self.password,
-                                    host = self.host, port=self.port, sslmode='verify-ca',
-                                    sslrootcert=self.ca_cert)
+            client = psycopg2.connect(database=self.database, user=self.user, password=self.password,
+                                      host=self.host, port=self.port, sslmode='verify-ca',
+                                      sslrootcert=self.ca_cert)
         else:
-            client = psycopg2.connect(database=self.database, user = self.user, password = self.password,
-                                    host = self.host, port=self.port)
+            client = psycopg2.connect(database=self.database, user=self.user, password=self.password,
+                                      host=self.host, port=self.port)
 
         return client
 
-
     def benchmark_performance(self):
-        print ('Starting benchmark')
+        print('Starting benchmark')
         loop_times = []
 
         iters = 10
@@ -60,13 +60,14 @@ class AsabruPostgres:
                 # print (res)
                 cursor.close()
             client.close()
-            
+
             iter_end = time.time() - iter_start
 
             loop_times.append(iter_end)
 
-        print ('Average Time taken : ', mean(loop_times))
-        print ('Median Time taken : ', median(loop_times))
+        print('Average Time taken : ', mean(loop_times))
+        print('Median Time taken : ', median(loop_times))
+
 
 t = AsabruPostgres()
 t.benchmark_performance()

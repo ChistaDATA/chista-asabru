@@ -78,15 +78,15 @@ services:
       - "9170:9170"
     environment:
       # CONFIG_FILE_URL: https://pastebin.com/raw/2Ts9aeN7 # Thread per client version
-#      CONFIG_FILE_URL: https://pastebin.com/raw/72vCDJvm # libuv version
+      #      CONFIG_FILE_URL: https://pastebin.com/raw/72vCDJvm # libuv version
       CONFIG_FILE_PATH: /bin/config.xml
     # network_mode: "host"
     links:
-      - "clickhouse-1:database"
-#      - "serving-proxy-1:cluster-1"
-#      - "serving-proxy-2:cluster-2"
-#      - "serving-proxy-3:cluster-3"
-#      - "serving-proxy-4:cluster-4"
+      - "clickhouse:database"
+    #      - "serving-proxy-1:cluster-1"
+    #      - "serving-proxy-2:cluster-2"
+    #      - "serving-proxy-3:cluster-3"
+    #      - "serving-proxy-4:cluster-4"
     networks:
       - backend
 
@@ -158,18 +158,26 @@ services:
   #    networks:
   #      - backend
 
-  # postgres-1:
-  #   image: postgres:14.4
-  #   ports:
-  #     - "5432:5432"
-  #     - "2345:2345"
-  #   environment:
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123456}
-  #     PGDATA: /var/lib/postgresql/postgres-1/data/pgdata
-  #   volumes:
-  #     - source: pg_data
-  #       target: /var/lib/postgresql/postgres-1/data
-  #       type: volume
+  postgres-1:
+    image: postgres:14.4
+    command: >
+      -c ssl=on 
+      -c ssl_cert_file=/var/lib/postgresql/server.crt 
+      -c ssl_key_file=/var/lib/postgresql/server.key
+    ports:
+      - "5432:5432"
+      - "2345:2345"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123456}
+      PGDATA: /var/lib/postgresql/postgres-1/data/pgdata
+    volumes:
+      - source: pg_data
+        target: /var/lib/postgresql/postgres-1/data
+        type: volume
+      - /Users/midhundarvin/certs/postgres/server.crt:/var/lib/postgresql/server.crt:ro
+      - /Users/midhundarvin/certs/postgres/server.key:/var/lib/postgresql/server.key:ro
+
 
 volumes:
   pg_data:
