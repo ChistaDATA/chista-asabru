@@ -1,7 +1,7 @@
 host: 'localhost'
 username: 'asabru'
 password: '123456'
-port: '5432'
+port: '9150'
 database: 'dvdrental'
 ssl: 'True'
 ca_cert: '/home/vijay/SSL/custom_ca.crt'

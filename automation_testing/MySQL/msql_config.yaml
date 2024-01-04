@@ -1,7 +1,7 @@
 host: 'localhost'
 username: 'asabru'
 password: '123456'
-port: '3306'
+port: '9170'
 database: 'employees'
 table: 'employees'
 ca_cert: 'mysql_ca.pem'

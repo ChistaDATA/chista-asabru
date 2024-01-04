@@ -7,3 +7,9 @@ ALTER USER asabru WITH ENCRYPTED PASSWORD '123456';
 
 pg_restore -U postgres -d dvdrental /home/vijay/Downloads/dvdrental.tar
 
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA dvdrental TO asabru;
+
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA dvdrental TO asabru;
+
+grant all privileges on all tables in schema public to asabru;
+

@@ -79,10 +79,10 @@ class AsabruCH:
         client.disconnect()
 
         ## Load data
-        if not self.ssl:
-            os.system(f'clickhouse-client --host {self.ch_host} --user {self.ch_user} --password {self.ch_password} --port {self.port} --query "INSERT INTO {self.database_name}.cell_towers FORMAT CSVWithNames" < cell_towers.csv')
-        else:
-            os.system(f'clickhouse-client --secure --host {self.ch_host} --user {self.ch_user} --password {self.ch_password} --port {self.port} --query "INSERT INTO {self.database_name}.cell_towers FORMAT CSVWithNames" < cell_towers.csv')
+        # if not self.ssl:
+        #     os.system(f'clickhouse-client --host {self.ch_host} --user {self.ch_user} --password {self.ch_password} --port {self.port} --query "INSERT INTO {self.database_name}.cell_towers FORMAT CSVWithNames" < cell_towers.csv')
+        # else:
+        #     os.system(f'clickhouse-client --secure --host {self.ch_host} --user {self.ch_user} --password {self.ch_password} --port {self.port} --query "INSERT INTO {self.database_name}.cell_towers FORMAT CSVWithNames" < cell_towers.csv')
 
         print('Successfully loaded the data in to the table')
 
@@ -106,20 +106,25 @@ class AsabruCH:
         print('Starting the benchmark')
 
         for x in range(iters):
-            client = self.create_client()
+            
             print(f'Iteration {x+1}')
 
-            iter_start = time.time()
+            
 
             for query_key in self.sql_statements['read'].keys():
+                client = self.create_client()
+                query_start = time.time()
                 query = self.sql_statements['read'][query_key]
                 client.execute(query)
-                print(query)
+                query_end = time.time() - query_start
+                loop_times.append(query_end)
+                print(query, query_end)
+                client.disconnect()
             
-            iter_end = time.time() - iter_start
-            client.disconnect()
+            # iter_end = time.time() - iter_start
+            
 
-            loop_times.append(iter_end)
+            
 
         print ('Average Time taken : ', mean(loop_times))
         print ('Median Time taken : ', median(loop_times))

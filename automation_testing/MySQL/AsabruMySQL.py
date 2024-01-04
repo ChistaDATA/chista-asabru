@@ -48,7 +48,7 @@ class AsabruMySQL:
         print ('Starting benchmark')
         loop_times = []
 
-        iters = 10
+        iters = 2
         queries = len(self.sql_statements['read'].keys())
         loop_start = time.time()
 
@@ -60,7 +60,8 @@ class AsabruMySQL:
 
             for query_key in self.sql_statements['read'].keys():
                 res = []
-                # print(self.sql_statements['read'][query_key])
+                print(self.sql_statements['read'][query_key])
+                client = self.create_client()
                 cursor = client.cursor()
                 # cursor.execute("SHOW STATUS LIKE '%Ssl_cipher%'")
                 # print(cursor.fetchall())
@@ -69,9 +70,10 @@ class AsabruMySQL:
                 # for x in myresult:
                 #     print(x)
                 cursor.close()
+                client.close()
             
             iter_end = time.time() - iter_start
-            client.close()
+            # client.close()
             loop_times.append(iter_end)
 
         print ('Average Time taken : ', mean(loop_times))
