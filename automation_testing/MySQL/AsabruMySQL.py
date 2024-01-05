@@ -1,12 +1,14 @@
 import mysql.connector
+from mysql.connector.constants import ClientFlag
 import os
 import yaml
 import time
 from statistics import mean, median
 
+
 class AsabruMySQL:
-    def __init__(self, config_file='msql_config.yaml', sql_file = 'msql_sql.yaml') -> None:
-        
+    def __init__(self, config_file='msql_config.yaml', sql_file='msql_sql.yaml') -> None:
+
         with open(config_file, "r") as f:
             config = yaml.safe_load(f)
 
@@ -19,33 +21,35 @@ class AsabruMySQL:
         self.database = config['database']
         self.port = config['port']
         self.ca_cert = config['ca_cert']
-        self.ssl = True if config['ssl']=='True' else False
+        self.ssl_cert = config['ssl_cert']
+        self.ssl_key = config['ssl_key']
+        self.ssl = True if config['ssl'] == 'True' else False
 
         if self.ssl:
-            print ('SSL Enabled')
-
+            print('SSL Enabled')
 
     def create_client(self):
 
-
         if self.ssl:
             client = mysql.connector.connect(host=self.host,
-                                            port=self.port,
-                                            user=self.user,
-                                            password=self.password,
-                                            ssl_ca=self.ca_cert)
+                                             port=self.port,
+                                             user=self.user,
+                                             password=self.password,
+                                             client_flags=[ClientFlag.SSL],
+                                             ssl_ca=self.ca_cert,
+                                             ssl_cert=self.ssl_cert,
+                                             ssl_key=self.ssl_key
+                                             )
 
         else:
             client = mysql.connector.connect(host=self.host,
-                                            port=self.port,
-                                            user=self.user,
-                                            password=self.password)
-
+                                             port=self.port,
+                                             user=self.user,
+                                             password=self.password)
         return client
 
-
     def benchmark_performance(self):
-        print ('Starting benchmark')
+        print('Starting benchmark')
         loop_times = []
 
         iters = 10
@@ -69,14 +73,13 @@ class AsabruMySQL:
                 # for x in myresult:
                 #     print(x)
                 cursor.close()
-            
+
             iter_end = time.time() - iter_start
             client.close()
             loop_times.append(iter_end)
 
-        print ('Average Time taken : ', mean(loop_times))
-        print ('Median Time taken : ', median(loop_times))
-
+        print('Average Time taken : ', mean(loop_times))
+        print('Median Time taken : ', median(loop_times))
 
 
 t = AsabruMySQL()

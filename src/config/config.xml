@@ -41,7 +41,7 @@
 					<PROTOCOL>CH_WIRE</PROTOCOL>
 					<SERVICES>
 						<SERVICE name="ch_wire_service1">
-							<HOST>localhost</HOST>
+							<HOST>clickhouse-1</HOST>
 							<PORT>9000</PORT>
 						</SERVICE>
 					</SERVICES>
@@ -54,7 +54,7 @@
 					<HANDLER>CHttpHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_http_service1">
-							<HOST>localhost</HOST>
+							<HOST>clickhouse-1</HOST>
 							<PORT>8123</PORT>
 						</SERVICE>
 					</SERVICES>
@@ -67,7 +67,7 @@
 					<HANDLER>CHWirePTHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_tls_wire_service1">
-							<HOST>a8eaf1295ea0c47d4891275c309da5bb-907491465.us-east-1.elb.amazonaws.com</HOST>
+							<HOST>clickhouse-1</HOST>
 							<PORT>9440</PORT>
 						</SERVICE>
 					</SERVICES>
@@ -80,7 +80,7 @@
 					<HANDLER>CHttpsHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_tls_http_service1">
-							<HOST>localhost</HOST>
+							<HOST>clickhouse-1</HOST>
 							<PORT>8443</PORT>
 						</SERVICE>
 					</SERVICES>
@@ -98,7 +98,7 @@
 					<HANDLER>CPostgreSQLHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="pg_wire_service1">
-							<HOST>localhost</HOST>
+							<HOST>postgres-1</HOST>
 							<PORT>5432</PORT>
 						</SERVICE>
 					</SERVICES>
@@ -111,7 +111,7 @@
 					<HANDLER>CPostgreSQLHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="pg_tls_service1">
-							<HOST>localhost</HOST>
+							<HOST>postgres-1</HOST>
 							<PORT>2345</PORT>
 						</SERVICE>
 					</SERVICES>
@@ -124,7 +124,7 @@
 					<HANDLER>CMySQLHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="mysql_wire_service1">
-							<HOST>localhost</HOST>
+							<HOST>mysql-1</HOST>
 							<PORT>3306</PORT>
 						</SERVICE>
 					</SERVICES>
@@ -137,7 +137,7 @@
 					<HANDLER>CMySQLHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="mysql_tls_service1">
-							<HOST>localhost</HOST>
+							<HOST>mysql-1</HOST>
 							<PORT>5501</PORT>
 						</SERVICE>
 					</SERVICES>

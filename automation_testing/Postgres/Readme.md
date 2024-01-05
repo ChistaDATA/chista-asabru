@@ -9,7 +9,6 @@ This code is meant to be run on Postgres on dvdrental dataset.
 * dvdrental dataset [Available here](https://www.postgresqltutorial.com/postgresql-getting-started/postgresql-sample-database/)
 * Dedicated postgres user for running the script (e.g CREATE USER asabru WITH ENCRYPTED PASSWORD '123456';
 )
-*
 
 ## Python Pre-requisites
 * Python 3.9+
