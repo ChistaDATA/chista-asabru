@@ -82,7 +82,8 @@ services:
       CONFIG_FILE_PATH: /bin/config.xml
     # network_mode: "host"
     links:
-      - "clickhouse:database"
+      - "clickhouse-1:clickhouse-1"
+      - "postgres-1:postgres-1"
     #      - "serving-proxy-1:cluster-1"
     #      - "serving-proxy-2:cluster-2"
     #      - "serving-proxy-3:cluster-3"
@@ -177,11 +178,66 @@ services:
         type: volume
       - /Users/midhundarvin/certs/postgres/server.crt:/var/lib/postgresql/server.crt:ro
       - /Users/midhundarvin/certs/postgres/server.key:/var/lib/postgresql/server.key:ro
+    networks:
+      - backend
 
+#  mysql:
+#    image: "mysql/mysql-server"
+#    container_name: mysql
+#    command: [ "mysqld",
+#               "--character-set-server=utf8mb4",
+#               "--collation-server=utf8mb4_unicode_ci",
+#               "--bind-address=0.0.0.0",
+#               "--require_secure_transport=ON",
+#               "--ssl-ca=/etc/certs/root-ca.pem",
+#               "--ssl-cert=/etc/certs/server-cert.pem",
+#               "--ssl-key=/etc/certs/server-key.pem",
+#               "--default_authentication_plugin=mysql_native_password" ]
+#    ports:
+#      - "3306:3306"
+#    volumes:
+#      - type: volume
+#        source: mysql_data
+#        target: /var/lib/mysql
+#      - type: bind
+#        source: /Users/midhundarvin/certs/mysql
+#        target: /etc/certs/
+#    restart: always
+#    environment:
+#      MYSQL_ROOT_PASSWORD: "123456"
+#      MYSQL_ROOT_HOST: "%"
+
+  mysql-1:
+    image: mysql/mysql-server
+    # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
+    # (this is just an example, not intended to be a production configuration)
+    command: [ "mysqld",
+               "--character-set-server=utf8mb4",
+               "--collation-server=utf8mb4_unicode_ci",
+               "--require_secure_transport=ON",
+               "--ssl-ca=/etc/certs/root-ca.pem",
+               "--ssl-cert=/etc/certs/server-cert.pem",
+               "--ssl-key=/etc/certs/server-key.pem",
+               "--default_authentication_plugin=mysql_native_password" ]
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - type: volume
+        source: mysql_data
+        target: /var/lib/mysql
+      - type: bind
+        source: /Users/midhundarvin/certs/mysql
+        target: /etc/certs/
+    ports:
+      - "3306:3306"
+    networks:
+      - backend
 
 volumes:
   pg_data:
-
+  mysql_data:
 networks:
   backend:
     driver: bridge

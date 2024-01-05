@@ -1,6 +1,6 @@
 read:
-  r1: "SELECT * FROM employees.employees"
-  r2: "SELECT * FROM employees.employees WHERE first_name = 'Chirstian'"
-  r3: "SELECT gender, count(gender) FROM employees.employees GROUP BY gender"
-  r4: "SELECT COUNT(DISTINCT emp_no) FROM employees.employees"
-  r5: "SELECT s.emp_no , e.first_name, s.salary FROM employees.salaries AS s INNER JOIN employees.employees AS e ON  e.emp_no = s.emp_no"
+  r1: "SELECT * FROM classicmodels.employees"
+  r2: "SELECT * FROM classicmodels.employees WHERE firstName = 'George'"
+  r3: "SELECT jobTitle, count(jobTitle) FROM classicmodels.employees GROUP BY jobTitle"
+  r4: "SELECT COUNT(DISTINCT employeeNumber) FROM classicmodels.employees"
+  r5: "SELECT e.employeeNumber , e.firstName, o.city FROM classicmodels.offices AS o INNER JOIN classicmodels.employees AS e ON  e.officeCode = o.officeCode"
