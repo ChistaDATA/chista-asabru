@@ -1,0 +1,109 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.chistadata.ch-java-client</groupId>
+    <artifactId>ch-java-client</artifactId>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+
+    <name>Maven Quick Start Archetype</name>
+    <url>http://maven.apache.org</url>
+
+    <properties>
+        <project.current.year>2023</project.current.year>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <clickhouse-java.version>0.4.6</clickhouse-java.version>
+        <compiler-plugin.version>3.8.1</compiler-plugin.version>
+
+        <minJdk>1.8</minJdk>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.clickhouse</groupId>
+            <!--
+                change to clickhouse-cli-client for TCP
+                or clickhouse-grpc-client for gRPC
+            -->
+            <artifactId>clickhouse-http-client</artifactId>
+            <version>${clickhouse-java.version}</version>
+            <classifier>shaded</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.clickhouse</groupId>
+            <!-- or clickhouse-grpc-client if you prefer gRPC -->
+            <artifactId>clickhouse-http-client</artifactId>
+            <version>0.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.clickhouse</groupId>
+            <artifactId>clickhouse-jdbc</artifactId>
+            <version>0.5.0</version>
+            <!-- use uber jar with all dependencies included, change classifier to http for smaller jar -->
+            <classifier>all</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.12.5</version> <!-- Use the latest version available -->
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.12.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>2.12.5</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler-plugin.version}</version>
+                <configuration>
+                    <source>16</source>
+                    <target>16</target>
+                    <showWarnings>true</showWarnings>
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                        <!-- arg>-Werror</arg -->
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
