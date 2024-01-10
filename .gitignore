@@ -12,3 +12,7 @@ __pycache__/
 debug
 venv
 *.iml
+bin/
+obj/
+.vs/
+*.sln
