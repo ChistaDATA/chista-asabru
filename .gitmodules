@@ -28,3 +28,6 @@
 	path = lib/zk-cluster-monitor-client
 	url = git@github.com:ChistaDATA/zk-cluster-monitor-client.git
 	branch = main
+[submodule "lib/gzip-hpp"]
+	path = lib/gzip-hpp
+	url = git@github.com:mapbox/gzip-hpp.git

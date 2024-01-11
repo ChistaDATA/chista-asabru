@@ -201,6 +201,7 @@ XMLError ConfigSingleton::LoadProxyServerConfigurations(XMLNode *pRoot)
     }
 
     m_ProxyConfig = proxyConfig;
+    return XML_SUCCESS;
 }
 
 std::vector<RESOLVED_PROXY_CONFIG> ConfigSingleton::ResolveProxyServerConfigurations()
@@ -304,6 +305,7 @@ XMLError ConfigSingleton::LoadProtocolServerConfigurations(XMLNode *root)
         protocol_server = protocol_server->NextSiblingElement("protocol-server");
     }
     m_ProtocolServerConfig = result;
+    return XML_SUCCESS;
 }
 
 std::vector<RESOLVED_PROTOCOL_CONFIG> ConfigSingleton::ResolveProtocolServerConfigurations()
