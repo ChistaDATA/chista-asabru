@@ -62,9 +62,9 @@ Our current version of Asabru serves as a highly efficient forward proxy for cli
 
 ## Visual aid included
 
-![proxy 1](/img/proxy1.png "proxy 1")
-![proxy 3](/img/proxy3.png "proxy 3")
-![proxy 2](/img/proxy2.png "proxy 2")
+![proxy 1](img/proxy1.png "proxy 1")
+![proxy 3](img/proxy3.png "proxy 3")
+![proxy 2](img/proxy2.png "proxy 2")
 
 
 ## Glossary
