@@ -20,7 +20,9 @@ For the independent proxying mode , the details about the proxy ports , please s
 
 ### Documentation
 
-- [Official Documentation](DOCUMENTION.md)
+- [Official Documentation](DOCUMENTATION.md)
+
+### Other
 
 https://solid-adventure-73een37.pages.github.io/#/
 
