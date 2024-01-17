@@ -5,7 +5,7 @@ There are two types of servers that we can configure
 1. Proxy Server - These accept connections and forward the requests to destination based on configuration.
 2. Protocol Server - These accept connections and process requests. This is used to control the proxy.
 
-There are several components that form the chisa-asabru proxy servers.
+There are several components that form the chista-asabru proxy servers.
 
 1. Pipelines - These control or decide the transport mechanism of packets through the proxy.
 2. Handlers - These are stateless lamda functions that decide what to do with the packet.

@@ -37,6 +37,8 @@ The above-mentioned steps will start the Asabru server and enable it to proxy co
 Asabru servers support various configurations to suit different needs and use cases. The proxy server operates on specific port numbers that correspond to the protocol used by the underlying database system.
 By leveraging the Asabru server, users can benefit from its efficient and reliable proxying capabilities, making it an excellent tool for database management and optimization.
 
+The port numbers for proxy given in the table are not fixed and can be changed from the proxy configuration file , if required. Here are the details about [proxy configuration](docs/configuration.md) 
+
 Asabru server provides users with an efficient and flexible way to manage their database connections through a range of proxy port numbers for various config types, allowing users to configure and manage their database connections with ease. Here are the available configurations:
 
 | #   | Proxy Port # | DB Port # | Description                                                                                      | Proxy Mode  | Status |
@@ -50,10 +52,9 @@ Asabru server provides users with an efficient and flexible way to manage their 
 | 7   | 9160         | 3306      | MySQL Wirelevel Protocol                                                                         | Passthrough | Done   |
 | 8   | 9170         | 3306      | MySQL TLS Wirelevel protocol                                                                     | Passthrough | Done   |
 
-To run the proxy for other configurations, refer to the Table above and replace the port number in the command above with the corresponding port number for the desired configuration. For example, if you want to run the proxy for PostgreSQL using the WireLevel protocol with port number 9140, use the following command:
+To run the proxy set the proxy configurations with required port numbers, and you can start proxy by running the following command :
 
-
-> ./Chista_Asabru 9140
+> ./Chista_Asabru
 
 By following these simple steps, you can easily run the Asabru server proxy from the command line for various database systems and configurations. This provides users with a powerful tool for managing their database connections and optimizing their database performance.
 
@@ -77,5 +78,5 @@ In Passthrough mode, the Asabru server acts as a transparent intermediary betwee
 **Wirelevel Protocol**
 
 The Wirelevel Protocol is a low-level communication protocol used by MySQL/ClickHouse/PostgreSQL to exchange information between the client and server. It is based on TCP/IP and supports a binary format making it efficient for transmitting large amounts of data. It includes features such as authentication, encryption, and compression to ensure secure and efficient communication between the client and the server.
-Examples of client applications that use the Wirelevel Protocol include the MySQL command-line client, MySQL Workbench, and various programming languages connectors such as JDBC for Java or the MySQL-python library for Python.
+Examples of client applications that use the Wire-level Protocol include the MySQL command-line client, MySQL Workbench, and various programming languages connectors such as JDBC for Java or the MySQL-python library for Python.
 
