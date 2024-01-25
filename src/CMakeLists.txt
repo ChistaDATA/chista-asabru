@@ -1,3 +1,10 @@
+cmake_minimum_required(VERSION 3.15)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+include(CMakePrintHelpers)
+
 # Get the value of an environment variable and set it as a preprocessor definition
 # Use $ENV{VAR_NAME} to access the value of the environment variable VAR_NAME
 # and set it as a preprocessor definition
@@ -60,8 +67,8 @@ set(PROJECT_LINK_LIBS
 
 # Collect all source files
 file(GLOB_RECURSE PIPELINE_FILES "./pipelines/*.cpp")
-file(COPY public DESTINATION .)
-file(COPY config/config.xml DESTINATION .)
+file(COPY public DESTINATION ..)
+file(COPY config/config.xml DESTINATION ..)
 
 add_executable(Chista_Asabru
         main.h

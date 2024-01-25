@@ -26,6 +26,11 @@
 					<method>POST</method>
 					<request_handler>PythonCommand</request_handler>
 				</route>
+				<route>
+					<path>/upload</path>
+					<method>POST</method>
+					<request_handler>HttpFileUploadCommand</request_handler>
+				</route>
 			</routes>
 		</protocol-server>
 	</protocol-server-config>
@@ -41,7 +46,7 @@
 					<PROTOCOL>CH_WIRE</PROTOCOL>
 					<SERVICES>
 						<SERVICE name="ch_wire_service1">
-							<HOST>clickhouse-1</HOST>
+							<HOST>localhost</HOST>
 							<PORT>9000</PORT>
 						</SERVICE>
 					</SERVICES>
@@ -51,10 +56,10 @@
 					<PROXY_PORT>9110</PROXY_PORT>
 					<PROTOCOL>CH_HTTP</PROTOCOL>
 					<PIPELINE>ClickHousePipeline</PIPELINE>
-					<HANDLER>CHttpHandler</HANDLER>
+					<HANDLER>GzipHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_http_service1">
-							<HOST>clickhouse-1</HOST>
+							<HOST>localhost</HOST>
 							<PORT>8123</PORT>
 						</SERVICE>
 					</SERVICES>

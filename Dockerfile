@@ -3,6 +3,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update -y \
   && apt-get upgrade -y \
   && apt-get install -y \
+    git \
     build-essential \
     libtool \
     libssl-dev \
@@ -59,7 +60,7 @@ RUN apt-get install -y \
 RUN mkdir -p /opt/bin
 RUN ln -s /usr/bin/curl /opt/bin/curl
 
-COPY --from=0 /app/build /bin
+COPY --from=0 /app/build/src /bin
 COPY --from=0 /app/lib/asabru-handlers/build /asabru-handlers
 ENV PLUGINS_FOLDER_PATH=/asabru-handlers
 ENV PUBLIC_FOLDER_PATH=/bin/public
