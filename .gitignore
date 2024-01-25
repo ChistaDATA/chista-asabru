@@ -16,3 +16,5 @@ bin/
 obj/
 .vs/
 *.sln
+**/java-client/target
+**/java-client/out

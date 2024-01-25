@@ -65,7 +65,6 @@ int initProtocolServers() {
 
                         CommandDispatcher::Dispatch(route.request_handler, &context);
                         auto response = std::any_cast<simple_http_server::HttpResponse *>(context.Get("response"));
-                        std::cout << (int) (response->status_code()) << std::endl;
                         return *response;
                     }
             );
