@@ -1,3 +1,8 @@
+# Set the compiler options
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "-lgcov --coverage -g -O0 -Wall -fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE ON)
+
 include(CMakePrintHelpers)
 include(FetchContent)
 FetchContent_Declare(
