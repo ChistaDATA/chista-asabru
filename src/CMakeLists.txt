@@ -31,10 +31,7 @@ include_directories(${Python_INCLUDE_DIRS})
 find_package (SQLite3 REQUIRED)
 include_directories(${SQLite3_INCLUDE_DIRS})
 
-add_subdirectory(../lib/tinyxml2 lib/tinyxml2)
-add_subdirectory(../lib/asabru-commons lib/asabru-commons)
-add_subdirectory(../lib/asabru-parsers lib/asabru-parsers)
-add_subdirectory(../lib/asabru-engine lib/asabru-engine)
+add_subdirectory(../lib/asabru-client/src ../lib/asabru-client)
 
 include_directories(../lib/tinyxml2)
 include_directories(../lib/libuv/include)

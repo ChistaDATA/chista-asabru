@@ -32,6 +32,7 @@ public:
         proxyPipelineFunctionMap["MySQLPipeline"] = MySQLPipeline;
 
         protocolPipelineFunctionMap["ProtocolPipeline"] = ProtocolPipeline;
+        protocolPipelineFunctionMap["CStreamPipeline"] = CStreamPipeline;
 
         libuvProxyPipelineFunctionMap["ClickHouseLibuvPipeline"] = ClickHouseLibuvPipeline;
     };

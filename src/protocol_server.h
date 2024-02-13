@@ -31,9 +31,11 @@ int startProtocolServer(
         return -2;
     }
     auto *protocolHandler = (CProtocolHandler *) configValue.handler;
-    if (!(*socket).SetHandler(protocolHandler)) {
-        LOG_ERROR("Failed to set " + protocolName + " Handler ..!");
-        return -2;
+    if (protocolHandler) {
+        if (!(*socket).SetHandler(protocolHandler)) {
+            LOG_ERROR("Failed to set " + protocolName + " Handler ..!");
+            return -2;
+        }
     }
 
     if (!(*socket).Start()) {
@@ -47,28 +49,31 @@ int startProtocolServer(
 int initProtocolServers() {
     std::vector<RESOLVED_PROTOCOL_CONFIG> protocolServerConfigValues = configSingleton.ResolveProtocolServerConfigurations();
     for (const auto& value: protocolServerConfigValues) {
-        auto httpProtocolHandler = (CHttpProtocolHandler *) value.handler;
-        for (const auto& route: value.routes) {
-            httpProtocolHandler->RegisterHttpRequestHandler(
-                    route.path,
-                    HttpMethodEnumMap.find(route.method)->second,
-                    [route](const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse {
-                        LOG_INFO("Starting request handler lambda :");
+        auto protocolHandler = (CHttpProtocolHandler *) value.handler;
+        if (protocolHandler) {
+            for (const auto& route: value.routes) {
+                protocolHandler->RegisterHttpRequestHandler(
+                        route.path,
+                        HttpMethodEnumMap.find(route.method)->second,
+                        [route](const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse {
+                            LOG_INFO("Starting request handler lambda :");
 
-                        ComputationContext context;
-                        /**
-                         * Set necessary shared variables and functions
-                         */
-                        context.Put("request", &request);
-                        context.Put("update_configuration", updateConfiguration);
-                        context.Put("update_endpoint_service",updateEndPointService);
+                            ComputationContext context;
+                            /**
+                             * Set necessary shared variables and functions
+                             */
+                            context.Put("request", &request);
+                            context.Put("update_configuration", updateConfiguration);
+                            context.Put("update_endpoint_service",updateEndPointService);
 
-                        CommandDispatcher::Dispatch(route.request_handler, &context);
-                        auto response = std::any_cast<simple_http_server::HttpResponse *>(context.Get("response"));
-                        return *response;
-                    }
-            );
+                            CommandDispatcher::Dispatch(route.request_handler, &context);
+                            auto response = std::any_cast<simple_http_server::HttpResponse *>(context.Get("response"));
+                            return *response;
+                        }
+                );
+            }
         }
+
         configSingleton.protocolSocketsMap[value.protocol_name] = new CProtocolSocket(value.protocol_port);
         int protocolServer = startProtocolServer(
                 configSingleton.protocolSocketsMap[value.protocol_name],

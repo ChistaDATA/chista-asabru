@@ -276,31 +276,34 @@ XMLError ConfigSingleton::LoadProtocolServerConfigurations(XMLNode *root)
         }
 
         XMLElement *routesElement = protocol_server->FirstChildElement("routes");
-        XMLElement *routeElement = routesElement->FirstChildElement("route");
-        std::vector<Route> routes;
-        while (routeElement) {
-            Route r;
-            XMLElement *pathElement = routeElement->FirstChildElement("path");
-            if (NULL != pathElement)
-            {
-                r.path = pathElement->GetText();
-            }
+        if (routesElement) {
+            XMLElement *routeElement = routesElement->FirstChildElement("route");
+            std::vector<Route> routes;
+            while (routeElement) {
+                Route r;
+                XMLElement *pathElement = routeElement->FirstChildElement("path");
+                if (NULL != pathElement)
+                {
+                    r.path = pathElement->GetText();
+                }
 
-            XMLElement *methodElement = routeElement->FirstChildElement("method");
-            if (NULL != methodElement)
-            {
-                r.method = methodElement->GetText();
-            }
+                XMLElement *methodElement = routeElement->FirstChildElement("method");
+                if (NULL != methodElement)
+                {
+                    r.method = methodElement->GetText();
+                }
 
-            XMLElement *requestHandlerElement = routeElement->FirstChildElement("request_handler");
-            if (NULL != requestHandlerElement)
-            {
-                r.request_handler = requestHandlerElement->GetText();
+                XMLElement *requestHandlerElement = routeElement->FirstChildElement("request_handler");
+                if (NULL != requestHandlerElement)
+                {
+                    r.request_handler = requestHandlerElement->GetText();
+                }
+                routes.push_back(r);
+                routeElement = routeElement->NextSiblingElement("route");
             }
-            routes.push_back(r);
-            routeElement = routeElement->NextSiblingElement("route");
+            config.routes = routes;
         }
-        config.routes = routes;
+
         result.push_back(config);
         protocol_server = protocol_server->NextSiblingElement("protocol-server");
     }
