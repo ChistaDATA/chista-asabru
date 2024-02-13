@@ -19,6 +19,7 @@ void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr);
 void *MySQLPipeline(CProxySocket *ptr, void *lptr);
 void *PassthroughPipeLine(CProtocolSocket *ptr, void *lptr);
 void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr);
+void *CStreamPipeline(CProtocolSocket *ptr, void *lptr);
 
 typedef struct {
     ClientTargetPair *pair;

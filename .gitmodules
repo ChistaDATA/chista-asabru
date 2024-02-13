@@ -31,3 +31,7 @@
 [submodule "lib/gzip-hpp"]
 	path = lib/gzip-hpp
 	url = git@github.com:mapbox/gzip-hpp.git
+[submodule "lib/asabru-client"]
+	path = lib/asabru-client
+	url = git@github.com:ChistaDATA/asabru-client.git
+	branch = main

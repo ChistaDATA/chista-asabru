@@ -1,8 +1,6 @@
 from clickhouse_driver import Client
 import os
 import yaml
-import requests
-import lzma
 
 config_file = 'ch_config.yaml'
 sql_file = 'ch_sql.yaml'

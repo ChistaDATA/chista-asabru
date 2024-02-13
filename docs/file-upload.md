@@ -34,3 +34,25 @@ export UPLOADS_FOLDER=/Users/midhunadarvin/Downloads
 curl --location 'http://localhost:8080/upload' \
 --form 'image=@"/Users/midhundarvin/Pictures/098A1981.JPG"'
 ```
+
+### TCP File Upload ( Streaming )
+##### Add the following configuration in the proxy config.xml
+```
+<protocol-server-config>
+    <protocol-server protocol="HTTP">
+        <protocol-port>8081</protocol-port>
+        <pipeline>CStreamPipeline</pipeline>
+    </protocol-server>
+</protocol-server-config>
+```
+
+##### Build and Run the chista-asabru proxy
+
+The build includes the `chista-asabru` client program to upload file as a stream.
+
+```
+Usage : ./build/lib/asabru-client/asabru_client <file-name> <proxy-host> <proxy-protocol-port>
+
+Eg: ./build/lib/asabru-client/asabru_client sample.txt localhost 8081
+```
+

@@ -10,6 +10,7 @@ list_of_directories=(
   ./lib/asabru-engine
   ./lib/asabru-parsers
   ./lib/asabru-handlers
+  ./lib/asabru-client
 )
 # For each subdirectory
 # for dir in $(find ./lib -maxdepth 1 -type d)

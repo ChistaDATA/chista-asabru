@@ -33,6 +33,10 @@
 				</route>
 			</routes>
 		</protocol-server>
+		<protocol-server protocol="HTTP">
+			<protocol-port>8081</protocol-port>
+			<pipeline>CStreamPipeline</pipeline>
+		</protocol-server>
 	</protocol-server-config>
 
 	<CLUSTERS>
