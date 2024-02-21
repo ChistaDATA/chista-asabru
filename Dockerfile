@@ -42,7 +42,7 @@ RUN cd build && cmake .. && make
 # The second stage will install the runtime dependencies only and copy
 # the compiled executables
 
-FROM arm64v8/ubuntu:latest AS builder
+FROM arm64v8/ubuntu:latest AS runner
 
 RUN apt-get update -y \
   && apt-get upgrade -y \
@@ -61,6 +61,8 @@ RUN mkdir -p /opt/bin
 RUN ln -s /usr/bin/curl /opt/bin/curl
 
 COPY --from=0 /app/build/src /bin
+COPY --from=0 /app/build/public /bin/public
+COPY --from=0 /app/build/config.xml /bin/config.xml
 COPY --from=0 /app/lib/asabru-handlers/build /asabru-handlers
 ENV PLUGINS_FOLDER_PATH=/asabru-handlers
 ENV PUBLIC_FOLDER_PATH=/bin/public

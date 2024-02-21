@@ -1,0 +1,157 @@
+<clickhouse-proxy-v2>
+
+    <protocol-server-config>
+        <protocol-server protocol="HTTP">
+            <protocol-port>8080</protocol-port>
+            <pipeline>ProtocolPipeline</pipeline>
+            <handler>CHttpProtocolHandler</handler>
+            <routes>
+                <route>
+                    <path>/configuration</path>
+                    <method>POST</method>
+                    <request_handler>UpdateConfigurationCommand</request_handler>
+                </route>
+                <route>
+                    <path>/updateService</path>
+                    <method>POST</method>
+                    <request_handler>UpdateEndPointServiceCommand</request_handler>
+                </route>
+                <route>
+                    <path>/</path>
+                    <method>GET</method>
+                    <request_handler>SendHtmlCommand</request_handler>
+                </route>
+                <route>
+                    <path>/python</path>
+                    <method>POST</method>
+                    <request_handler>PythonCommand</request_handler>
+                </route>
+                <route>
+                    <path>/upload</path>
+                    <method>POST</method>
+                    <request_handler>HttpFileUploadCommand</request_handler>
+                </route>
+            </routes>
+        </protocol-server>
+        <protocol-server protocol="HTTP">
+            <protocol-port>8081</protocol-port>
+            <pipeline>CStreamPipeline</pipeline>
+        </protocol-server>
+    </protocol-server-config>
+
+    <CLUSTERS>
+        <CLUSTER name ="cluster1">
+            <END_POINTS>
+                <END_POINT name="ch_wire_node1">
+                    <READ_WRITE>yes</READ_WRITE>
+                    <PROXY_PORT>9100</PROXY_PORT>
+                    <PIPELINE>ClickHousePipeline</PIPELINE>
+                    <HANDLER>CHWirePTHandler</HANDLER>
+                    <PROTOCOL>CH_WIRE</PROTOCOL>
+                    <SERVICES>
+                        <SERVICE name="ch_wire_service1">
+                            <HOST>clickhouse-1</HOST>
+                            <PORT>9000</PORT>
+                        </SERVICE>
+                    </SERVICES>
+                </END_POINT>
+                <END_POINT name="ch_http_node1">
+                    <READ_WRITE>yes</READ_WRITE>
+                    <PROXY_PORT>9110</PROXY_PORT>
+                    <PROTOCOL>CH_HTTP</PROTOCOL>
+                    <PIPELINE>ClickHousePipeline</PIPELINE>
+                    <HANDLER>GzipHandler</HANDLER>
+                    <SERVICES>
+                        <SERVICE name="ch_http_service1">
+                            <HOST>clickhouse-1</HOST>
+                            <PORT>8123</PORT>
+                        </SERVICE>
+                    </SERVICES>
+                </END_POINT>
+                <END_POINT name="ch_tls_wire_node1">
+                    <READ_WRITE>no</READ_WRITE>
+                    <PROXY_PORT>9120</PROXY_PORT>
+                    <PROTOCOL>CH_TLS_WIRE</PROTOCOL>
+                    <PIPELINE>ClickHousePipeline</PIPELINE>
+                    <HANDLER>CHWirePTHandler</HANDLER>
+                    <SERVICES>
+                        <SERVICE name="ch_tls_wire_service1">
+                            <HOST>clickhouse-1</HOST>
+                            <PORT>9440</PORT>
+                        </SERVICE>
+                    </SERVICES>
+                </END_POINT>
+                <END_POINT name="ch_tls_http_node1">
+                    <READ_WRITE>no</READ_WRITE>
+                    <PROXY_PORT>9130</PROXY_PORT>
+                    <PROTOCOL>CH_TLS_HTTP</PROTOCOL>
+                    <PIPELINE>ClickHouseTLSExchangePipeline</PIPELINE>
+                    <HANDLER>CHttpsHandler</HANDLER>
+                    <SERVICES>
+                        <SERVICE name="ch_tls_http_service1">
+                            <HOST>clickhouse-1</HOST>
+                            <PORT>8443</PORT>
+                        </SERVICE>
+                    </SERVICES>
+                </END_POINT>
+            </END_POINTS>
+        </CLUSTER>
+
+        <CLUSTER name ="cluster2">
+            <END_POINTS>
+                <END_POINT name="pg_wire_node1">
+                    <READ_WRITE>no</READ_WRITE>
+                    <PROXY_PORT>9140</PROXY_PORT>
+                    <PROTOCOL>PG_WIRE</PROTOCOL>
+                    <PIPELINE>PostgreSQLPipeline</PIPELINE>
+                    <HANDLER>CPostgreSQLHandler</HANDLER>
+                    <SERVICES>
+                        <SERVICE name="pg_wire_service1">
+                            <HOST>postgres-1</HOST>
+                            <PORT>5432</PORT>
+                        </SERVICE>
+                    </SERVICES>
+                </END_POINT>
+                <END_POINT name="pg_tls_node1">
+                    <READ_WRITE>no</READ_WRITE>
+                    <PROXY_PORT>9150</PROXY_PORT>
+                    <PROTOCOL>PG_TLS_WIRE</PROTOCOL>
+                    <PIPELINE>PostgreSQLPipeline</PIPELINE>
+                    <HANDLER>CPostgreSQLHandler</HANDLER>
+                    <SERVICES>
+                        <SERVICE name="pg_tls_service1">
+                            <HOST>postgres-1</HOST>
+                            <PORT>2345</PORT>
+                        </SERVICE>
+                    </SERVICES>
+                </END_POINT>
+                <END_POINT name="mysql_wire_node1">
+                    <READ_WRITE>yes</READ_WRITE>
+                    <PROXY_PORT>9160</PROXY_PORT>
+                    <PROTOCOL>MYSQL_WIRE</PROTOCOL>
+                    <PIPELINE>MySQLPipeline</PIPELINE>
+                    <HANDLER>CMySQLHandler</HANDLER>
+                    <SERVICES>
+                        <SERVICE name="mysql_wire_service1">
+                            <HOST>mysql-1</HOST>
+                            <PORT>3306</PORT>
+                        </SERVICE>
+                    </SERVICES>
+                </END_POINT>
+                <END_POINT name="mysql_tls_node1">
+                    <READ_WRITE>yes</READ_WRITE>
+                    <PROXY_PORT>9170</PROXY_PORT>
+                    <PROTOCOL>MYSQL_TLS_WIRE</PROTOCOL>
+                    <PIPELINE>MySQLPipeline</PIPELINE>
+                    <HANDLER>CMySQLHandler</HANDLER>
+                    <SERVICES>
+                        <SERVICE name="mysql_tls_service1">
+                            <HOST>mysql-1</HOST>
+                            <PORT>5501</PORT>
+                        </SERVICE>
+                    </SERVICES>
+                </END_POINT>
+            </END_POINTS>
+        </CLUSTER>
+    </CLUSTERS>
+</clickhouse-proxy-v2>

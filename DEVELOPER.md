@@ -129,6 +129,19 @@ export LOGGER_TYPE=FILE
 
 The text file will be generated in the build folder with the current date appended for the logs.
 
+**Network Logging**
+
+In the case of network logging, the logs are sent terminated by a new line. Set the following variables
+to set host and port of the network log processor.
+
+```
+export NETWORK_LOGGER_HOST=localhost
+export NETWORK_LOGGER_PORT=5170
+```
+
+[Fluent Bit](https://fluentbit.io/) is an open source network log processor. It can be started locally via the
+`docker compose up` command.
+
 ##### Build the asabru app from  the root of the repository
 
 ```

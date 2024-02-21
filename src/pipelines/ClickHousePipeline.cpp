@@ -39,7 +39,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
         target_socket = new CClientSocket(target_endpoint.ipaddress, target_endpoint.port);
     } catch (std::exception &e) {
         std::cout << e.what() << std::endl;
-        LOG_ERROR(e.what());
+        LOG_ERROR(std::string("Error connecting to target : ") + e.what());
         client_socket->Close();
         delete client_socket;
         return nullptr;
