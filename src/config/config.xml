@@ -50,7 +50,7 @@
 					<PROTOCOL>CH_WIRE</PROTOCOL>
 					<SERVICES>
 						<SERVICE name="ch_wire_service1">
-							<HOST>localhost</HOST>
+							<HOST>clickhouse-1</HOST>
 							<PORT>9000</PORT>
 						</SERVICE>
 					</SERVICES>
@@ -60,10 +60,10 @@
 					<PROXY_PORT>9110</PROXY_PORT>
 					<PROTOCOL>CH_HTTP</PROTOCOL>
 					<PIPELINE>ClickHousePipeline</PIPELINE>
-					<HANDLER>GzipHandler</HANDLER>
+					<HANDLER>CHttpHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_http_service1">
-							<HOST>localhost</HOST>
+							<HOST>clickhouse-1</HOST>
 							<PORT>8123</PORT>
 						</SERVICE>
 					</SERVICES>
@@ -89,7 +89,7 @@
 					<HANDLER>CHttpsHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_tls_http_service1">
-							<HOST>clickhouse-1</HOST>
+							<HOST>localhost</HOST>
 							<PORT>8443</PORT>
 						</SERVICE>
 					</SERVICES>

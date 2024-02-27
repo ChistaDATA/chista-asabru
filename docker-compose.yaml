@@ -7,54 +7,80 @@ services:
       - "9440:9440"
       - "8123:8123"
       - "8443:8443"
-    networks:
-      - backend
     ## Uncomment the below lines to setup TLS for wire level protocol
     ## Reference : https://www.bytebase.com/blog/how-to-configure-clickhouse-ssl-connection/
-    # volumes:
-    #   - /Users/midhundarvin/software/openssl/ca.pem:/etc/clickhouse-server/ca.pem
-    #   - /Users/midhundarvin/software/openssl/server.pem:/etc/clickhouse-server/server.pem
-    #   - /Users/midhundarvin/software/openssl/server.key:/etc/clickhouse-server/server.key
-    #   - /Users/midhundarvin/software/openssl/dhparam.pem:/etc/clickhouse-server/dhparam.pem
-    #   - /Users/midhundarvin/software/openssl/config.xml:/etc/clickhouse-server/config.xml
+    volumes:
+       - /Users/midhundarvin/software/openssl/ca.pem:/etc/clickhouse-server/ca.pem
+       - /Users/midhundarvin/software/openssl/server.pem:/etc/clickhouse-server/server.pem
+       - /Users/midhundarvin/software/openssl/server.key:/etc/clickhouse-server/server.key
+       - /Users/midhundarvin/software/openssl/dhparam.pem:/etc/clickhouse-server/dhparam.pem
+       - /Users/midhundarvin/software/openssl/config.xml:/etc/clickhouse-server/config.xml
+    networks:
+      - backend
 
   fluent-bit:
     image: fluent/fluent-bit:latest
     restart: always
     volumes:
-      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./external/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./external/parser.conf:/fluent-bit/etc/parser.conf
     ports:
       - "5170:5170"
-    links:
-      - "parseable:parseable"
     depends_on:
       - clickhouse-1
-      - parseable
+    networks:
+      - backend
+#
+#  parseable:
+#    image: parseable/parseable:edge
+#    command: ["parseable", "local-store"]
+#    ports:
+#      - "8000:8000"
+#    environment:
+#      - P_S3_URL=https://minio.parseable.io:9000
+#      - P_S3_ACCESS_KEY=minioadmin
+#      - P_S3_SECRET_KEY=minioadmin
+#      - P_S3_REGION=us-east-1
+#      - P_S3_BUCKET=parseable
+#      - P_LOCAL_STORAGE=/tmp/data
+#      - P_USERNAME=parseable
+#      - P_PASSWORD=parseable
+#      - P_STAGING_DIR=/parseable/staging
+#      - P_LOCAL_MODE=true
+#    volumes:
+#      - source: parseable_data
+#        target: /parseable
+#        type: volume
+#    networks:
+#      - backend
+
+#  prometheus:
+#    image: prom/prometheus
+#    container_name: prometheus
+#    command:
+#      - '--config.file=/etc/prometheus/prometheus.yml'
+#    ports:
+#      - "9090:9090"
+#    restart: unless-stopped
+#    volumes:
+#      - ./external/prometheus:/etc/prometheus
+#      - prom_data:/prometheus
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+    volumes:
+      - ./external/grafana:/etc/grafana/provisioning/datasources
+      - grafana_storage:/var/lib/grafana
     networks:
       - backend
 
-  parseable:
-    image: parseable/parseable:edge
-    command: ["parseable", "local-store"]
-    ports:
-      - "8000:8000"
-    environment:
-      - P_S3_URL=https://minio.parseable.io:9000
-      - P_S3_ACCESS_KEY=minioadmin
-      - P_S3_SECRET_KEY=minioadmin
-      - P_S3_REGION=us-east-1
-      - P_S3_BUCKET=parseable
-      - P_LOCAL_STORAGE=/tmp/data
-      - P_USERNAME=parseable
-      - P_PASSWORD=parseable
-      - P_STAGING_DIR=/parseable/staging
-      - P_LOCAL_MODE=true
-    volumes:
-      - source: parseable_data
-        target: /parseable
-        type: volume
-    networks:
-      - backend
 
   intercepting-proxy:
     # platform: linux/amd64
@@ -74,7 +100,7 @@ services:
     depends_on:
       - clickhouse-1
       - fluent-bit
-      - parseable
+#      - parseable
     environment:
       # CONFIG_FILE_URL: https://pastebin.com/raw/2Ts9aeN7 # Thread per client version
       # CONFIG_FILE_URL: https://pastebin.com/raw/72vCDJvm # libuv version
@@ -82,9 +108,14 @@ services:
       LOGGER_TYPE: NET
       NETWORK_LOGGER_HOST: fluent-bit
       NETWORK_LOGGER_PORT: 5170
+      SSL_CERT_FILE_PATH: /bin/server.pem
+      SSL_KEY_FILE_PATH: /bin/server.key
+      SSL_VERIFY_CERT: false
     # network_mode: "host"
-#    volumes:
-#      - ./docker-proxy-config.xml:/bin/config.xml
+    volumes:
+      - ./docker-proxy-config.xml:/bin/config.xml
+      - /Users/midhundarvin/software/openssl/server.pem:/bin/server.pem
+      - /Users/midhundarvin/software/openssl/server.key:/bin/server.key
     links:
       - "clickhouse-1:clickhouse-1"
 #      - "postgres-1:postgres-1"
@@ -207,27 +238,27 @@ services:
   #    networks:
   #      - backend
 
-#  postgres-1:
-#    image: postgres:14.4
-#    command: >
-#      -c ssl=on
-#      -c ssl_cert_file=/var/lib/postgresql/server.crt
-#      -c ssl_key_file=/var/lib/postgresql/server.key
-#    ports:
-#      - "5432:5432"
-#      - "2345:2345"
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123456}
-#      PGDATA: /var/lib/postgresql/postgres-1/data/pgdata
-#    volumes:
-#      - source: pg_data
-#        target: /var/lib/postgresql/postgres-1/data
-#        type: volume
-#      - /Users/midhundarvin/certs/postgres/server.crt:/var/lib/postgresql/server.crt:ro
-#      - /Users/midhundarvin/certs/postgres/server.key:/var/lib/postgresql/server.key:ro
-#    networks:
-#      - backend
+  postgres-1:
+    image: postgres:14.4
+    command: >
+      -c ssl=on
+      -c ssl_cert_file=/var/lib/postgresql/server.crt
+      -c ssl_key_file=/var/lib/postgresql/server.key
+    ports:
+      - "5432:5432"
+      - "2345:2345"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123456}
+      PGDATA: /var/lib/postgresql/postgres-1/data/pgdata
+    volumes:
+      - source: pg_data
+        target: /var/lib/postgresql/postgres-1/data
+        type: volume
+      - /Users/midhundarvin/certs/postgres/server.crt:/var/lib/postgresql/server.crt:ro
+      - /Users/midhundarvin/certs/postgres/server.key:/var/lib/postgresql/server.key:ro
+    networks:
+      - backend
 
 #  mysql-1:
 #    image: mysql/mysql-server
@@ -261,6 +292,8 @@ volumes:
   pg_data:
   mysql_data:
   parseable_data:
+  prom_data:
+  grafana_storage:
 networks:
   backend:
     driver: bridge
