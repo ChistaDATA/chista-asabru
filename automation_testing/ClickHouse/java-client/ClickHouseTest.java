@@ -1,13 +1,14 @@
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
+import com.clickhouse.jdbc.ClickHouseDataSource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
@@ -51,12 +52,17 @@ public class ClickHouseTest {
 
             System.out.println("Iteration " + (i + 1));
 
-            try {
-                connection = DriverManager.getConnection(jdbcUrl, configuration.username, configuration.password);
-                for (String stmt: sql_statements) {
-                    // Open a connection
+            Properties properties = new Properties();
+            properties.setProperty("ssl", "true");
+            properties.setProperty("sslmode", "none"); // NONE to trust all servers; STRICT for trusted only
+//                properties.setProperty("sslrootcert", configuration.ca_cert);
 
+            try {
+                ClickHouseDataSource dataSource = new ClickHouseDataSource(jdbcUrl, properties);
+
+                for (String stmt: sql_statements) {
                     // Execute a query
+                    connection = dataSource.getConnection(configuration.username, configuration.password);
                     statement = connection.createStatement();
                     statement.executeQuery(stmt);
                     System.out.println(stmt);
