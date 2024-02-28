@@ -7,7 +7,7 @@
 
 typedef struct {
     int port;
-    std::string protocol;
+    int weight;
     std::string name;
     std::string host;
 } SERVICE;
@@ -20,6 +20,7 @@ typedef struct {
     std::string ipaddress;
     std::string handler;
     std::string pipeline;
+    std::string loadBalancerStrategy;
 } REMOTE_END_POINT;
 
 typedef struct {
@@ -73,21 +74,6 @@ typedef struct
     std::vector<RESOLVED_SERVICE> services;
 } RESOLVED_PROXY_CONFIG;
 
-typedef struct {
-    std::string node;
-    std::string host;
-    std::vector<SERVICE> services;
-} LOCAL_END_POINT;
-
-typedef struct {
-    std::string clusterName;
-    std::vector<LOCAL_END_POINT> endpoints;
-} LOCAL_END_POINTS;
-
-typedef struct {
-    std::string name;
-    LOCAL_END_POINTS localEndpoints;
-} WORK_SPACE;
 
 typedef struct {
     std::string name;

@@ -10,6 +10,7 @@
 #include "ConfigTypes.h"
 #include "CProxyHandler.h"
 #include "PipelineFactory.h"
+#include "ConfigParser.h"
 
 using namespace tinyxml2;
 
@@ -17,14 +18,7 @@ using namespace tinyxml2;
 typedef std::map<std::string, CProxySocket *> ProxySocketsMap;
 typedef std::map<std::string, CProtocolSocket *> ProtocolSocketsMap;
 
-#ifndef XMLCheckResult
-#define XMLCheckResult(a_eResult)         \
-    if (a_eResult != XML_SUCCESS)         \
-    {                                     \
-        printf("Error: %i\n", a_eResult); \
-        return a_eResult;                 \
-    }
-#endif
+
 
 class ConfigSingleton
 {
@@ -45,10 +39,6 @@ private:
     std::vector<PROTOCOL_SERVER_CONFIG> m_ProtocolServerConfig;
 
     XMLError LoadConfigurationsFromFile(std::string filePath);
-    XMLError ParseConfiguration(XMLDocument *xmlDoc);
-    XMLError LoadProtocolServerConfigurations(XMLNode *root);
-    XMLError LoadProxyServerConfigurations(XMLNode *pRoot);
-    ENDPOINT_SERVICE_CONFIG ParseEndPointServiceConfiguration(XMLDocument * xmlDoc);
 public:
     static bool initialized;
     static ConfigSingleton &getInstance()
@@ -63,8 +53,8 @@ public:
     }
 
     XMLError LoadConfigurationsFromString(std::string xml_string);
-    ENDPOINT_SERVICE_CONFIG LoadEndpointServiceFromString(std::string xml_string);
-    std::vector<RESOLVED_PROXY_CONFIG> ResolveProxyServerConfigurations();
+    static ENDPOINT_SERVICE_CONFIG LoadEndpointServiceFromString(const std::string& xml_string);
+    std::vector<RESOLVED_PROXY_CONFIG> ResolveProxyServerConfigurations() const;
     std::vector<RESOLVED_PROTOCOL_CONFIG> ResolveProtocolServerConfigurations();
 
     void DownloadConfigFile(const std::string& url, const std::string& outputFilePath);
