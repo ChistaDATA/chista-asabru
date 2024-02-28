@@ -5,7 +5,7 @@ services:
     ports:
       - "9000:9000"
       - "9440:9440"
-      - "8123:8123"
+#      - "8123:8123"
       - "8443:8443"
     ## Uncomment the below lines to setup TLS for wire level protocol
     ## Reference : https://www.bytebase.com/blog/how-to-configure-clickhouse-ssl-connection/
@@ -18,12 +18,28 @@ services:
     networks:
       - backend
 
+  clickhouse-2:
+    image: clickhouse/clickhouse-server:23.11
+    ports:
+#      - "9000:9000"
+#      - "9440:9440"
+      - "8123:8123"
+#      - "8443:8443"
+    environment:
+      - CLICKHOUSE_DB=fluentbit
+      - CLICKHOUSE_USER=fluentbit
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+      - CLICKHOUSE_PASSWORD=password
+    networks:
+      - backend
+
   fluent-bit:
     image: fluent/fluent-bit:latest
     restart: always
     volumes:
-      - ./external/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
-      - ./external/parser.conf:/fluent-bit/etc/parser.conf
+      - ./external/fluent-bit/functions.lua:/fluent-bit/scripts/functions.lua
+      - ./external/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./external/fluent-bit/parser.conf:/fluent-bit/etc/parser.conf
     ports:
       - "5170:5170"
     depends_on:

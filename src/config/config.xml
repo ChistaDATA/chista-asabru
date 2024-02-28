@@ -48,8 +48,9 @@
 					<PIPELINE>ClickHousePipeline</PIPELINE>
 					<HANDLER>CHWirePTHandler</HANDLER>
 					<PROTOCOL>CH_WIRE</PROTOCOL>
+					<loadbalancer-strategy>WeightedRoundRobinStrategy</loadbalancer-strategy>
 					<SERVICES>
-						<SERVICE name="ch_wire_service1">
+						<SERVICE name="ch_wire_service1" weight="1">
 							<HOST>clickhouse-1</HOST>
 							<PORT>9000</PORT>
 						</SERVICE>
