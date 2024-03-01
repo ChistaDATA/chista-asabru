@@ -51,7 +51,7 @@
 					<loadbalancer-strategy>WeightedRoundRobinStrategy</loadbalancer-strategy>
 					<SERVICES>
 						<SERVICE name="ch_wire_service1" weight="1">
-							<HOST>clickhouse-1</HOST>
+							<HOST>localhost</HOST>
 							<PORT>9000</PORT>
 						</SERVICE>
 					</SERVICES>
@@ -64,7 +64,7 @@
 					<HANDLER>CHttpHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_http_service1">
-							<HOST>clickhouse-1</HOST>
+							<HOST>localhost</HOST>
 							<PORT>8123</PORT>
 						</SERVICE>
 					</SERVICES>

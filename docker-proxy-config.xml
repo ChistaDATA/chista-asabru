@@ -60,7 +60,7 @@
                     <PROXY_PORT>9110</PROXY_PORT>
                     <PROTOCOL>CH_HTTP</PROTOCOL>
                     <PIPELINE>ClickHousePipeline</PIPELINE>
-                    <HANDLER>GzipHandler</HANDLER>
+                    <HANDLER>CHttpHandler</HANDLER>
                     <SERVICES>
                         <SERVICE name="ch_http_service1">
                             <HOST>clickhouse-1</HOST>

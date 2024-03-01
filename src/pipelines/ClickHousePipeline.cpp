@@ -9,6 +9,7 @@
 #include "CHttpParser.h"
 #include "Logger.h"
 #include <utility>
+#include <chrono>
 
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
 {
@@ -52,6 +53,7 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
     ProtocolHelper::SetReadTimeOut(target_socket->GetSocket(), 1);
     ProtocolHelper::SetKeepAlive(target_socket->GetSocket(), 1);
 
+    auto start = std::chrono::high_resolution_clock::now();
     while (true)
     {
         SocketSelect *sel;
@@ -121,7 +123,9 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
             break;
         }
     }
-
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    LOG_INFO("LATENCY : " + std::to_string(duration.count()));
     // Close the server socket
     target_socket->Close();
     delete target_socket;

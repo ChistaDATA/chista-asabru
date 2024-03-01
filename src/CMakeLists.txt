@@ -16,7 +16,13 @@ add_definitions(-DCONFIG_FILE_URL= "$ENV{CONFIG_FILE_URL}")
 add_compile_definitions(DEBUG)
 
 # Find OpenSSL library
+set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL REQUIRED)
+if (OPENSSL_FOUND)
+    message(STATUS "OpenSSL found: ${OpenSSL}")
+else()
+    message(FATAL_ERROR "OpenSSL not found.")
+endif()
 
 # Find Python
 find_package(Python COMPONENTS Interpreter Development)
