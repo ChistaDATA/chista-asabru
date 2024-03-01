@@ -17,7 +17,7 @@ void *ClickHouseTLSStartPipeline(CProxySocket *ptr, void *lptr);
 void *ClickHouseTLSExchangePipeline(CProxySocket *ptr, void *lptr);
 void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr);
 void *MySQLPipeline(CProxySocket *ptr, void *lptr);
-void *PassthroughPipeLine(CProtocolSocket *ptr, void *lptr);
+void *PassthroughPipeline(CProxySocket *ptr, void *lptr);
 void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr);
 void *CStreamPipeline(CProtocolSocket *ptr, void *lptr);
 

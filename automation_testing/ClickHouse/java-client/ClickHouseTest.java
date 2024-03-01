@@ -53,7 +53,7 @@ public class ClickHouseTest {
             System.out.println("Iteration " + (i + 1));
 
             Properties properties = new Properties();
-            properties.setProperty("ssl", "true");
+            properties.setProperty("ssl", "false");
             properties.setProperty("sslmode", "none"); // NONE to trust all servers; STRICT for trusted only
 //                properties.setProperty("sslrootcert", configuration.ca_cert);
 
@@ -66,6 +66,7 @@ public class ClickHouseTest {
                     statement = connection.createStatement();
                     statement.executeQuery(stmt);
                     System.out.println(stmt);
+                    connection.close();
                 }
             } catch (Exception e) {
                 e.printStackTrace();

@@ -30,6 +30,7 @@ public:
         proxyPipelineFunctionMap["ClickHouseTLSExchangePipeline"] = ClickHouseTLSExchangePipeline;
         proxyPipelineFunctionMap["PostgreSQLPipeline"] = PostgreSQLPipeline;
         proxyPipelineFunctionMap["MySQLPipeline"] = MySQLPipeline;
+        proxyPipelineFunctionMap["PassthroughPipeline"] = PassthroughPipeline;
 
         protocolPipelineFunctionMap["ProtocolPipeline"] = ProtocolPipeline;
         protocolPipelineFunctionMap["CStreamPipeline"] = CStreamPipeline;
