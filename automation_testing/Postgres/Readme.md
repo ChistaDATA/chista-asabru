@@ -9,6 +9,11 @@ This code is meant to be run on Postgres on dvdrental dataset.
 * dvdrental dataset [Available here](https://www.postgresqltutorial.com/postgresql-getting-started/postgresql-sample-database/)
 * Dedicated postgres user for running the script (e.g CREATE USER asabru WITH ENCRYPTED PASSWORD '123456';
 )
+* Install pg_restore : https://www.cyberithub.com/how-to-install-pg_dump-and-pg_restore-on-macos-using-7-easy-steps/
+* Restore the dvdrental database using the following command :
+```
+pg_restore --host localhost --port 5432 --username postgres --dbname dvdrental --verbose -W "dvdrental.tar"
+```
 
 ## Python Pre-requisites
 * Python 3.9+

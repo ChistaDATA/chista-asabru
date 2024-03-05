@@ -77,8 +77,8 @@
 					<HANDLER>CHWirePTHandler</HANDLER>
 					<SERVICES>
 						<SERVICE name="ch_tls_wire_service1">
-							<HOST>clickhouse-1</HOST>
-							<PORT>9440</PORT>
+							<HOST>localhost</HOST>
+							<PORT>5432</PORT>
 						</SERVICE>
 					</SERVICES>
 				</END_POINT>

@@ -51,13 +51,13 @@ class AsabruPostgres:
 
             for query_key in self.sql_statements['read'].keys():
                 res = []
-                # print(self.sql_statements['read'][query_key])
+                print(self.sql_statements['read'][query_key])
                 cursor = client.cursor()
                 cursor.execute(self.sql_statements['read'][query_key])
                 result = cursor.fetchall()
                 for x in result:
                     res.append(x)
-                # print (res)
+                # print(res)
                 cursor.close()
             client.close()
 
