@@ -35,7 +35,7 @@ namespace clickhouse_pipeline {
                 std::cout << "Calling Proxy Upstream Handler.." << std::endl;
 
                 std::cout << "Buffer length " << std::string((char *) buf->base).size() << std::endl;
-                std::string response = connection_data->proxy_handler->HandleUpstreamData((void *)buf->base, nread, &exec_context);
+                std::string response = connection_data->proxy_handler->HandleUpstreamData(buf->base, nread, &exec_context);
                 // Data received from the client, forward it to the target server
                 auto *write_req = new uv_write_t;
                 uv_buf_t write_buf = uv_buf_init((char *) response.c_str(), response.size());
