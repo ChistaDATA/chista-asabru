@@ -1,8 +1,6 @@
 #include "CProtocolSocket.h"
 #include "CProxySocket.h"
 #include "CClientSSLSocket.h"
-#include "Socket.h"
-#include "SSLSocket.h"
 #include "SocketSelect.h"
 #include "CHttpParser.h"
 #include "Logger.h"
@@ -62,10 +60,9 @@ void *ClickHouseTLSExchangePipeline(CProxySocket *ptr, void *lptr) {
             if (sel->Readable(client_socket)) {
                 LOG_INFO("client socket is readable, reading bytes : ");
                 std::string bytes = client_socket->ReceiveBytes();
-
                 if (!bytes.empty()) {
                     LOG_INFO("Calling Proxy Upstream Handler..");
-                    std::string response = proxy_handler->HandleUpstreamData((void *) bytes.c_str(), bytes.size(),
+                    std::string response = proxy_handler->HandleUpstreamData(bytes, bytes.size(),
                                                                              &exec_context);
                     target_socket->SendBytes((char *) response.c_str(), response.size());
                 }
@@ -85,7 +82,7 @@ void *ClickHouseTLSExchangePipeline(CProxySocket *ptr, void *lptr) {
 
                 if (!bytes.empty()) {
                     LOG_INFO("Calling Proxy Downstream Handler..");
-                    std::string response = proxy_handler->HandleDownStreamData((void *) bytes.c_str(), bytes.size(),
+                    std::string response = proxy_handler->HandleDownStreamData(bytes, bytes.size(),
                                                                                &exec_context);
                     client_socket->SendBytes((char *) response.c_str(), response.size());
                 }
