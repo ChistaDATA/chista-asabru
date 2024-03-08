@@ -4,6 +4,9 @@ project(Chista_Asabru VERSION 1.0)
 
 include(ExternalProject)
 
+# Enables generation of compile_commands.json
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # we cannot analyse results without gcov
 find_program(GCOV_PATH gcov)
 if(NOT GCOV_PATH)

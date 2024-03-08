@@ -19,3 +19,4 @@ obj/
 **/java-client/target
 **/java-client/out
 .env
+.cache/clangd
