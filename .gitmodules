@@ -35,3 +35,6 @@
 	path = lib/asabru-client
 	url = git@github.com:ChistaDATA/asabru-client.git
 	branch = main
+[submodule "lib/stduuid"]
+	path = lib/stduuid
+	url = git@github.com:mariusbancila/stduuid.git

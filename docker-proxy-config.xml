@@ -59,12 +59,12 @@
                     <READ_WRITE>yes</READ_WRITE>
                     <PROXY_PORT>9110</PROXY_PORT>
                     <PROTOCOL>CH_HTTP</PROTOCOL>
-                    <PIPELINE>ClickHouseTLSExchangePipeline</PIPELINE>
+                    <PIPELINE>ClickHousePipeline</PIPELINE>
                     <HANDLER>CHttpHandler</HANDLER>
                     <SERVICES>
                         <SERVICE name="ch_http_service1">
-                            <HOST>ip24827.ap-southeast-1.snowflakecomputing.com</HOST>
-                            <PORT>443</PORT>
+                            <HOST>clickhouse-1</HOST>
+                            <PORT>8123</PORT>
                         </SERVICE>
                     </SERVICES>
                 </END_POINT>
