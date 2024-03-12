@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.15)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(CMakePrintHelpers)
 
 # Get the value of an environment variable and set it as a preprocessor definition
@@ -40,7 +41,9 @@ include_directories(${SQLite3_INCLUDE_DIRS})
 add_subdirectory(../lib/asabru-client/src ../lib/asabru-client)
 
 include_directories(../lib/tinyxml2)
+include_directories(../lib/stduuid/include)
 include_directories(../lib/libuv/include)
+include_directories(../gzip-hpp/include)
 include_directories(../lib/asabru-parsers/src)
 include_directories(../lib/asabru-handlers/src)
 

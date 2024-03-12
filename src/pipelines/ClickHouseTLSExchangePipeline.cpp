@@ -5,6 +5,7 @@
 #include "CHttpParser.h"
 #include "Logger.h"
 #include <utility>
+#include "uuid/UuidGenerator.h"
 
 /**
  * HTTPS/TCP-TLS Exchange ( Forwarding SSL ) Pipeline :
@@ -13,6 +14,8 @@
  * decrypted packet to the target endpoint via separate TLS connection.
  */
 void *ClickHouseTLSExchangePipeline(CProxySocket *ptr, void *lptr) {
+    std::string correlation_id = UuidGenerator::generateUuid();
+    LOG_INFO("Correlation ID : " + correlation_id);
     LOG_INFO("ClickHouseTLSExchangePipeline::start");
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
@@ -38,12 +41,14 @@ void *ClickHouseTLSExchangePipeline(CProxySocket *ptr, void *lptr) {
     auto *target_socket = new CClientSSLSocket(target_endpoint.ipaddress, target_endpoint.port);
 
     EXECUTION_CONTEXT exec_context;
+    exec_context["correlation_id"] = (void *) correlation_id.c_str();
 
     ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
     ProtocolHelper::SetKeepAlive(client_socket->GetSocket(), 1);
     ProtocolHelper::SetReadTimeOut(target_socket->GetSocket(), 1);
     ProtocolHelper::SetKeepAlive(target_socket->GetSocket(), 1);
 
+    auto start = std::chrono::high_resolution_clock::now();
     while (true) {
         SocketSelect *sel;
 
@@ -104,6 +109,9 @@ void *ClickHouseTLSExchangePipeline(CProxySocket *ptr, void *lptr) {
 
     // Close the server socket
     target_socket->Close();
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    LOG_LATENCY(correlation_id, std::to_string(duration.count()));
     LOG_INFO("ClickHouseTLSExchangePipeline::end");
 #ifdef WINDOWS_OS
     return 0;

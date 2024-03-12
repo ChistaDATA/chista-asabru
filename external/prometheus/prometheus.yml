@@ -20,19 +20,11 @@ scrape_configs:
       - targets:
           - localhost:9090
   - job_name: 'postgres'
-    static_configs:
-      - targets:
-          - postgres-1:5432
     metrics_path: /metrics
     params:
       auth_module: [ foo ]
-    relabel_configs:
-      - source_labels: [ __address__ ]
-        target_label: __param_target
-      - source_labels: [ __param_target ]
-        target_label: instance
-      - target_label: __address__
-        replacement: postgres-exporter:9187
+    static_configs:
+      - targets: [ "postgres-exporter:9187" ]
   - job_name: 'clickhouse'
     honor_timestamps: true
     scrape_interval: 15s
@@ -42,3 +34,8 @@ scrape_configs:
     static_configs:
       - targets:
           - clickhouse-1:9363
+  - job_name: snowflake
+    scrape_interval: 30s
+    scrape_timeout: 25s
+    static_configs:
+      - targets: [ "snowflake-exporter:9975" ]

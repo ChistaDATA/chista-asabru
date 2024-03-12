@@ -18,3 +18,4 @@ obj/
 *.sln
 **/java-client/target
 **/java-client/out
+.env

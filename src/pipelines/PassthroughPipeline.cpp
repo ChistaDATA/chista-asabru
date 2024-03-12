@@ -4,12 +4,13 @@
 #include "../config/ConfigSingleton.h"
 #include "SocketSelect.h"
 #include "Pipeline.h"
-#include "CHttpParser.h"
 #include <utility>
-#include <chrono>
+#include "uuid/UuidGenerator.h"
 
 void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
 {
+    std::string correlation_id = UuidGenerator::generateUuid();
+    LOG_INFO("Correlation ID : " + correlation_id);
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
 
@@ -44,6 +45,7 @@ void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
     }
 
     EXECUTION_CONTEXT exec_context;
+    exec_context["correlation_id"] = (void *) correlation_id.c_str();
 
     ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
     ProtocolHelper::SetKeepAlive(client_socket->GetSocket(), 1);
@@ -119,7 +121,7 @@ void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
     }
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    LOG_INFO("LATENCY : " + std::to_string(duration.count()));
+    LOG_LATENCY(correlation_id, std::to_string(duration.count()));
     // Close the server socket
     target_socket->Close();
     delete target_socket;

@@ -8,7 +8,7 @@ services:
       - "9363:9363"
       - "9000:9000"
       - "9440:9440"
-      - "8123:8123"
+#      - "8123:8123"
       - "8443:8443"
     ## Uncomment the below lines to setup TLS for wire level protocol
     ## Reference : https://www.bytebase.com/blog/how-to-configure-clickhouse-ssl-connection/
@@ -52,22 +52,24 @@ services:
     volumes:
       - ./external/postgres-exporter/postgres_exporter.yml:/tmp/postgres_exporter.yml
     environment:
-      DATA_SOURCE_NAME: "postgresql://postgres:123456@localhost:5432/postgres?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://postgres:123456@postgres-1:5432/postgres?sslmode=disable"
     networks:
       - backend
 
   clickhouse-2:
     image: clickhouse/clickhouse-server:23.11
-#    ports:
+    ports:
 #      - "9000:9000"
 #      - "9440:9440"
-#      - "8123:8123"
+      - "8123:8123"
 #      - "8443:8443"
     environment:
       - CLICKHOUSE_DB=fluentbit
       - CLICKHOUSE_USER=fluentbit
       - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
       - CLICKHOUSE_PASSWORD=password
+    volumes:
+      - "./external/clickhouse/init-db.sql:/docker-entrypoint-initdb.d/init.sql"
     networks:
       - backend
 
@@ -129,59 +131,79 @@ services:
       - "3000:3000"
     restart: unless-stopped
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=grafana
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: grafana
+      GF_INSTALL_PLUGINS: grafana-clickhouse-datasource
     volumes:
-      - ./external/grafana:/etc/grafana/provisioning/datasources
+      - source: ./external/grafana/provisioning
+        target: /etc/grafana/provisioning
+        type: bind
+      - source: ./external/grafana/dashboards
+        target: /var/lib/grafana/dashboards
+        type: bind
       - grafana_storage:/var/lib/grafana
     networks:
       - backend
 
-
-  intercepting-proxy:
-    # platform: linux/amd64
+  snowflake-exporter:
     build:
-      context: .
-      dockerfile: ./Dockerfile
+      context: ./external/snowflake-exporter
     ports:
-      - "8080:8080"
-      - "9100:9100"
-      - "9110:9110"
-      - "9120:9120"
-      - "9130:9130"
-      - "9140:9140"
-      - "9150:9150"
-      - "9160:9160"
-      - "9170:9170"
-    depends_on:
-      - clickhouse-1
-      - fluent-bit
-#      - parseable
+      - "9975:9975"
     environment:
-      # CONFIG_FILE_URL: https://pastebin.com/raw/2Ts9aeN7 # Thread per client version
-      # CONFIG_FILE_URL: https://pastebin.com/raw/72vCDJvm # libuv version
-      CONFIG_FILE_PATH: /bin/config.xml
-      LOGGER_TYPE: NET
-      NETWORK_LOGGER_HOST: fluent-bit
-      NETWORK_LOGGER_PORT: 5170
-      SSL_CERT_FILE_PATH: /bin/server.pem
-      SSL_KEY_FILE_PATH: /bin/server.key
-      SSL_VERIFY_CERT: false
-    # network_mode: "host"
-    volumes:
-      - ./docker-proxy-config.xml:/bin/config.xml
-      - /Users/midhundarvin/software/openssl/server.pem:/bin/server.pem
-      - /Users/midhundarvin/software/openssl/server.key:/bin/server.key
-    links:
-      - "clickhouse-1:clickhouse-1"
-#      - "postgres-1:postgres-1"
-      - "fluent-bit:fluent-bit"
-    #      - "serving-proxy-1:cluster-1"
-    #      - "serving-proxy-2:cluster-2"
-    #      - "serving-proxy-3:cluster-3"
-    #      - "serving-proxy-4:cluster-4"
+      SNOWFLAKE_EXPORTER_ACCOUNT: ${SNOWFLAKE_EXPORTER_ACCOUNT:-}
+      SNOWFLAKE_EXPORTER_USERNAME: ${SNOWFLAKE_EXPORTER_USERNAME:-}
+      SNOWFLAKE_EXPORTER_PASSWORD: ${SNOWFLAKE_EXPORTER_PASSWORD:-}
+      SNOWFLAKE_EXPORTER_ROLE: ${SNOWFLAKE_EXPORTER_ROLE:-}
+      SNOWFLAKE_EXPORTER_WAREHOUSE: ${SNOWFLAKE_EXPORTER_WAREHOUSE:-}
+      SNOWFLAKE_EXPORTER_WEB_TELEMETRY_PATH: ${SNOWFLAKE_EXPORTER_WEB_TELEMETRY_PATH:-}
     networks:
       - backend
+
+#  intercepting-proxy:
+#    # platform: linux/amd64
+#    build:
+#      context: .
+#      dockerfile: ./Dockerfile
+#    ports:
+#      - "8080:8080"
+#      - "9100:9100"
+#      - "9110:9110"
+#      - "9120:9120"
+#      - "9130:9130"
+#      - "9140:9140"
+#      - "9150:9150"
+#      - "9160:9160"
+#      - "9170:9170"
+#    depends_on:
+#      - clickhouse-1
+#      - fluent-bit
+##      - parseable
+#    environment:
+#      # CONFIG_FILE_URL: https://pastebin.com/raw/2Ts9aeN7 # Thread per client version
+#      # CONFIG_FILE_URL: https://pastebin.com/raw/72vCDJvm # libuv version
+#      CONFIG_FILE_PATH: /bin/config.xml
+#      LOGGER_TYPE: NET
+#      NETWORK_LOGGER_HOST: fluent-bit
+#      NETWORK_LOGGER_PORT: 5170
+#      SSL_CERT_FILE_PATH: /bin/server.pem
+#      SSL_KEY_FILE_PATH: /bin/server.key
+#      SSL_VERIFY_CERT: false
+#    # network_mode: "host"
+#    volumes:
+#      - ./docker-proxy-config.xml:/bin/config.xml
+#      - /Users/midhundarvin/software/openssl/server.pem:/bin/server.pem
+#      - /Users/midhundarvin/software/openssl/server.key:/bin/server.key
+#    links:
+#      - "clickhouse-1:clickhouse-1"
+##      - "postgres-1:postgres-1"
+#      - "fluent-bit:fluent-bit"
+#    #      - "serving-proxy-1:cluster-1"
+#    #      - "serving-proxy-2:cluster-2"
+#    #      - "serving-proxy-3:cluster-3"
+#    #      - "serving-proxy-4:cluster-4"
+#    networks:
+#      - backend
 
 #  zookeeper:
 #    image: 'bitnami/zookeeper:latest'
