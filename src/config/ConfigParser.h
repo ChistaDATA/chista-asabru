@@ -8,6 +8,7 @@
 #define XMLCheckResult(a_eResult)         \
     if (a_eResult != XML_SUCCESS)         \
     {                                     \
+        LOG_ERROR("Error parsing XML");   \
         printf("Error: %i\n", a_eResult); \
         return a_eResult;                 \
     }

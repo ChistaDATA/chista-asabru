@@ -1,15 +1,10 @@
 
 #include "CProtocolSocket.h"
 #include "CProxySocket.h"
-#include "CClientSocket.h"
 #include "../config/ConfigSingleton.h"
-#include "Socket.h"
 #include "SocketSelect.h"
 #include "Pipeline.h"
-#include "CHttpParser.h"
-#include "Logger.h"
 #include <utility>
-#include <chrono>
 #include "uuid/UuidGenerator.h"
 
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
@@ -101,9 +96,11 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
                 LOG_INFO("target socket is readable, reading bytes : ");
                 std::string bytes = target_socket->ReceiveBytes();
 
-                LOG_INFO("Calling Proxy Downstream Handler..");
-                std::string response = proxy_handler->HandleDownStreamData(bytes, bytes.size(), &exec_context);
-                client_socket->SendBytes((char *)response.c_str(), response.size());
+                if (!bytes.empty()) {
+                    LOG_INFO("Calling Proxy Downstream Handler..");
+                    std::string response = proxy_handler->HandleDownStreamData(bytes, bytes.size(), &exec_context);
+                    client_socket->SendBytes((char *) response.c_str(), response.size());
+                }
 
                 if (bytes.empty())
                     still_connected = false;

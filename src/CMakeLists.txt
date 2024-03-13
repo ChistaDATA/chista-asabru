@@ -80,10 +80,10 @@ add_executable(Chista_Asabru
         main.h
         main.cpp
 
-        config/ConfigParser.h
         config/ConfigParser.cpp
         config/ConfigSingleton.cpp
         config/PipelineFactory.cpp
+        config/LoadBalancerFactory.cpp
 
         ${PIPELINE_FILES})
 

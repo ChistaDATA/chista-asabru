@@ -1,5 +1,4 @@
-#ifndef CONFIG_SINGLETON_DOT_H
-#define CONFIG_SINGLETON_DOT_H
+#pragma once
 
 #include <cstdlib>
 #include <iostream>
@@ -11,6 +10,7 @@
 #include "CProxyHandler.h"
 #include "PipelineFactory.h"
 #include "ConfigParser.h"
+#include "LoadBalancerFactory.h"
 
 using namespace tinyxml2;
 
@@ -58,11 +58,11 @@ public:
     std::vector<RESOLVED_PROTOCOL_CONFIG> ResolveProtocolServerConfigurations();
 
     void DownloadConfigFile(const std::string& url, const std::string& outputFilePath);
-    PipelineFactory * pipelineFactory = new PipelineFactory();
+    PipelineFactory *pipelineFactory = new PipelineFactory();
+    LoadBalancerFactory *loadBalancerFactory = new LoadBalancerFactory();
     // Create Proxy sockets mapping
     ProxySocketsMap proxySocketsMap;
     ProtocolSocketsMap protocolSocketsMap;
 };
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
-#endif
