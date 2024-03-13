@@ -1,0 +1,17 @@
+FROM ubuntu:latest
+
+# Install Keepalived, and tools for the demonstration
+RUN apt-get update && apt-get install -y keepalived iputils-ping sendmail curl
+# && \
+    # rm -rf /var/lib/apt/lists/*
+
+# Copy the scripts
+COPY ./check_service.sh /usr/local/bin/check_service.sh
+COPY ./notify.sh /usr/local/bin/notify.sh
+COPY ./my_service.sh /usr/local/bin/my_service.sh
+
+# Make scripts executable
+RUN chmod +x /usr/local/bin/check_service.sh /usr/local/bin/notify.sh /usr/local/bin/my_service.sh
+
+# Start Keepalived and the service script
+CMD /usr/local/bin/my_service.sh & exec keepalived --dont-fork --log-console --release-vips

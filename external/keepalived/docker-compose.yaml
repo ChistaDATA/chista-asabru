@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  keepalived_master:
+    image: keepalived_custom:latest
+    volumes:
+      - ./keepalived_master.conf:/etc/keepalived/keepalived.conf
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - KEEPALIVED_ROLE=MASTER
+    networks:
+      custom_network:
+        ipv4_address: 172.29.0.3
+
+  keepalived_backup:
+    depends_on:
+      - keepalived_master
+    image: keepalived_custom:latest
+    volumes:
+      - ./keepalived_backup.conf:/etc/keepalived/keepalived.conf
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - KEEPALIVED_ROLE=BACKUP
+    networks:
+      custom_network:
+        ipv4_address: 172.29.0.4 # Assign a different IP for the backup within the same subnet
+
+networks:
+  custom_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.29.0.0/16
