@@ -154,7 +154,13 @@ int initProxyServers() {
             if (proxy < 0)
                 return proxy;
         } else {
-            configSingleton.proxySocketsMap[value.name] = new CProxySocket(value.proxyPort);
+
+            if (value.loadBalancerStrategy) {
+                configSingleton.proxySocketsMap[value.name] = new CProxySocket(value.proxyPort, value.loadBalancerStrategy);
+            } else {
+                configSingleton.proxySocketsMap[value.name] = new CProxySocket(value.proxyPort);
+            }
+
             int proxy = startProxyServer(
                     configSingleton.proxySocketsMap[value.name],
                     value);

@@ -50,9 +50,13 @@
 					<PROTOCOL>CH_WIRE</PROTOCOL>
 					<loadbalancer-strategy>WeightedRoundRobinStrategy</loadbalancer-strategy>
 					<SERVICES>
+						<SERVICE name="ch_wire_service1" weight="2">
+							<HOST>localhost</HOST>
+							<PORT>9111</PORT>
+						</SERVICE>
 						<SERVICE name="ch_wire_service1" weight="1">
 							<HOST>localhost</HOST>
-							<PORT>9000</PORT>
+							<PORT>9112</PORT>
 						</SERVICE>
 					</SERVICES>
 				</END_POINT>

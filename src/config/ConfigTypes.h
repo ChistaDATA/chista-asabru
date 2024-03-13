@@ -4,6 +4,7 @@
 #include <string>
 #include "CProxySocket.h"
 #include "CProtocolSocket.h"
+#include "LoadBalancerStrategy.h"
 
 typedef struct {
     int port;
@@ -72,6 +73,7 @@ typedef struct
     PipelineFunction<CProxySocket> pipeline;
     void *handler; // handler for this endpoint
     std::vector<RESOLVED_SERVICE> services;
+    LoadBalancerStrategy<RESOLVED_SERVICE>* loadBalancerStrategy;
 } RESOLVED_PROXY_CONFIG;
 
 

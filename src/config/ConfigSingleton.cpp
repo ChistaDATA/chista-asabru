@@ -73,13 +73,18 @@ std::vector<RESOLVED_PROXY_CONFIG> ConfigSingleton::ResolveProxyServerConfigurat
                 resolvedService.r_w = endpoint.readWrite;
                 resolvedService.alias = "";
                 resolvedService.reserved = 0;
+                resolvedService.weight = service.weight;
                 memset(resolvedService.Buffer, 0, sizeof resolvedService.Buffer);
                 result.services.push_back(resolvedService);
             }
+            // Resolve load balancer stragegy
+            if (!endpoint.loadBalancerStrategy.empty())
+                result.loadBalancerStrategy = loadBalancerFactory->GetLoadBalancerStrategy(endpoint.loadBalancerStrategy);
 
             // Resolve the Pipeline
             result.pipelineName = endpoint.pipeline;
             result.pipeline = pipelineFactory->GetProxyPipeline(endpoint.pipeline);
+
             // Resolve the Handler class
             CommandDispatcher::RegisterCommand<BaseHandler>(endpoint.handler);
             result.handler = CommandDispatcher::GetCommand<BaseHandler>(endpoint.handler);
