@@ -1,0 +1,31 @@
+create:
+  c1: "CREATE TABLE car_prices (
+    year UInt16,
+    make String,
+    model String,
+    trim String,
+    body String,
+    transmission String,
+    vin String,
+    state String,
+    condition UInt8,
+    odometer UInt32,
+    color String,
+    interior String,
+    seller String,
+    mmr UInt32,
+    sellingprice UInt32,
+    saledate DateTime
+) ENGINE = MergeTree()
+ORDER BY (vin);"
+read:
+  r1: "SELECT year, count() AS c FROM default.car_prices GROUP BY year ORDER BY c DESC"
+  r2: "SELECT make, count() FROM default.car_prices GROUP BY make ORDER BY count() DESC LIMIT 10"
+  r3: "SELECT COUNT(*) FROM default.car_prices"
+  r4: "SELECT * FROM default.car_prices LIMIT 1000"
+  r5: "SELECT * FROM default.car_prices LIMIT 10000"
+
+
+
+
+

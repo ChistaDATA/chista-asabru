@@ -8,7 +8,7 @@ services:
       - "9363:9363"
       - "9000:9000"
       - "9440:9440"
-#      - "8123:8123"
+      - "8123:8123"
       - "8443:8443"
     ## Uncomment the below lines to setup TLS for wire level protocol
     ## Reference : https://www.bytebase.com/blog/how-to-configure-clickhouse-ssl-connection/
@@ -61,7 +61,7 @@ services:
     ports:
 #      - "9000:9000"
 #      - "9440:9440"
-      - "8123:8123"
+      - "8124:8123"
 #      - "8443:8443"
     environment:
       - CLICKHOUSE_DB=fluentbit
@@ -247,40 +247,36 @@ services:
 #      - intercepting-proxy
 #    networks:
 #      - backend
-
-  #  serving-proxy-1:
-  #    build:
-  #      context: .
-  #      dockerfile: ./Dockerfile
-  #    expose:
-  #      - "9100"
-  #      - "9110"
-  #    ports:
-  #      - "9111:9110"
-  #    environment:
-  #      CONFIG_FILE_URL: https://pastebin.com/raw/NSufsj00
-  #      CONFIG_FILE_PATH: /tmp/config.xml
-  #    links:
-  #      - "clickhouse-1:database"
-  #    networks:
-  #      - backend
-  #
-  #  serving-proxy-2:
-  #    build:
-  #      context: .
-  #      dockerfile: ./Dockerfile
-  #    expose:
-  #      - "9100"
-  #      - "9110"
-  #    ports:
-  #      - "9112:9110"
-  #    environment:
-  #      CONFIG_FILE_URL: https://pastebin.com/raw/NSufsj00
-  #      CONFIG_FILE_PATH: /tmp/config.xml
-  #    links:
-  #      - "clickhouse-1:database"
-  #    networks:
-  #      - backend
+#
+#  serving-proxy-1:
+#    build:
+#      context: .
+#      dockerfile: ./Dockerfile
+#    expose:
+#      - "9100"
+#      - "9110"
+#    ports:
+#      - "9111:9110"
+#    environment:
+#      CONFIG_FILE_URL: https://pastebin.com/raw/NSufsj00
+#      CONFIG_FILE_PATH: /tmp/config.xml
+#    networks:
+#      - backend
+#
+#  serving-proxy-2:
+#    build:
+#      context: .
+#      dockerfile: ./Dockerfile
+#    expose:
+#      - "9100"
+#      - "9110"
+#    ports:
+#      - "9112:9110"
+#    environment:
+#      CONFIG_FILE_URL: https://pastebin.com/raw/NSufsj00
+#      CONFIG_FILE_PATH: /tmp/config.xml
+#    networks:
+#      - backend
   #
   #  serving-proxy-3:
   #    build:
@@ -294,8 +290,6 @@ services:
   #    environment:
   #      CONFIG_FILE_URL: https://pastebin.com/raw/NSufsj00
   #      CONFIG_FILE_PATH: /tmp/config.xml
-  #    links:
-  #      - "clickhouse-1:database"
   #    networks:
   #      - backend
   #
@@ -311,8 +305,6 @@ services:
   #    environment:
   #      CONFIG_FILE_URL: https://pastebin.com/raw/NSufsj00
   #      CONFIG_FILE_PATH: /tmp/config.xml
-  #    links:
-  #      - "clickhouse-1:database"
   #    networks:
   #      - backend
 
