@@ -9,8 +9,6 @@
 
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
 {
-    std::string correlation_id = UuidGenerator::generateUuid();
-    LOG_INFO("Correlation ID : " + correlation_id);
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
 
@@ -45,13 +43,13 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
     }
 
     EXECUTION_CONTEXT exec_context;
-    exec_context["correlation_id"] = (void *) correlation_id.c_str();
     ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
     ProtocolHelper::SetKeepAlive(client_socket->GetSocket(), 1);
     ProtocolHelper::SetReadTimeOut(target_socket->GetSocket(), 1);
     ProtocolHelper::SetKeepAlive(target_socket->GetSocket(), 1);
-
-    auto start = std::chrono::high_resolution_clock::now();
+    std::string correlation_id;
+    bool data_sent = false;
+    std::chrono::time_point start = std::chrono::high_resolution_clock::now();
     while (true)
     {
         SocketSelect *sel;
@@ -75,8 +73,14 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
 
                 if (!bytes.empty()) {
                     LOG_INFO("Calling Proxy Upstream Handler..");
+
+                    correlation_id = UuidGenerator::generateUuid();
+                    LOG_INFO("Correlation ID : " + correlation_id);
+                    exec_context["correlation_id"] = (void *) correlation_id.c_str();
+                    start = std::chrono::high_resolution_clock::now();
                     std::string response = proxy_handler->HandleUpstreamData(bytes, bytes.size(), &exec_context);
                     target_socket->SendBytes((char *)response.c_str(), response.size());
+                    data_sent = true;
                 }
 
                 if (bytes.empty())
@@ -97,6 +101,14 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
                 std::string bytes = target_socket->ReceiveBytes();
 
                 if (!bytes.empty()) {
+                    if (data_sent) {
+                        auto stop = std::chrono::high_resolution_clock::now();
+                        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+                        LOG_LATENCY(
+                                correlation_id,
+                                std::to_string(duration.count())+ "," +target_endpoint.ipaddress+":"+std::to_string(target_endpoint.port));
+                        data_sent = false;
+                    }
                     LOG_INFO("Calling Proxy Downstream Handler..");
                     std::string response = proxy_handler->HandleDownStreamData(bytes, bytes.size(), &exec_context);
                     client_socket->SendBytes((char *) response.c_str(), response.size());
@@ -118,15 +130,14 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
             delete sel;
 
             // Close the client socket
+            LOG_INFO("Closing the client socket");
             client_socket->Close();
             delete client_socket;
             break;
         }
     }
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    LOG_LATENCY(correlation_id, std::to_string(duration.count()));
     // Close the server socket
+    LOG_INFO("Closing the target socket");
     target_socket->Close();
     delete target_socket;
 #ifdef WINDOWS_OS

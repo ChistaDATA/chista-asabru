@@ -80,6 +80,8 @@ std::vector<RESOLVED_PROXY_CONFIG> ConfigSingleton::ResolveProxyServerConfigurat
             // Resolve load balancer stragegy
             if (!endpoint.loadBalancerStrategy.empty())
                 result.loadBalancerStrategy = loadBalancerFactory->GetLoadBalancerStrategy(endpoint.loadBalancerStrategy);
+            else
+                result.loadBalancerStrategy = nullptr;
 
             // Resolve the Pipeline
             result.pipelineName = endpoint.pipeline;
