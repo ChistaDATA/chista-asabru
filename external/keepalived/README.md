@@ -28,17 +28,11 @@ git clone
 2. Navigate to the keepalived directory:
 
 ```bash
-cd keepalived
+cd external/keepalived
 ```
 
-3. Build keepalived_custom image:
+3. Start the keepalived service:
 
-```bash
-docker build -t keepalived_custom .
-```
-
-4. Start the keepalived service:
-
-```bash
-docker-compose up -d
-```
+ ```bash
+ docker-compose up -d
+ ```

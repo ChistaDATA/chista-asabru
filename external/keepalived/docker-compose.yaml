@@ -2,7 +2,9 @@ version: '3.7'
 
 services:
   keepalived_master:
-    image: keepalived_custom:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - ./keepalived_master.conf:/etc/keepalived/keepalived.conf
     cap_add:
@@ -14,9 +16,11 @@ services:
         ipv4_address: 172.29.0.3
 
   keepalived_backup:
+    build:
+      context: .
+      dockerfile: Dockerfile
     depends_on:
       - keepalived_master
-    image: keepalived_custom:latest
     volumes:
       - ./keepalived_backup.conf:/etc/keepalived/keepalived.conf
     cap_add:
