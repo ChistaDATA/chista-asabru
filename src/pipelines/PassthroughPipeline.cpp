@@ -45,7 +45,7 @@ void *PassthroughPipeline(CProxySocket *ptr, void *lptr)
     }
 
     EXECUTION_CONTEXT exec_context;
-    exec_context["correlation_id"] = (void *) correlation_id.c_str();
+    exec_context["correlation_id"] = correlation_id;
 
     ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
     ProtocolHelper::SetKeepAlive(client_socket->GetSocket(), 1);

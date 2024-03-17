@@ -3,7 +3,8 @@ services:
   clickhouse-1:
     image: clickhouse/clickhouse-server:23.11
     volumes:
-      - ./external/clickhouse/config.xml:/etc/clickhouse-server/config.xml
+      - ./external/clickhouse-1/config.xml:/etc/clickhouse-server/config.xml
+      - ./external/clickhouse-1/init-db.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "9363:9363"
       - "9000:9000"
@@ -69,7 +70,7 @@ services:
       - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
       - CLICKHOUSE_PASSWORD=password
     volumes:
-      - "./external/clickhouse/init-db.sql:/docker-entrypoint-initdb.d/init.sql"
+      - "./external/clickhouse-2/init-db.sql:/docker-entrypoint-initdb.d/init.sql"
     networks:
       - backend
 

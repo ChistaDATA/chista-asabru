@@ -14,8 +14,6 @@
  * decrypted packet to the target endpoint via separate TLS connection.
  */
 void *ClickHouseTLSExchangePipeline(CProxySocket *ptr, void *lptr) {
-    std::string correlation_id = UuidGenerator::generateUuid();
-    LOG_INFO("Correlation ID : " + correlation_id);
     LOG_INFO("ClickHouseTLSExchangePipeline::start");
     CLIENT_DATA clientData;
     memcpy(&clientData, lptr, sizeof(CLIENT_DATA));
@@ -41,7 +39,8 @@ void *ClickHouseTLSExchangePipeline(CProxySocket *ptr, void *lptr) {
     auto *target_socket = new CClientSSLSocket(target_endpoint.ipaddress, target_endpoint.port);
 
     EXECUTION_CONTEXT exec_context;
-    exec_context["correlation_id"] = (void *) correlation_id.c_str();
+    std::string correlation_id;
+    bool data_sent = false;
 
     ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
     ProtocolHelper::SetKeepAlive(client_socket->GetSocket(), 1);
@@ -66,10 +65,19 @@ void *ClickHouseTLSExchangePipeline(CProxySocket *ptr, void *lptr) {
                 LOG_INFO("client socket is readable, reading bytes : ");
                 std::string bytes = client_socket->ReceiveBytes();
                 if (!bytes.empty()) {
+
+                    if (!data_sent) {
+                        correlation_id = UuidGenerator::generateUuid();
+                        LOG_INFO("Correlation ID : " + correlation_id);
+                        exec_context["correlation_id"] = correlation_id;
+                    }
+
+                    start = std::chrono::high_resolution_clock::now();
                     LOG_INFO("Calling Proxy Upstream Handler..");
                     std::string response = proxy_handler->HandleUpstreamData(bytes, bytes.size(),
                                                                              &exec_context);
                     target_socket->SendBytes((char *) response.c_str(), response.size());
+                    data_sent = true;
                 }
 
                 if (bytes.empty())
@@ -86,6 +94,16 @@ void *ClickHouseTLSExchangePipeline(CProxySocket *ptr, void *lptr) {
                 std::string bytes = target_socket->ReceiveBytes();
 
                 if (!bytes.empty()) {
+                    auto stop = std::chrono::high_resolution_clock::now();
+                    if (data_sent) {
+                        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+                        LOG_LATENCY(
+                                correlation_id,
+                                std::to_string(duration.count())+ "," +target_endpoint.ipaddress+":"+std::to_string(target_endpoint.port));
+                        data_sent = false;
+                    }
+                    exec_context["request_stop_time"] = stop;
+                    exec_context["target_host"] = target_endpoint.ipaddress+":"+std::to_string(target_endpoint.port);
                     LOG_INFO("Calling Proxy Downstream Handler..");
                     std::string response = proxy_handler->HandleDownStreamData(bytes, bytes.size(),
                                                                                &exec_context);

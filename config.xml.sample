@@ -48,15 +48,23 @@
 					<PIPELINE>ClickHousePipeline</PIPELINE>
 					<HANDLER>CHWirePTHandler</HANDLER>
 					<PROTOCOL>CH_WIRE</PROTOCOL>
-					<loadbalancer-strategy>WeightedRoundRobinStrategy</loadbalancer-strategy>
 					<SERVICES>
 						<SERVICE name="ch_wire_service1" weight="2">
 							<HOST>localhost</HOST>
-							<PORT>9111</PORT>
+							<PORT>9000</PORT>
 						</SERVICE>
-						<SERVICE name="ch_wire_service1" weight="1">
+					</SERVICES>
+				</END_POINT>
+				<END_POINT name="ch_http_node1">
+					<READ_WRITE>yes</READ_WRITE>
+					<PROXY_PORT>9110</PROXY_PORT>
+					<PROTOCOL>CH_HTTP</PROTOCOL>
+					<PIPELINE>ClickHousePipeline</PIPELINE>
+					<HANDLER>CHttpHandler</HANDLER>
+					<SERVICES>
+						<SERVICE name="ch_http_service1">
 							<HOST>localhost</HOST>
-							<PORT>9112</PORT>
+							<PORT>8123</PORT>
 						</SERVICE>
 					</SERVICES>
 				</END_POINT>
