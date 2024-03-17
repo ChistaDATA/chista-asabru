@@ -43,12 +43,14 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
     }
 
     EXECUTION_CONTEXT exec_context;
+    std::string correlation_id;
+    bool data_sent = false;
+
     ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
     ProtocolHelper::SetKeepAlive(client_socket->GetSocket(), 1);
     ProtocolHelper::SetReadTimeOut(target_socket->GetSocket(), 1);
     ProtocolHelper::SetKeepAlive(target_socket->GetSocket(), 1);
-    std::string correlation_id;
-    bool data_sent = false;
+
     std::chrono::time_point start = std::chrono::high_resolution_clock::now();
     while (true)
     {
@@ -74,9 +76,12 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
                 if (!bytes.empty()) {
                     LOG_INFO("Calling Proxy Upstream Handler..");
 
-                    correlation_id = UuidGenerator::generateUuid();
-                    LOG_INFO("Correlation ID : " + correlation_id);
-                    exec_context["correlation_id"] = (void *) correlation_id.c_str();
+                    if (!data_sent) {
+                        correlation_id = UuidGenerator::generateUuid();
+                        LOG_INFO("Correlation ID : " + correlation_id);
+                        exec_context["correlation_id"] = correlation_id;
+                    }
+
                     start = std::chrono::high_resolution_clock::now();
                     std::string response = proxy_handler->HandleUpstreamData(bytes, bytes.size(), &exec_context);
                     target_socket->SendBytes((char *)response.c_str(), response.size());
@@ -101,14 +106,16 @@ void *ClickHousePipeline(CProxySocket *ptr, void *lptr)
                 std::string bytes = target_socket->ReceiveBytes();
 
                 if (!bytes.empty()) {
+                    auto stop = std::chrono::high_resolution_clock::now();
                     if (data_sent) {
-                        auto stop = std::chrono::high_resolution_clock::now();
                         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
                         LOG_LATENCY(
                                 correlation_id,
                                 std::to_string(duration.count())+ "," +target_endpoint.ipaddress+":"+std::to_string(target_endpoint.port));
                         data_sent = false;
                     }
+                    exec_context["request_stop_time"] = stop;
+                    exec_context["target_host"] = target_endpoint.ipaddress+":"+std::to_string(target_endpoint.port);
                     LOG_INFO("Calling Proxy Downstream Handler..");
                     std::string response = proxy_handler->HandleDownStreamData(bytes, bytes.size(), &exec_context);
                     client_socket->SendBytes((char *) response.c_str(), response.size());
