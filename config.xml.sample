@@ -5,31 +5,66 @@
 			<protocol-port>8080</protocol-port>
 			<pipeline>ProtocolPipeline</pipeline>
 			<handler>CHttpProtocolHandler</handler>
+			<auth>
+				<strategy>basic</strategy>
+				<handler>HTTPBasicIsAuthenticatedCommand</handler>
+			</auth>
 			<routes>
+				<route>
+					<path>/auth/login</path>
+					<method>POST</method>
+					<request_handler>HTTPBasicLoginCommand</request_handler>
+					<auth>
+						<required>false</required>
+					</auth>
+				</route>
+				<route>
+					<path>/auth/logout</path>
+					<method>POST</method>
+					<request_handler>HTTPBasicLogoutCommand</request_handler>
+					<auth>
+						<required>true</required>
+					</auth>
+				</route>
 				<route>
 					<path>/configuration</path>
 					<method>POST</method>
 					<request_handler>UpdateConfigurationCommand</request_handler>
+					<auth>
+						<required>yes</required>
+					</auth>
 				</route>
 				<route>
 					<path>/updateService</path>
 					<method>POST</method>
 					<request_handler>UpdateEndPointServiceCommand</request_handler>
+					<auth>
+						<required>yes</required>
+					</auth>
 				</route>
 				<route>
 					<path>/</path>
 					<method>GET</method>
 					<request_handler>SendHtmlCommand</request_handler>
+					<auth>
+						<required>yes</required>
+					</auth>
 				</route>
 				<route>
 					<path>/python</path>
 					<method>POST</method>
 					<request_handler>PythonCommand</request_handler>
+					<auth>
+						<required>yes</required>
+					</auth>
 				</route>
 				<route>
 					<path>/upload</path>
 					<method>POST</method>
 					<request_handler>HttpFileUploadCommand</request_handler>
+					<auth>
+						<required>yes</required>
+					</auth>
 				</route>
 			</routes>
 		</protocol-server>

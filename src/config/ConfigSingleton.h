@@ -11,6 +11,7 @@
 #include "PipelineFactory.h"
 #include "ConfigParser.h"
 #include "LoadBalancerFactory.h"
+#include "AuthenticationFactory.h"
 
 using namespace tinyxml2;
 
@@ -63,6 +64,8 @@ public:
     // Create Proxy sockets mapping
     ProxySocketsMap proxySocketsMap;
     ProtocolSocketsMap protocolSocketsMap;
+
+    AuthenticationFactory *authenticationFactory = new AuthenticationFactory();
 };
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();

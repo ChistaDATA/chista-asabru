@@ -178,6 +178,22 @@ XMLError ConfigParser::LoadProtocolServerConfigurations(XMLNode *root, std::vect
             config.handler = handlerElement->GetText();
         }
 
+        XMLElement *authElement = protocol_server->FirstChildElement("auth");
+        if (authElement)
+        {
+            XMLElement *strategyElement = authElement->FirstChildElement("strategy");
+            if (NULL != strategyElement)
+            {
+                config.auth.strategy = strategyElement->GetText();
+            }
+
+            XMLElement *handlerElement = authElement->FirstChildElement("handler");
+            if (NULL != handlerElement)
+            {
+                config.auth.handler = handlerElement->GetText();
+            }
+        }
+
         XMLElement *routesElement = protocol_server->FirstChildElement("routes");
         if (routesElement) {
             XMLElement *routeElement = routesElement->FirstChildElement("route");
@@ -201,6 +217,16 @@ XMLError ConfigParser::LoadProtocolServerConfigurations(XMLNode *root, std::vect
                 {
                     r.request_handler = requestHandlerElement->GetText();
                 }
+
+                XMLElement *authConfigElement = routeElement->FirstChildElement("auth");
+                if (authConfigElement) {
+                    XMLElement *requiredElement = authConfigElement->FirstChildElement("required");
+                    if (NULL != requiredElement)
+                    {
+                        r.auth.required = requiredElement->GetText();
+                    }
+                }
+
                 routes.push_back(r);
                 routeElement = routeElement->NextSiblingElement("route");
             }

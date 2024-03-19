@@ -42,6 +42,7 @@ add_subdirectory(../lib/asabru-client/src ../lib/asabru-client)
 
 include_directories(../lib/tinyxml2)
 include_directories(../lib/stduuid/include)
+include_directories(../lib/jwt-cpp/include)
 include_directories(../lib/libuv/include)
 include_directories(../gzip-hpp/include)
 include_directories(../lib/asabru-parsers/src)

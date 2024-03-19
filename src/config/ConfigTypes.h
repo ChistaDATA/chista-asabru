@@ -5,6 +5,7 @@
 #include "CProxySocket.h"
 #include "CProtocolSocket.h"
 #include "LoadBalancerStrategy.h"
+#include "AuthenticationStrategy.h"
 
 typedef struct {
     int port;
@@ -35,24 +36,40 @@ typedef struct {
 } PROXY_CONFIG;
 
 typedef struct {
+    std::string required;
+} ROUTE_AUTH_CONFIG;
+
+typedef struct {
     std::string path;
     std::string method;
     std::string request_handler;
+    ROUTE_AUTH_CONFIG auth;
 } Route;
+typedef struct {
+    std::string strategy;
+    std::string handler;
+} AUTH_CONFIG;
 
 typedef struct {
     std::string protocol_name;
     int protocol_port;
     std::string pipeline;
     std::string handler;
+    AUTH_CONFIG auth;
     std::vector<Route> routes;
 } PROTOCOL_SERVER_CONFIG;
+
+typedef struct {
+    AuthenticationStrategy *strategy;
+     std::string handler;
+} RESOLVED_PROTOCOL_AUTH_CONFIG;
 
 typedef struct {
     std::string protocol_name;
     int protocol_port;
     PipelineFunction<CProtocolSocket> pipeline;
     void *handler;
+    RESOLVED_PROTOCOL_AUTH_CONFIG auth;
     std::vector<Route> routes;
 } RESOLVED_PROTOCOL_CONFIG;
 

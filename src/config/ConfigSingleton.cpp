@@ -110,6 +110,9 @@ std::vector<RESOLVED_PROTOCOL_CONFIG> ConfigSingleton::ResolveProtocolServerConf
         CommandDispatcher::RegisterCommand<BaseHandler>(protocol_server.handler);
         result.handler = CommandDispatcher::GetCommand<BaseHandler>(protocol_server.handler);
 
+        result.auth.strategy = authenticationFactory->createAuthenticationStrategy(protocol_server.auth.strategy);
+        result.auth.handler = protocol_server.auth.handler;
+
         result.routes = protocol_server.routes;
         results.push_back(result);
     }
