@@ -67,8 +67,8 @@ int initProtocolServers() {
                             context.Put("update_endpoint_service",updateEndPointService);
                             context.Put("authentication", value.auth.strategy);
 
-                            if (route.auth.required == "true" || route.auth.required == "True" || route.auth.required == "TRUE"
-                                || route.auth.required == "yes" || route.auth.required == "Yes" || route.auth.required == "YES") {
+                            if (route.auth.required) {
+                                LOG_INFO("Authenticating request :");
                                 CommandDispatcher::Dispatch(value.auth.handler, &context);
                                 if (!std::any_cast<bool>(context.Get("authenticated"))) {
                                     auto *response = new simple_http_server::HttpResponse(simple_http_server::HttpStatusCode::Unauthorized);

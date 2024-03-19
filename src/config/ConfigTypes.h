@@ -36,7 +36,7 @@ typedef struct {
 } PROXY_CONFIG;
 
 typedef struct {
-    std::string required;
+    bool required;
 } ROUTE_AUTH_CONFIG;
 
 typedef struct {
@@ -61,7 +61,7 @@ typedef struct {
 
 typedef struct {
     AuthenticationStrategy *strategy;
-     std::string handler;
+    std::string handler;
 } RESOLVED_PROTOCOL_AUTH_CONFIG;
 
 typedef struct {

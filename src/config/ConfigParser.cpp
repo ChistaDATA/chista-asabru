@@ -223,7 +223,11 @@ XMLError ConfigParser::LoadProtocolServerConfigurations(XMLNode *root, std::vect
                     XMLElement *requiredElement = authConfigElement->FirstChildElement("required");
                     if (NULL != requiredElement)
                     {
-                        r.auth.required = requiredElement->GetText();
+                        auto requiredStrC = requiredElement->GetText();
+                        std::string requiredStr(requiredStrC);
+                        std::transform(requiredStr.begin(), requiredStr.end(), requiredStr.begin(),
+                            [](unsigned char c) { return std::tolower(c); });
+                        r.auth.required = requiredStr == "true" || requiredStr == "yes";
                     }
                 }
 
