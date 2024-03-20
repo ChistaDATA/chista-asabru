@@ -5,6 +5,11 @@ services:
     volumes:
       - ./external/clickhouse-1/config.xml:/etc/clickhouse-server/config.xml
       - ./external/clickhouse-1/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - CLICKHOUSE_DB=default
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+      - CLICKHOUSE_PASSWORD=password
     ports:
       - "9363:9363"
       - "9000:9000"
@@ -24,6 +29,9 @@ services:
 
   postgres-1:
     image: postgres:14.4
+    command:
+      - -c
+      - shared_preload_libraries=pg_stat_statements
 #    command: >
 #      -c ssl=on
 #      -c ssl_cert_file=/var/lib/postgresql/server.crt
@@ -36,6 +44,10 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123456}
       PGDATA: /var/lib/postgresql/postgres-1/data/pgdata
     volumes:
+      - source: ./external/postgres
+        target: /docker-entrypoint-initdb.d
+        type: bind
+        read_only: true
       - source: pg_data
         target: /var/lib/postgresql/postgres-1/data
         type: volume
@@ -130,11 +142,18 @@ services:
     container_name: grafana
     ports:
       - "3000:3000"
-    restart: unless-stopped
     environment:
+      SNOWFLAKE_ACCOUNT: ${SNOWFLAKE_EXPORTER_ACCOUNT:-}
+      SNOWFLAKE_USERNAME: ${SNOWFLAKE_EXPORTER_USERNAME:-}
+      SNOWFLAKE_PASSWORD: ${SNOWFLAKE_EXPORTER_PASSWORD:-}
+      SNOWFLAKE_ROLE: ${SNOWFLAKE_EXPORTER_ROLE:-}
+      SNOWFLAKE_WAREHOUSE: ${SNOWFLAKE_EXPORTER_WAREHOUSE:-}
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: grafana
       GF_INSTALL_PLUGINS: grafana-clickhouse-datasource
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: michelin-snowflake-datasource
     volumes:
       - source: ./external/grafana/provisioning
         target: /etc/grafana/provisioning
@@ -142,7 +161,9 @@ services:
       - source: ./external/grafana/dashboards
         target: /var/lib/grafana/dashboards
         type: bind
-      - grafana_storage:/var/lib/grafana
+      - source: ./external/grafana/plugins
+        target: /var/lib/grafana/plugins
+        type: bind
     networks:
       - backend
 
@@ -342,7 +363,6 @@ volumes:
   mysql_data:
   parseable_data:
   prom_data:
-  grafana_storage:
 networks:
   backend:
     driver: bridge

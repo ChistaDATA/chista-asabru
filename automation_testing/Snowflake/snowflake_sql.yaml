@@ -1,0 +1,8 @@
+create:
+  c1: "create TABLE IDENTIFIER('\"DEMO\".\"TEST\".\"CAR_PRICES\"') ( year NUMBER(38, 0) , make VARCHAR , model VARCHAR , trim VARCHAR , body VARCHAR , transmission VARCHAR , vin VARCHAR , state VARCHAR , condition NUMBER(38, 0) , odometer NUMBER(38, 0) , color VARCHAR , interior VARCHAR , seller VARCHAR , mmr NUMBER(38, 0) , sellingprice NUMBER(38, 0) , saledate TIMESTAMP )"
+read:
+  r1: "SELECT year, count(*) AS c FROM car_prices GROUP BY year ORDER BY c DESC"
+  r2: "SELECT make, count(*) FROM car_prices GROUP BY make ORDER BY count(*) DESC LIMIT 10"
+  r3: "SELECT COUNT(*) FROM car_prices"
+  r4: "SELECT * FROM car_prices LIMIT 1000"
+  r5: "SELECT * FROM car_prices LIMIT 10000"

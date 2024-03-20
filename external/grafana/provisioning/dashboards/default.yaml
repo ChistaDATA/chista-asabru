@@ -16,3 +16,8 @@ providers:
     type: file
     options:
       path: /var/lib/grafana/dashboards/clickhouse
+  - name: Unified
+    folder: Unified
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards/unified

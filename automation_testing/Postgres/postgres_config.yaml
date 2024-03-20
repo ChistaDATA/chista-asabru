@@ -1,7 +1,7 @@
 host: 'localhost'
 username: 'postgres'
 password: '123456'
-port: '9120'
+port: '9140'
 database: 'dvdrental'
 ssl: 'False'
 ca_cert: '/Users/midhundarvin/certs/postgres/server.crt'

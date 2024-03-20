@@ -34,7 +34,7 @@ ORDER BY (vin);
 
 Insert data into clickhouse.
 ```
-clickhouse client --host localhost --port 9100 --user default --query "INSERT INTO default.car_prices FORMAT CSVWithNames" < car_prices.csv
+clickhouse client --host localhost --port 9100 --user default --password=password --query "INSERT INTO default.car_prices FORMAT CSVWithNames" < car_prices.csv
 ```
 ### Add Configuration for Tests
 Edit `ch_config_2.yaml` with the appropriate values for the proxy and clickhouse details.

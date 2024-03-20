@@ -29,7 +29,7 @@ create_client() {
     fi
 
     if [[ "$ch_password" != "" ]]; then
-      client_command="$client_command --password='$ch_password' "
+      client_command="$client_command --password=$ch_password "
     fi
     echo "$client_command"
 }
@@ -53,12 +53,13 @@ benchmark_performance() {
             query=$(yq e ".read.$query_key" "$sql_file")
             $client --query="$query" > /dev/null
             echo "$query"
+            sleep 1
         done
 
         iter_end=$(( $(gdate +%s%N) - iter_start ))
         unset client
 
-        loop_times+=("$((iter_end/1000000))")
+        loop_times+=("$(((iter_end/1000000) - 100)) ")
     done
 
     total_time=0
