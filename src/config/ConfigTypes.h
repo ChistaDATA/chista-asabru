@@ -55,7 +55,7 @@ typedef struct {
     int protocol_port;
     std::string pipeline;
     std::string handler;
-    AUTH_CONFIG auth;
+    AUTH_CONFIG *auth;
     std::vector<Route> routes;
 } PROTOCOL_SERVER_CONFIG;
 
@@ -69,7 +69,7 @@ typedef struct {
     int protocol_port;
     PipelineFunction<CProtocolSocket> pipeline;
     void *handler;
-    RESOLVED_PROTOCOL_AUTH_CONFIG auth;
+    RESOLVED_PROTOCOL_AUTH_CONFIG *auth;
     std::vector<Route> routes;
 } RESOLVED_PROTOCOL_CONFIG;
 

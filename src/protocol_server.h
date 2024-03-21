@@ -65,12 +65,13 @@ int initProtocolServers() {
                             context.Put("request", &request);
                             context.Put("update_configuration", updateConfiguration);
                             context.Put("update_endpoint_service",updateEndPointService);
-                            context.Put("authentication", value.auth.strategy);
+                            context.Put("authentication", value.auth->strategy);
 
                             if (route.auth.required) {
                                 LOG_INFO("Authenticating request :");
-                                CommandDispatcher::Dispatch(value.auth.handler, &context);
-                                if (!std::any_cast<bool>(context.Get("authenticated"))) {
+                                CommandDispatcher::Dispatch(value.auth->handler, &context);
+                                if (!std::any_cast<bool>(context.Get("authenticated")))
+                                {
                                     auto *response = new simple_http_server::HttpResponse(simple_http_server::HttpStatusCode::Unauthorized);
                                     response->SetHeader("Content-Type", "application/json");
                                     response->SetContent("Unauthorized");
