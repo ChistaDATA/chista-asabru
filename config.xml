@@ -19,7 +19,17 @@
 				<route>
 					<path>/</path>
 					<method>GET</method>
-					<request_handler>SendHtmlCommand</request_handler>
+					<request_handler>SendFileCommand</request_handler>
+				</route>
+				<route>
+					<path>^/env.js</path>
+					<method>GET</method>
+					<request_handler>SendFileCommand</request_handler>
+				</route>
+				<route>
+					<path>^/assets.*</path>
+					<method>GET</method>
+					<request_handler>SendFileCommand</request_handler>
 				</route>
 				<route>
 					<path>/python</path>
@@ -45,13 +55,13 @@
 				<END_POINT name="ch_wire_node1">
 					<READ_WRITE>yes</READ_WRITE>
 					<PROXY_PORT>9100</PROXY_PORT>
-					<PIPELINE>ClickHousePipeline</PIPELINE>
+					<PIPELINE>ClickHouseTLSExchangePipeline</PIPELINE>
 					<HANDLER>CHWirePTHandler</HANDLER>
 					<PROTOCOL>CH_WIRE</PROTOCOL>
 					<SERVICES>
 						<SERVICE name="ch_wire_service1" weight="2">
 							<HOST>localhost</HOST>
-							<PORT>9000</PORT>
+							<PORT>9440</PORT>
 						</SERVICE>
 					</SERVICES>
 				</END_POINT>
@@ -65,6 +75,32 @@
 						<SERVICE name="ch_http_service1">
 							<HOST>ip24827.ap-southeast-1.snowflakecomputing.com</HOST>
 							<PORT>443</PORT>
+						</SERVICE>
+					</SERVICES>
+				</END_POINT>
+				<END_POINT name="ch_https_node1">
+					<READ_WRITE>yes</READ_WRITE>
+					<PROXY_PORT>9120</PROXY_PORT>
+					<PROTOCOL>CH_HTTP</PROTOCOL>
+					<PIPELINE>ClickHouseTLSExchangePipeline</PIPELINE>
+					<HANDLER>CHttpsHandler</HANDLER>
+					<SERVICES>
+						<SERVICE name="ch_https_service1">
+							<HOST>root.localhost</HOST>
+							<PORT>8443</PORT>
+						</SERVICE>
+					</SERVICES>
+				</END_POINT>
+				<END_POINT name="pg_wire_node1">
+					<READ_WRITE>no</READ_WRITE>
+					<PROXY_PORT>9140</PROXY_PORT>
+					<PROTOCOL>PG_WIRE</PROTOCOL>
+					<PIPELINE>PostgreSQLPipeline</PIPELINE>
+					<HANDLER>CPostgreSQLHandler</HANDLER>
+					<SERVICES>
+						<SERVICE name="pg_wire_service1">
+							<HOST>localhost</HOST>
+							<PORT>5432</PORT>
 						</SERVICE>
 					</SERVICES>
 				</END_POINT>

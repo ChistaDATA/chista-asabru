@@ -1,0 +1,8 @@
+snowflake_hostname: 'root.localhost'
+snowflake_port: '9110'
+snowflake_account: ''
+snowflake_user: ''
+snowflake_password: ''
+snowflake_warehouse: ''
+snowflake_database: ''
+snowflake_schema: ''
