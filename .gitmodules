@@ -38,3 +38,6 @@
 [submodule "lib/stduuid"]
 	path = lib/stduuid
 	url = git@github.com:mariusbancila/stduuid.git
+[submodule "lib/asabru-ui"]
+	path = lib/asabru-ui
+	url = git@github.com:ChistaDATA/asabru-ui.git

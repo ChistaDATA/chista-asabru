@@ -73,7 +73,7 @@ set(PROJECT_LINK_LIBS
 
 # Collect all source files
 file(GLOB_RECURSE PIPELINE_FILES "./pipelines/*.cpp")
-file(COPY public DESTINATION ..)
+file(COPY ../lib/asabru-ui/build/ DESTINATION ../public)
 file(COPY ../config.xml DESTINATION ..)
 
 add_executable(Chista_Asabru
