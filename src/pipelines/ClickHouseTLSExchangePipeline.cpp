@@ -76,7 +76,7 @@ void *ClickHouseTLSExchangePipeline(CProxySocket *ptr, void *lptr) {
                     LOG_INFO("Calling Proxy Upstream Handler..");
                     std::string response = proxy_handler->HandleUpstreamData(bytes, bytes.size(),
                                                                              &exec_context);
-                    target_socket->SendBytes((char *) response.c_str(), response.size());
+                    target_socket->SendBytes(&response[0], response.size());
                     data_sent = true;
                 }
 
@@ -107,7 +107,7 @@ void *ClickHouseTLSExchangePipeline(CProxySocket *ptr, void *lptr) {
                     LOG_INFO("Calling Proxy Downstream Handler..");
                     std::string response = proxy_handler->HandleDownStreamData(bytes, bytes.size(),
                                                                                &exec_context);
-                    client_socket->SendBytes((char *) response.c_str(), response.size());
+                    client_socket->SendBytes(&response[0], response.size());
                 }
 
                 if (bytes.empty())
@@ -120,16 +120,13 @@ void *ClickHouseTLSExchangePipeline(CProxySocket *ptr, void *lptr) {
 
         if (!still_connected) {
             // Close the client socket
-            client_socket->Close();
+            // client_socket->Close();
             break;
         }
     }
 
     // Close the server socket
     target_socket->Close();
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    LOG_LATENCY(correlation_id, std::to_string(duration.count()));
     LOG_INFO("ClickHouseTLSExchangePipeline::end");
 #ifdef WINDOWS_OS
     return 0;

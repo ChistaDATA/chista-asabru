@@ -178,6 +178,25 @@ XMLError ConfigParser::LoadProtocolServerConfigurations(XMLNode *root, std::vect
             config.handler = handlerElement->GetText();
         }
 
+        XMLElement *authElement = protocol_server->FirstChildElement("auth");
+        if (authElement)
+        {
+            config.auth = new AUTH_CONFIG();
+            XMLElement *strategyElement = authElement->FirstChildElement("strategy");
+            if (NULL != strategyElement)
+            {
+                config.auth->strategy = strategyElement->GetText();
+            }
+
+            XMLElement *handlerElement = authElement->FirstChildElement("handler");
+            if (NULL != handlerElement)
+            {
+                config.auth->handler = handlerElement->GetText();
+            }
+        } else {
+            config.auth = nullptr;
+        }
+
         XMLElement *routesElement = protocol_server->FirstChildElement("routes");
         if (routesElement) {
             XMLElement *routeElement = routesElement->FirstChildElement("route");
@@ -201,6 +220,34 @@ XMLError ConfigParser::LoadProtocolServerConfigurations(XMLNode *root, std::vect
                 {
                     r.request_handler = requestHandlerElement->GetText();
                 }
+
+                XMLElement *authConfigElement = routeElement->FirstChildElement("auth");
+                r.auth.required = (config.auth != nullptr);
+                if (authConfigElement)
+                {
+                    XMLElement *requiredElement = authConfigElement->FirstChildElement("required");
+                    if (requiredElement)
+                    {
+                        auto requiredStrC = requiredElement->GetText();
+                        std::string requiredStr(requiredStrC ? requiredStrC : ""); // Ensure non-null string
+                        std::transform(requiredStr.begin(), requiredStr.end(), requiredStr.begin(),
+                                       [](unsigned char c)
+                                       { return std::tolower(c); });
+                        if (requiredStr == "false" || requiredStr == "0" || requiredStr == "no")
+                        {
+                            r.auth.required = false;
+                        }
+                        else if (requiredStr == "true" || requiredStr == "1" || requiredStr == "yes")
+                        {
+                            r.auth.required = true;
+                        }
+                        else
+                        {
+                            throw std::runtime_error("Invalid or undefined auth configuration ('" + requiredStr + "') for route: " + r.path);
+                        }
+                    }
+                }
+
                 routes.push_back(r);
                 routeElement = routeElement->NextSiblingElement("route");
             }

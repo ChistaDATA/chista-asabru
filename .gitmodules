@@ -41,3 +41,6 @@
 [submodule "lib/asabru-ui"]
 	path = lib/asabru-ui
 	url = git@github.com:ChistaDATA/asabru-ui.git
+[submodule "lib/jwt-cpp"]
+	path = lib/jwt-cpp
+	url = git@github.com:Thalhammer/jwt-cpp.git
