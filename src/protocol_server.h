@@ -55,7 +55,7 @@ int initProtocolServers() {
                 protocolHandler->RegisterHttpRequestHandler(
                         route.path,
                         HttpMethodEnumMap.find(route.method)->second,
-                        [route](const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse {
+                        [route, value](const simple_http_server::HttpRequest &request) -> simple_http_server::HttpResponse {
                             LOG_INFO("Starting request handler lambda :");
 
                             ComputationContext context;
@@ -65,6 +65,19 @@ int initProtocolServers() {
                             context.Put("request", &request);
                             context.Put("update_configuration", updateConfiguration);
                             context.Put("update_endpoint_service",updateEndPointService);
+                            context.Put("authentication", value.auth->strategy);
+
+                            if (route.auth.required) {
+                                LOG_INFO("Authenticating request :");
+                                CommandDispatcher::Dispatch(value.auth->handler, &context);
+                                if (!std::any_cast<bool>(context.Get("authenticated")))
+                                {
+                                    auto *response = new simple_http_server::HttpResponse(simple_http_server::HttpStatusCode::Unauthorized);
+                                    response->SetHeader("Content-Type", "application/json");
+                                    response->SetContent("Unauthorized");
+                                    return *response;
+                                }
+                            }
 
                             CommandDispatcher::Dispatch(route.request_handler, &context);
                             auto response = std::any_cast<simple_http_server::HttpResponse *>(context.Get("response"));
