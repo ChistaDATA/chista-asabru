@@ -7,6 +7,7 @@
 #include "ProtocolHelper.h"
 #include "Socket.h"
 #include "SocketSelect.h"
+#include "uuid/UuidGenerator.h"
 #include <utility>
 
 void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr) {
@@ -34,12 +35,15 @@ void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr) {
 	CClientSocket *target_socket = new CClientSocket(target_endpoint.ipaddress, target_endpoint.port);
 
 	EXECUTION_CONTEXT exec_context;
+	std::string correlation_id;
+	bool data_sent = false;
 
 	ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
 	ProtocolHelper::SetKeepAlive(client_socket->GetSocket(), 1);
 	ProtocolHelper::SetReadTimeOut(target_socket->GetSocket(), 1);
 	ProtocolHelper::SetKeepAlive(target_socket->GetSocket(), 1);
 
+	auto start = std::chrono::high_resolution_clock::now();
 	while (true) {
 		SocketSelect *sel;
 		try {
@@ -55,10 +59,20 @@ void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr) {
 				LOG_INFO("client socket is readable, reading bytes : ");
 				std::string bytes = client_socket->ReceiveBytes();
 
-				LOG_INFO("Calling Proxy Upstream Handler..");
-				std::string response = proxy_handler->HandleUpstreamData(bytes, bytes.size(), &exec_context);
-				target_socket->SendBytes((char *)response.c_str(), response.size());
-				// target_socket.SendBytes((char *) bytes.c_str(), bytes.size());
+				if (!bytes.empty()) {
+
+					if (!data_sent) {
+						correlation_id = UuidGenerator::generateUuid();
+						LOG_INFO("Correlation ID : " + correlation_id);
+						exec_context["correlation_id"] = correlation_id;
+					}
+
+					start = std::chrono::high_resolution_clock::now();
+					LOG_INFO("Calling Proxy Upstream Handler..");
+					std::string response = proxy_handler->HandleUpstreamData(bytes, bytes.size(), &exec_context);
+					target_socket->SendBytes((char *)response.c_str(), response.size());
+					data_sent = true;
+				}
 
 				if (bytes.empty())
 					still_connected = false;
@@ -73,9 +87,20 @@ void *PostgreSQLPipeline(CProxySocket *ptr, void *lptr) {
 				LOG_INFO("target socket is readable, reading bytes : ");
 				std::string bytes = target_socket->ReceiveBytes();
 
-				LOG_INFO("Calling Proxy Downstream Handler..");
-				std::string response = proxy_handler->HandleDownStreamData(bytes, bytes.size(), &exec_context);
-				client_socket->SendBytes((char *)response.c_str(), response.size());
+				if (!bytes.empty()) {
+					auto stop = std::chrono::high_resolution_clock::now();
+					if (data_sent) {
+						auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+						LOG_LATENCY(correlation_id, std::to_string(duration.count()) + "," + target_endpoint.ipaddress + ":" +
+														std::to_string(target_endpoint.port));
+						data_sent = false;
+					}
+					exec_context["request_stop_time"] = stop;
+					exec_context["target_host"] = target_endpoint.ipaddress + ":" + std::to_string(target_endpoint.port);
+					LOG_INFO("Calling Proxy Downstream Handler..");
+					std::string response = proxy_handler->HandleDownStreamData(bytes, bytes.size(), &exec_context);
+					client_socket->SendBytes((char *)response.c_str(), response.size());
+				}
 
 				if (bytes.empty())
 					still_connected = false;

@@ -169,6 +169,19 @@
 <!--						</SERVICE>-->
 <!--					</SERVICES>-->
 <!--				</END_POINT>-->
+				<END_POINT name="pg_wire_node1">
+					<READ_WRITE>yes</READ_WRITE>
+					<PROXY_PORT>9140</PROXY_PORT>
+					<PIPELINE>PostgreSQLPipeline</PIPELINE>
+					<HANDLER>CPostgreSQLHandler</HANDLER>
+					<PROTOCOL>CH_WIRE</PROTOCOL>
+					<SERVICES>
+						<SERVICE name="pg_wire_service1">
+							<HOST>localhost</HOST>
+							<PORT>5432</PORT>
+						</SERVICE>
+					</SERVICES>
+				</END_POINT>
 			</END_POINTS>
 		</CLUSTER>
 
