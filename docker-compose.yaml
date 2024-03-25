@@ -15,15 +15,15 @@ services:
       - "8443:8443"
 
     volumes:
-       - ./external/clickhouse-1/config.xml:/etc/clickhouse-server/config.xml
-       - ./external/clickhouse-1/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./external/clickhouse-1/config.xml:/etc/clickhouse-server/config.xml
+      - ./external/clickhouse-1/init-db.sql:/docker-entrypoint-initdb.d/init.sql
         # Uncomment the below lines to setup TLS for wire level protocol
         # Reference : https://www.bytebase.com/blog/how-to-configure-clickhouse-ssl-connection/
-#       - /Users/midhundarvin/software/openssl/trusted/rootCA.pem:/etc/clickhouse-server/ca.pem
-#       - /Users/midhundarvin/software/openssl/trusted/root.localhost.pem:/etc/clickhouse-server/server.pem
-#       - /Users/midhundarvin/software/openssl/trusted/device.key:/etc/clickhouse-server/server.key
-#       - /Users/midhundarvin/software/openssl/dhparam.pem:/etc/clickhouse-server/dhparam.pem
-#       - /Users/midhundarvin/software/openssl/config.xml:/etc/clickhouse-server/config.xml
+    #       - /Users/midhundarvin/software/openssl/trusted/rootCA.pem:/etc/clickhouse-server/ca.pem
+    #       - /Users/midhundarvin/software/openssl/trusted/root.localhost.pem:/etc/clickhouse-server/server.pem
+    #       - /Users/midhundarvin/software/openssl/trusted/device.key:/etc/clickhouse-server/server.key
+    #       - /Users/midhundarvin/software/openssl/dhparam.pem:/etc/clickhouse-server/dhparam.pem
+    #       - /Users/midhundarvin/software/openssl/config.xml:/etc/clickhouse-server/config.xml
     networks:
       - backend
 
@@ -32,10 +32,10 @@ services:
     command:
       - -c
       - shared_preload_libraries=pg_stat_statements
-#    command: >
-#      -c ssl=on
-#      -c ssl_cert_file=/var/lib/postgresql/server.crt
-#      -c ssl_key_file=/var/lib/postgresql/server.key
+    #    command: >
+    #      -c ssl=on
+    #      -c ssl_cert_file=/var/lib/postgresql/server.crt
+    #      -c ssl_key_file=/var/lib/postgresql/server.key
     ports:
       - "5432:5432"
       - "2345:2345"
@@ -72,10 +72,10 @@ services:
   clickhouse-2:
     image: clickhouse/clickhouse-server:23.11
     ports:
-#      - "9000:9000"
-#      - "9440:9440"
+      #      - "9000:9000"
+      #      - "9440:9440"
       - "8124:8123"
-#      - "8443:8443"
+    #      - "8443:8443"
     environment:
       - CLICKHOUSE_DB=fluentbit
       - CLICKHOUSE_USER=fluentbit
@@ -99,35 +99,35 @@ services:
       - clickhouse-1
     networks:
       - backend
-#
-#  parseable:
-#    image: parseable/parseable:edge
-#    command: ["parseable", "local-store"]
-#    ports:
-#      - "8000:8000"
-#    environment:
-#      - P_S3_URL=https://minio.parseable.io:9000
-#      - P_S3_ACCESS_KEY=minioadmin
-#      - P_S3_SECRET_KEY=minioadmin
-#      - P_S3_REGION=us-east-1
-#      - P_S3_BUCKET=parseable
-#      - P_LOCAL_STORAGE=/tmp/data
-#      - P_USERNAME=parseable
-#      - P_PASSWORD=parseable
-#      - P_STAGING_DIR=/parseable/staging
-#      - P_LOCAL_MODE=true
-#    volumes:
-#      - source: parseable_data
-#        target: /parseable
-#        type: volume
-#    networks:
-#      - backend
+  #
+  #  parseable:
+  #    image: parseable/parseable:edge
+  #    command: ["parseable", "local-store"]
+  #    ports:
+  #      - "8000:8000"
+  #    environment:
+  #      - P_S3_URL=https://minio.parseable.io:9000
+  #      - P_S3_ACCESS_KEY=minioadmin
+  #      - P_S3_SECRET_KEY=minioadmin
+  #      - P_S3_REGION=us-east-1
+  #      - P_S3_BUCKET=parseable
+  #      - P_LOCAL_STORAGE=/tmp/data
+  #      - P_USERNAME=parseable
+  #      - P_PASSWORD=parseable
+  #      - P_STAGING_DIR=/parseable/staging
+  #      - P_LOCAL_MODE=true
+  #    volumes:
+  #      - source: parseable_data
+  #        target: /parseable
+  #        type: volume
+  #    networks:
+  #      - backend
 
   prometheus:
     image: prom/prometheus
     container_name: prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
+      - "--config.file=/etc/prometheus/prometheus.yml"
     ports:
       - "9090:9090"
     restart: unless-stopped
@@ -299,36 +299,36 @@ services:
 #      CONFIG_FILE_PATH: /tmp/config.xml
 #    networks:
 #      - backend
-  #
-  #  serving-proxy-3:
-  #    build:
-  #      context: .
-  #      dockerfile: ./Dockerfile
-  #    expose:
-  #      - "9100"
-  #      - "9110"
-  #    ports:
-  #      - "9113:9110"
-  #    environment:
-  #      CONFIG_FILE_URL: https://pastebin.com/raw/NSufsj00
-  #      CONFIG_FILE_PATH: /tmp/config.xml
-  #    networks:
-  #      - backend
-  #
-  #  serving-proxy-4:
-  #    build:
-  #      context: .
-  #      dockerfile: ./Dockerfile
-  #    expose:
-  #      - "9100"
-  #      - "9110"
-  #    ports:
-  #      - "9114:9110"
-  #    environment:
-  #      CONFIG_FILE_URL: https://pastebin.com/raw/NSufsj00
-  #      CONFIG_FILE_PATH: /tmp/config.xml
-  #    networks:
-  #      - backend
+#
+#  serving-proxy-3:
+#    build:
+#      context: .
+#      dockerfile: ./Dockerfile
+#    expose:
+#      - "9100"
+#      - "9110"
+#    ports:
+#      - "9113:9110"
+#    environment:
+#      CONFIG_FILE_URL: https://pastebin.com/raw/NSufsj00
+#      CONFIG_FILE_PATH: /tmp/config.xml
+#    networks:
+#      - backend
+#
+#  serving-proxy-4:
+#    build:
+#      context: .
+#      dockerfile: ./Dockerfile
+#    expose:
+#      - "9100"
+#      - "9110"
+#    ports:
+#      - "9114:9110"
+#    environment:
+#      CONFIG_FILE_URL: https://pastebin.com/raw/NSufsj00
+#      CONFIG_FILE_PATH: /tmp/config.xml
+#    networks:
+#      - backend
 
 #  mysql-1:
 #    image: mysql/mysql-server
