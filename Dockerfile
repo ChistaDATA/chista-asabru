@@ -16,13 +16,17 @@ RUN apt-get update -y \
     python3-dev \
     sqlite3 \
     libsqlite3-dev \
-    bash
+    bash \
+    curl
 
 RUN apt-get install -y \
     intltool \
     autoconf \
     m4 \
     libssl-dev
+
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash
+RUN apt-get install -y nodejs
 
 # Set the working directory inside the container
 WORKDIR /app
