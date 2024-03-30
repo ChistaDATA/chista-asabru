@@ -47,6 +47,7 @@ include_directories(../lib/libuv/include)
 include_directories(../gzip-hpp/include)
 include_directories(../lib/asabru-parsers/src)
 include_directories(../lib/asabru-handlers/src)
+include_directories(../lib/nlohmann_json/single_include)
 
 MACRO(HEADER_DIRECTORIES search_path return_list)
     FILE(GLOB_RECURSE new_list ${search_path})

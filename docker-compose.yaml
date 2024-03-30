@@ -19,11 +19,11 @@ services:
       - ./external/clickhouse-1/init-db.sql:/docker-entrypoint-initdb.d/init.sql
         # Uncomment the below lines to setup TLS for wire level protocol
         # Reference : https://www.bytebase.com/blog/how-to-configure-clickhouse-ssl-connection/
-    #       - /Users/midhundarvin/software/openssl/trusted/rootCA.pem:/etc/clickhouse-server/ca.pem
-    #       - /Users/midhundarvin/software/openssl/trusted/root.localhost.pem:/etc/clickhouse-server/server.pem
-    #       - /Users/midhundarvin/software/openssl/trusted/device.key:/etc/clickhouse-server/server.key
-    #       - /Users/midhundarvin/software/openssl/dhparam.pem:/etc/clickhouse-server/dhparam.pem
-    #       - /Users/midhundarvin/software/openssl/config.xml:/etc/clickhouse-server/config.xml
+#       - /Users/midhundarvin/software/openssl/trusted/rootCA.pem:/etc/clickhouse-server/ca.pem
+#       - /Users/midhundarvin/software/openssl/trusted/root.localhost.pem:/etc/clickhouse-server/server.pem
+#       - /Users/midhundarvin/software/openssl/trusted/device.key:/etc/clickhouse-server/server.key
+#       - /Users/midhundarvin/software/openssl/dhparam.pem:/etc/clickhouse-server/dhparam.pem
+#       - /Users/midhundarvin/software/openssl/config.xml:/etc/clickhouse-server/config.xml
     networks:
       - backend
 
@@ -72,10 +72,10 @@ services:
   clickhouse-2:
     image: clickhouse/clickhouse-server:23.11
     ports:
-      #      - "9000:9000"
-      #      - "9440:9440"
+#      - "9000:9000"
+#      - "9440:9440"
       - "8124:8123"
-    #      - "8443:8443"
+#      - "8443:8443"
     environment:
       - CLICKHOUSE_DB=fluentbit
       - CLICKHOUSE_USER=fluentbit
@@ -99,29 +99,29 @@ services:
       - clickhouse-1
     networks:
       - backend
-  #
-  #  parseable:
-  #    image: parseable/parseable:edge
-  #    command: ["parseable", "local-store"]
-  #    ports:
-  #      - "8000:8000"
-  #    environment:
-  #      - P_S3_URL=https://minio.parseable.io:9000
-  #      - P_S3_ACCESS_KEY=minioadmin
-  #      - P_S3_SECRET_KEY=minioadmin
-  #      - P_S3_REGION=us-east-1
-  #      - P_S3_BUCKET=parseable
-  #      - P_LOCAL_STORAGE=/tmp/data
-  #      - P_USERNAME=parseable
-  #      - P_PASSWORD=parseable
-  #      - P_STAGING_DIR=/parseable/staging
-  #      - P_LOCAL_MODE=true
-  #    volumes:
-  #      - source: parseable_data
-  #        target: /parseable
-  #        type: volume
-  #    networks:
-  #      - backend
+#
+#  parseable:
+#    image: parseable/parseable:edge
+#    command: ["parseable", "local-store"]
+#    ports:
+#      - "8000:8000"
+#    environment:
+#      - P_S3_URL=https://minio.parseable.io:9000
+#      - P_S3_ACCESS_KEY=minioadmin
+#      - P_S3_SECRET_KEY=minioadmin
+#      - P_S3_REGION=us-east-1
+#      - P_S3_BUCKET=parseable
+#      - P_LOCAL_STORAGE=/tmp/data
+#      - P_USERNAME=parseable
+#      - P_PASSWORD=parseable
+#      - P_STAGING_DIR=/parseable/staging
+#      - P_LOCAL_MODE=true
+#    volumes:
+#      - source: parseable_data
+#        target: /parseable
+#        type: volume
+#    networks:
+#      - backend
 
   prometheus:
     image: prom/prometheus
@@ -166,21 +166,40 @@ services:
         type: bind
     networks:
       - backend
+#
+#  snowflake-exporter:
+#    build:
+#      context: ./external/snowflake-exporter
+#    ports:
+#      - "9975:9975"
+#    environment:
+#      SNOWFLAKE_EXPORTER_ACCOUNT: ${SNOWFLAKE_EXPORTER_ACCOUNT:-}
+#      SNOWFLAKE_EXPORTER_USERNAME: ${SNOWFLAKE_EXPORTER_USERNAME:-}
+#      SNOWFLAKE_EXPORTER_PASSWORD: ${SNOWFLAKE_EXPORTER_PASSWORD:-}
+#      SNOWFLAKE_EXPORTER_ROLE: ${SNOWFLAKE_EXPORTER_ROLE:-}
+#      SNOWFLAKE_EXPORTER_WAREHOUSE: ${SNOWFLAKE_EXPORTER_WAREHOUSE:-}
+#      SNOWFLAKE_EXPORTER_WEB_TELEMETRY_PATH: ${SNOWFLAKE_EXPORTER_WEB_TELEMETRY_PATH:-}
+#    networks:
+#      - backend
 
-  snowflake-exporter:
-    build:
-      context: ./external/snowflake-exporter
+  mongo:
+    image: mongo
     ports:
-      - "9975:9975"
+      - 27017:27017
     environment:
-      SNOWFLAKE_EXPORTER_ACCOUNT: ${SNOWFLAKE_EXPORTER_ACCOUNT:-}
-      SNOWFLAKE_EXPORTER_USERNAME: ${SNOWFLAKE_EXPORTER_USERNAME:-}
-      SNOWFLAKE_EXPORTER_PASSWORD: ${SNOWFLAKE_EXPORTER_PASSWORD:-}
-      SNOWFLAKE_EXPORTER_ROLE: ${SNOWFLAKE_EXPORTER_ROLE:-}
-      SNOWFLAKE_EXPORTER_WAREHOUSE: ${SNOWFLAKE_EXPORTER_WAREHOUSE:-}
-      SNOWFLAKE_EXPORTER_WEB_TELEMETRY_PATH: ${SNOWFLAKE_EXPORTER_WEB_TELEMETRY_PATH:-}
-    networks:
-      - backend
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: root
+      ME_CONFIG_BASICAUTH_PASSWORD: example
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
 
 #  intercepting-proxy:
 #    # platform: linux/amd64
