@@ -1,14 +1,13 @@
-
 #ifndef PIPELINE_DOT_H
 #define PIPELINE_DOT_H
 
+#include "CClientSocket.h"
 #include "CProtocolSocket.h"
 #include "CProxySocket.h"
-#include "CClientSocket.h"
+#include "CServerSocket.h"
+#include "LibuvProxySocket.h"
 #include "ProtocolHelper.h"
 #include "Socket.h"
-#include "LibuvProxySocket.h"
-#include "CServerSocket.h"
 
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr);
 void *ClickHouseLibuvPipeline(LibuvProxySocket *ptr, void *lptr);
@@ -22,8 +21,8 @@ void *ProtocolPipeline(CProtocolSocket *ptr, void *lptr);
 void *CStreamPipeline(CProtocolSocket *ptr, void *lptr);
 
 typedef struct {
-    ClientTargetPair *pair;
-    CProxyHandler *proxy_handler;
+	ClientTargetPair *pair;
+	CProxyHandler *proxy_handler;
 } ConnectionData;
 
 #endif
