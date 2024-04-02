@@ -16,3 +16,8 @@ providers:
     type: file
     options:
       path: /var/lib/grafana/dashboards/clickhouse
+  - name: Comparison
+    folder: Comparison
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards/comparison

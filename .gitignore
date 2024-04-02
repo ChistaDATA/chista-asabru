@@ -20,3 +20,5 @@ obj/
 **/java-client/out
 .env
 .cache/clangd
+external/grafana/plugins/snowflake-grafana-datasource
+external/grafana/plugins/grafana-clickhouse-datasource

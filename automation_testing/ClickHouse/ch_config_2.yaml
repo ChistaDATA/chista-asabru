@@ -1,6 +1,6 @@
 host: 'localhost'
 username: 'default'
-password: ''
+password: 'password'
 port: '9100'
 ssl: 'False'
 ca_cert: '/Users/midhundarvin/software/openssl/client.crt'

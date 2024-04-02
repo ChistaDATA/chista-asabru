@@ -2,8 +2,8 @@ from clickhouse_driver import Client
 import os
 import yaml
 
-config_file = 'ch_config.yaml'
-sql_file = 'ch_sql.yaml'
+config_file = 'ch_config_2.yaml'
+sql_file = 'ch_sql_2.yaml'
 
 
 class DatabaseInserter:
@@ -82,5 +82,5 @@ class DatabaseInserter:
 
 
 if __name__ == "__main__":
-    databaseInserter = DatabaseInserter()
+    databaseInserter = DatabaseInserter(config_file, sql_file)
     databaseInserter.load_dataset()
