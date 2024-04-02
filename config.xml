@@ -117,6 +117,19 @@
                         </SERVICE>
                     </SERVICES>
                 </END_POINT>
+                <END_POINT name="mysql_wire_node1">
+                    <READ_WRITE>yes</READ_WRITE>
+                    <PROXY_PORT>9160</PROXY_PORT>
+                    <PROTOCOL>MYSQL_WIRE</PROTOCOL>
+                    <PIPELINE>MySQLPipeline</PIPELINE>
+                    <HANDLER>CMySQLHandler</HANDLER>
+                    <SERVICES>
+                        <SERVICE name="mysql_wire_service1">
+                            <HOST>localhost</HOST>
+                            <PORT>3306</PORT>
+                        </SERVICE>
+                    </SERVICES>
+                </END_POINT>
                 <END_POINT name="pg_wire_node1">
                     <READ_WRITE>no</READ_WRITE>
                     <PROXY_PORT>9140</PROXY_PORT>
