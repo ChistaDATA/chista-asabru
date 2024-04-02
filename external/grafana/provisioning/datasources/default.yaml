@@ -19,7 +19,7 @@ datasources:
       host: clickhouse-2
       port: 9000
       protocol: native
-      username: default
+      username: fluentbit
       version: 4.0.3
     secureJsonFields:
       password: true

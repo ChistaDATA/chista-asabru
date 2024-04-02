@@ -13,8 +13,6 @@ dataset_csv_name=$(yq e .dataset_csv_name "$config_file")
 database_name=$(yq e .database "$config_file")
 table_name=$(yq e .table "$config_file")
 port=$(yq e .port "$config_file")
-ca_cert=$(yq e .ca_cert "$config_file")
-client_config=$(yq e .client_config "$config_file")
 ssl=$(yq e .ssl "$config_file")
 
 if [[ "$ssl" == "True" ]]; then

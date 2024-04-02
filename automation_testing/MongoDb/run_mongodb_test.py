@@ -1,5 +1,6 @@
 from pymongo import MongoClient
-
+import time
+from statistics import mean, median
 
 def get_database():
     # Provide the mongodb atlas url to connect python to mongodb using pymongo
@@ -11,9 +12,7 @@ def get_database():
     # Create the database for our example (we will use the same database throughout the tutorial
     return client['user_shopping_list']
 
-
-# This is added so that many files can reuse the function get_database()
-if __name__ == "__main__":
+def run_test():
     # Get the database
     dbname = get_database()
 
@@ -41,3 +40,24 @@ if __name__ == "__main__":
 
     for x in collection_name.find():
         print(x)
+
+def benchmark_performance():
+    print('Starting benchmark')
+    loop_times = []
+
+    iters = 100
+
+    for x in range(iters):
+        print('Iteration ' + str(x + 1))
+        iter_start = time.time()
+        run_test()
+        iter_end = time.time() - iter_start
+        time.sleep(1)
+        loop_times.append(iter_end)
+
+    print('Average Time taken : ', mean(loop_times))
+    print('Median Time taken : ', median(loop_times))
+
+# This is added so that many files can reuse the function get_database()
+if __name__ == "__main__":
+    benchmark_performance()
