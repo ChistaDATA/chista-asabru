@@ -4,3 +4,5 @@ cmake-build-debug
 debug
 .vscode
 .env
+lib/*/build
+build
