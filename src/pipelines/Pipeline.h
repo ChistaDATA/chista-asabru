@@ -25,4 +25,9 @@ typedef struct {
 	CProxyHandler *proxy_handler;
 } ConnectionData;
 
+typedef struct {
+	Socket *client_socket;
+	Socket *target_socket;
+} Connection;
+
 #endif
