@@ -1,4 +1,5 @@
 #include "../config/ConfigSingleton.h"
+#include "CClientSSLSocket.h"
 #include "CClientSocket.h"
 #include "CHttpParser.h"
 #include "CMySQLHandler.h"
@@ -7,6 +8,7 @@
 #include "Logger.h"
 #include "Pipeline.h"
 #include "ProtocolHelper.h"
+#include "SSLSocket.h"
 #include "Socket.h"
 #include "SocketSelect.h"
 #include "uuid/UuidGenerator.h"
@@ -34,6 +36,8 @@ std::string read_packet(Socket *socket) {
 	return buffer;
 }
 
+void write_packet(Socket *socket, std::string packet) { socket->SendBytes((char *)packet.c_str(), packet.size()); }
+
 /** @brief Extract packets from buffer
  *
  * Sometimes a buffer might contain multiple packets. This function extracts the different packets from the buffer and returns a
@@ -57,18 +61,21 @@ std::vector<std::string> extract_packets(std::string buffer, ssize_t buffer_leng
 /** @brief Perform the MySQL protocol handshake
  *
  * Perform the MySQL protocol handshake
- * @param[in]  client_socket  client socket
- * @param[in]  target_socket  server socket
+ * @param[in]  conn  a connection object with client and server sockets
  * @param[in]  exec_context   execution context
  * @return status whether the handshake was successful. (0 = success)
  */
-int MySQLHandshake(Socket *client_socket, Socket *target_socket, EXECUTION_CONTEXT *exec_context) {
+// int MySQLHandshake(Socket **client_socket, Socket **target_socket, EXECUTION_CONTEXT *exec_context) {
+int MySQLHandshake(Connection *conn, EXECUTION_CONTEXT *exec_context) {
 	std::string packet = "";
 
-	packet = read_packet(target_socket);
-	client_socket->SendBytes((char *)packet.c_str(), packet.size());
+	std::string ipaddress = std::any_cast<std::string>((*exec_context)["target_ipaddress"]);
+	int port = std::any_cast<int>((*exec_context)["target_port"]);
 
-	packet = read_packet(client_socket);
+	packet = read_packet(conn->target_socket);
+	write_packet(conn->client_socket, packet);
+
+	packet = read_packet(conn->client_socket);
 	// extract client capabilities
 	int start = 0;
 	start += 4; // skipping 4 byte header
@@ -80,18 +87,18 @@ int MySQLHandshake(Socket *client_socket, Socket *target_socket, EXECUTION_CONTE
 		LOG_ERROR("error during handshake. Unsupported protocol version")
 		return -1;
 	}
-	if (capabilities & CLIENT_SSL) {
-		LOG_INFO("SSL enabled. Switching to passthrough mode")
-		target_socket->SendBytes((char *)packet.c_str(), packet.size());
-		(*exec_context)["ssl_enabled"] = true;
-		return 0;
-	}
-	(*exec_context)["ssl_enabled"] = false;
+	write_packet(conn->target_socket, packet);
 	(*exec_context)["capabilities"] = capabilities;
-	target_socket->SendBytes((char *)packet.c_str(), packet.size());
+	if (capabilities & CLIENT_SSL) {
+		LOG_INFO("SSL enabled")
+		conn->client_socket = new SSLSocket((conn->client_socket)->GetSocket());
+		conn->target_socket = new CClientSSLSocket((conn->target_socket)->GetSocket(), ipaddress, port);
+		packet = read_packet(conn->client_socket);
+		write_packet(conn->target_socket, packet);
+	}
 
-	packet = read_packet(target_socket);
-	client_socket->SendBytes((char *)packet.c_str(), packet.size());
+	packet = read_packet(conn->target_socket);
+	write_packet(conn->client_socket, packet);
 
 	LOG_INFO("Handshake complete")
 	return 0;
@@ -118,109 +125,96 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
 	LOG_INFO("Resolved (Target) Host: " + target_endpoint.ipaddress);
 	LOG_INFO("Resolved (Target) Port: " + std::to_string(target_endpoint.port));
 
-	Socket *client_socket = (Socket *)clientData.client_socket;
-	CClientSocket *target_socket = new CClientSocket(target_endpoint.ipaddress, target_endpoint.port);
+	Connection conn = {
+		.client_socket = (Socket *)clientData.client_socket,
+		.target_socket = new CClientSocket(target_endpoint.ipaddress, target_endpoint.port),
+	};
 
 	EXECUTION_CONTEXT exec_context;
 	exec_context["target_host"] = target_endpoint.ipaddress + ":" + std::to_string(target_endpoint.port);
+	exec_context["target_ipaddress"] = target_endpoint.ipaddress;
+	exec_context["target_port"] = target_endpoint.port;
 
 	std::string correlation_id;
-	bool data_sent = false;
 
-	ProtocolHelper::SetReadTimeOut(client_socket->GetSocket(), 1);
-	ProtocolHelper::SetKeepAlive(client_socket->GetSocket(), 1);
-	ProtocolHelper::SetReadTimeOut(target_socket->GetSocket(), 1);
-	ProtocolHelper::SetKeepAlive(target_socket->GetSocket(), 1);
+	ProtocolHelper::SetReadTimeOut(conn.client_socket->GetSocket(), 1);
+	ProtocolHelper::SetKeepAlive(conn.client_socket->GetSocket(), 1);
+	ProtocolHelper::SetReadTimeOut(conn.target_socket->GetSocket(), 1);
+	ProtocolHelper::SetKeepAlive(conn.target_socket->GetSocket(), 1);
 
-	bool still_connected = true;
+	bool has_error = false;
 	try {
 		// Perform the mysql protocol handshake
-		if (MySQLHandshake(client_socket, target_socket, &exec_context) != 0) {
-			still_connected = false;
+		if (MySQLHandshake(&conn, &exec_context) != 0) {
+			has_error = true;
 			LOG_ERROR("error occurred during handshake");
 		}
 	} catch (std::exception &e) {
-		still_connected = false;
+		has_error = true;
 		LOG_ERROR(e.what());
 		LOG_ERROR("error occurred during handshake");
 	}
 
-	bool ssl_enabled = std::any_cast<bool>(exec_context["ssl_enabled"]);
-
-	while (still_connected) {
+	while (!has_error) {
 		SocketSelect *sel;
 		try {
-			sel = new SocketSelect(client_socket, target_socket, NonBlockingSocket);
+			sel = new SocketSelect(conn.client_socket, conn.target_socket, NonBlockingSocket);
 		} catch (std::exception &e) {
 			LOG_ERROR(e.what());
 			LOG_ERROR("error occurred while creating socket select ");
 		}
 
 		try {
-			if (sel->Readable(client_socket)) {
+			if (sel->Readable(conn.client_socket)) {
 				LOG_INFO("client socket is readable, reading bytes : ");
-				std::string bytes = client_socket->ReceiveBytes();
+				std::string bytes = conn.client_socket->ReceiveBytes();
 
 				if (!bytes.empty()) {
 					for (const std::string packet : extract_packets(bytes, bytes.length())) {
 						LOG_INFO("Calling Proxy Upstream Handler..");
-						std::string response = "";
-						if (!ssl_enabled) {
-							// packets can be read only if ssl is disabled
-							response = proxy_handler->HandleUpstreamData(packet, packet.size(), &exec_context);
-						} else {
-							response = bytes;
-						}
-						target_socket->SendBytes((char *)response.c_str(), response.size());
+						std::string response = proxy_handler->HandleUpstreamData(packet, packet.size(), &exec_context);
+						conn.target_socket->SendBytes((char *)response.c_str(), response.size());
 					}
 				}
 
 				if (bytes.empty())
-					still_connected = false;
+					has_error = true;
 			}
 		} catch (std::exception &e) {
 			LOG_ERROR("Error while sending to target " + std::string(e.what()));
-			still_connected = false;
+			has_error = true;
 		}
 
 		try {
-			if (sel->Readable(target_socket)) {
+			if (sel->Readable(conn.target_socket)) {
 				LOG_INFO("target socket is readable, reading bytes : ");
-				std::string bytes = target_socket->ReceiveBytes();
+				std::string bytes = conn.target_socket->ReceiveBytes();
 
 				if (!bytes.empty()) {
 					LOG_INFO("Calling Proxy Downstream Handler..");
-					std::string response = "";
-					if (!ssl_enabled) {
-						// packets can be read only if ssl is disabled
-						response = proxy_handler->HandleDownStreamData(bytes, bytes.size(), &exec_context);
-					} else {
-						response = bytes;
-					}
-					client_socket->SendBytes((char *)response.c_str(), response.size());
+					std::string response = proxy_handler->HandleDownStreamData(bytes, bytes.size(), &exec_context);
+					conn.client_socket->SendBytes((char *)response.c_str(), response.size());
 				}
 
 				if (bytes.empty())
-					still_connected = false;
+					has_error = true;
 			}
 		} catch (std::exception &e) {
 			LOG_ERROR("Error while sending to client " + std::string(e.what()));
-			still_connected = false;
+			has_error = true;
 		}
 
-		if (!still_connected) {
+		if (has_error) {
 			// Delete Select from memory
 			delete sel;
 		}
 	}
 
 	// Close the client socket
-	client_socket->Close();
-	delete client_socket;
+	delete conn.client_socket;
 
 	// Close the server socket
-	target_socket->Close();
-	delete target_socket;
+	delete conn.target_socket;
 
 	LOG_INFO("MySQLPipeline::end");
 #ifdef WINDOWS_OS
