@@ -65,7 +65,6 @@ std::vector<std::string> extract_packets(std::string buffer, ssize_t buffer_leng
  * @param[in]  exec_context   execution context
  * @return status whether the handshake was successful. (0 = success)
  */
-// int MySQLHandshake(Socket **client_socket, Socket **target_socket, EXECUTION_CONTEXT *exec_context) {
 int MySQLHandshake(Connection *conn, EXECUTION_CONTEXT *exec_context) {
 	std::string packet = "";
 
