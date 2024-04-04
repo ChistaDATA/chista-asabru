@@ -23,7 +23,9 @@ RUN apt-get install -y \
     intltool \
     autoconf \
     m4 \
-    libssl-dev
+    libssl-dev \
+    libreadline8 \
+    libreadline-dev
 
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash
 RUN apt-get install -y nodejs
@@ -58,8 +60,9 @@ RUN apt-get update -y \
 RUN apt-get install -y \
     intltool \
     autoconf \
-    m4
-
+    m4 \
+    libreadline8 \
+    libreadline-dev
 
 RUN mkdir -p /opt/bin
 RUN ln -s /usr/bin/curl /opt/bin/curl
