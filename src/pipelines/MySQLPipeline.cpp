@@ -115,7 +115,7 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
 	// Check if handler is defined
 	CProxyHandler *proxy_handler = ptr->GetHandler();
 	if (proxy_handler == nullptr) {
-		std::cout << "The handler is not defined. Exiting!" << std::endl;
+		LOG_ERROR("The handler is not defined. Exiting!")
 		return nullptr;
 	}
 
@@ -136,6 +136,8 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
 	exec_context["target_port"] = target_endpoint.port;
 
 	std::string correlation_id;
+	std::chrono::time_point start_time = std::chrono::high_resolution_clock::now();
+	bool latency_logged = true;
 
 	ProtocolHelper::SetReadTimeOut(conn.client_socket->GetSocket(), 1);
 	ProtocolHelper::SetKeepAlive(conn.client_socket->GetSocket(), 1);
@@ -170,6 +172,13 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
 				std::string bytes = conn.client_socket->ReceiveBytes();
 
 				if (!bytes.empty()) {
+					if (latency_logged) {
+						correlation_id = UuidGenerator::generateUuid();
+						LOG_INFO("Correlation ID : " + correlation_id);
+						exec_context["correlation_id"] = correlation_id;
+						latency_logged = false;
+					}
+					start_time = std::chrono::high_resolution_clock::now();
 					for (const std::string packet : extract_packets(bytes, bytes.length())) {
 						LOG_INFO("Calling Proxy Upstream Handler..");
 						std::string response = proxy_handler->HandleUpstreamData(packet, packet.size(), &exec_context);
@@ -191,6 +200,13 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
 				std::string bytes = conn.target_socket->ReceiveBytes();
 
 				if (!bytes.empty()) {
+					if (!latency_logged) {
+						auto stop_time = std::chrono::high_resolution_clock::now();
+						auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop_time - start_time);
+						LOG_LATENCY(correlation_id, std::to_string(duration.count()) + "," + target_endpoint.ipaddress + ":" +
+														std::to_string(target_endpoint.port));
+						latency_logged = true;
+					}
 					LOG_INFO("Calling Proxy Downstream Handler..");
 					std::string response = proxy_handler->HandleDownStreamData(bytes, bytes.size(), &exec_context);
 					conn.client_socket->SendBytes((char *)response.c_str(), response.size());
