@@ -21,7 +21,7 @@
  * @param[in]  socket  the socket to read from
  * @return buffer the buffer with packet bytes
  */
-std::string read_packet(Socket *socket) {
+static std::string read_packet(Socket *socket) {
 	// MySQL packet header is 4 bytes
 	char header[4];
 	socket->RecvBlocking(header, 4);
@@ -36,7 +36,7 @@ std::string read_packet(Socket *socket) {
 	return buffer;
 }
 
-void write_packet(Socket *socket, std::string packet) { socket->SendBytes((char *)packet.c_str(), packet.size()); }
+static void write_packet(Socket *socket, std::string packet) { socket->SendBytes((char *)packet.c_str(), packet.size()); }
 
 /** @brief Extract packets from buffer
  *
@@ -46,7 +46,7 @@ void write_packet(Socket *socket, std::string packet) { socket->SendBytes((char 
  * @param[in]  buffer_length  length of the buffer
  * @return packets vector of packets
  */
-std::vector<std::string> extract_packets(std::string buffer, ssize_t buffer_length) {
+static std::vector<std::string> extract_packets(std::string buffer, ssize_t buffer_length) {
 	std::vector<std::string> packets;
 	int pos = 0;
 	while (pos < buffer_length) {
