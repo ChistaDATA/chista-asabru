@@ -68,9 +68,6 @@ static std::vector<std::string> extract_packets(std::string buffer, ssize_t buff
 int MySQLHandshake(Connection *conn, EXECUTION_CONTEXT *exec_context) {
 	std::string packet = "";
 
-	std::string ipaddress = std::any_cast<std::string>((*exec_context)["target_ipaddress"]);
-	int port = std::any_cast<int>((*exec_context)["target_port"]);
-
 	packet = read_packet(conn->target_socket);
 	write_packet(conn->client_socket, packet);
 
@@ -91,7 +88,7 @@ int MySQLHandshake(Connection *conn, EXECUTION_CONTEXT *exec_context) {
 	if (capabilities & CLIENT_SSL) {
 		LOG_INFO("SSL enabled")
 		conn->client_socket = new SSLSocket((conn->client_socket)->GetSocket());
-		conn->target_socket = new CClientSSLSocket((conn->target_socket)->GetSocket(), ipaddress, port);
+		conn->target_socket = new CClientSSLSocket((conn->target_socket)->GetSocket(), conn->target_address, conn->target_port);
 		packet = read_packet(conn->client_socket);
 		write_packet(conn->target_socket, packet);
 	}
@@ -127,12 +124,15 @@ void *MySQLPipeline(CProxySocket *ptr, void *lptr) {
 	auto original_client_socket = (Socket *)clientData.client_socket;
 	auto original_target_socket = new CClientSocket(target_endpoint.ipaddress, target_endpoint.port);
 
-	Connection conn = {.client_socket = original_client_socket, .target_socket = original_target_socket};
+	Connection conn = {
+		.client_socket = original_client_socket,
+		.target_socket = original_target_socket,
+		.target_address = target_endpoint.ipaddress,
+		.target_port = target_endpoint.port,
+	};
 
 	EXECUTION_CONTEXT exec_context;
 	exec_context["target_host"] = target_endpoint.ipaddress + ":" + std::to_string(target_endpoint.port);
-	exec_context["target_ipaddress"] = target_endpoint.ipaddress;
-	exec_context["target_port"] = target_endpoint.port;
 
 	std::string correlation_id;
 	std::chrono::time_point start_time = std::chrono::high_resolution_clock::now();
