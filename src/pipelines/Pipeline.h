@@ -28,6 +28,8 @@ typedef struct {
 typedef struct {
 	Socket *client_socket;
 	Socket *target_socket;
+	std::string target_address;
+	int target_port;
 } Connection;
 
 #endif
