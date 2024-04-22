@@ -1,13 +1,13 @@
 #ifndef PIPELINE_DOT_H
 #define PIPELINE_DOT_H
 
-#include "CClientSocket.h"
-#include "CProtocolSocket.h"
-#include "CProxySocket.h"
-#include "CServerSocket.h"
-#include "LibuvProxySocket.h"
+#include "socket/CClientSocket.h"
+#include "interface/CProtocolSocket.h"
+#include "interface/CProxySocket.h"
+#include "socket/CServerSocket.h"
+#include "interface/LibuvProxySocket.h"
 #include "ProtocolHelper.h"
-#include "Socket.h"
+#include "socket/Socket.h"
 
 void *ClickHousePipeline(CProxySocket *ptr, void *lptr);
 void *ClickHouseLibuvPipeline(LibuvProxySocket *ptr, void *lptr);

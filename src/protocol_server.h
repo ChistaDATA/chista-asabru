@@ -3,7 +3,7 @@
 #include "CommandDispatcher.h"
 #include "proxy_server.h"
 #include "protocol-handlers/CHttpProtocolHandler.h"
-#include "CProtocolSocket.h"
+#include "interface/CProtocolSocket.h"
 #include "config/ConfigSingleton.h"
 
 std::string updateConfiguration(std::string content) {

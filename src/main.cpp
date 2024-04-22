@@ -1,6 +1,6 @@
 #include "main.h"
-#include "Logger.h"
-#include "ThreadPoolSingleton.h"
+#include "logger/Logger.h"
+#include "util/ThreadPoolSingleton.h"
 
 /**
  * Database Proxy main function

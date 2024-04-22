@@ -1,9 +1,9 @@
 #pragma once
 #include <map>
-#include "config_types.h"
-#include "RoundRobinStrategy.h"
-#include "RandomStrategy.h"
-#include "WeightedRoundRobinStrategy.h"
+#include "config/config_types.h"
+#include "load_balancer/RoundRobinStrategy.h"
+#include "load_balancer/RandomStrategy.h"
+#include "load_balancer/WeightedRoundRobinStrategy.h"
 
 typedef std::map<std::string, LoadBalancerStrategy<RESOLVED_SERVICE> *> LoadBalancerStrategyMap;
 

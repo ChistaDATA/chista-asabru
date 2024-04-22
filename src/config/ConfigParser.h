@@ -1,6 +1,6 @@
 #pragma once
 #include "tinyxml2.h"
-#include "Logger.h"
+#include "logger/Logger.h"
 #include "CommonTypes.h"
 #include "ConfigTypes.h"
 

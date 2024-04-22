@@ -1,10 +1,10 @@
-#include "CProtocolSocket.h"
-#include "CProxySocket.h"
-#include "CClientSocket.h"
-#include "Socket.h"
-#include "SSLSocket.h"
-#include "SocketSelect.h"
-#include "Logger.h"
+#include "interface/CProtocolSocket.h"
+#include "interface/CProxySocket.h"
+#include "socket/CClientSocket.h"
+#include "socket/Socket.h"
+#include "socket/SSLSocket.h"
+#include "socket/SocketSelect.h"
+#include "logger/Logger.h"
 #include <utility>
 
 /**

@@ -1,7 +1,7 @@
 #include "ConfigSingleton.h"
 #include "Utils.h"
 #include "CommandDispatcher.h"
-#include "Logger.h"
+#include "logger/Logger.h"
 
 /**
  * Function to load the config.xml file from a URL

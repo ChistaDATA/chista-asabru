@@ -4,10 +4,10 @@
 
 #include <set>
 #include <dlfcn.h>
-#include "Socket.h"
-#include "CProxySocket.h"
-#include "CProtocolSocket.h"
-#include "LibuvProxySocket.h"
+#include "socket/Socket.h"
+#include "interface/CProxySocket.h"
+#include "interface/CProtocolSocket.h"
+#include "interface/LibuvProxySocket.h"
 #include "../pipelines/Pipeline.h"
 
 typedef std::map<std::string, PipelineFunction<CProtocolSocket>> ProtocolPipelineFunctionMap;

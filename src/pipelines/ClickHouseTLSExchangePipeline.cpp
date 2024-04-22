@@ -1,9 +1,9 @@
-#include "CProtocolSocket.h"
-#include "CProxySocket.h"
-#include "CClientSSLSocket.h"
-#include "SocketSelect.h"
+#include "interface/CProtocolSocket.h"
+#include "interface/CProxySocket.h"
+#include "socket/CClientSSLSocket.h"
+#include "socket/SocketSelect.h"
 #include "CHttpParser.h"
-#include "Logger.h"
+#include "logger/Logger.h"
 #include <utility>
 #include "uuid/UuidGenerator.h"
 

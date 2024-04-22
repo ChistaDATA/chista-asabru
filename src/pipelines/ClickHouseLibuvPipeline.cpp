@@ -2,7 +2,7 @@
 // Created by Midhun Darvin on 20/10/23.
 //
 
-#include "CProtocolSocket.h"
+#include "interface/CProtocolSocket.h"
 #include "Pipeline.h"
 
 namespace clickhouse_pipeline {

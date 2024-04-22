@@ -2,10 +2,10 @@
 
 #include <vector>
 #include <string>
-#include "CProxySocket.h"
-#include "CProtocolSocket.h"
-#include "LoadBalancerStrategy.h"
-#include "AuthenticationStrategy.h"
+#include "interface/CProxySocket.h"
+#include "interface/CProtocolSocket.h"
+#include "load_balancer/LoadBalancerStrategy.h"
+#include "authentication/AuthenticationStrategy.h"
 
 typedef struct {
     int port;

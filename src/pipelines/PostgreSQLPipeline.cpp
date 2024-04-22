@@ -1,17 +1,18 @@
 #include "../config/ConfigSingleton.h"
-#include "CClientSSLSocket.h"
-#include "CClientSocket.h"
+#include "socket/CClientSSLSocket.h"
+#include "socket/CClientSocket.h"
 #include "CHttpParser.h"
-#include "CPostgreSQLHandler.h"
-#include "CProtocolSocket.h"
-#include "CProxySocket.h"
+#include "interface/CProtocolSocket.h"
+#include "interface/CProxySocket.h"
 #include "Pipeline.h"
 #include "ProtocolHelper.h"
-#include "Socket.h"
-#include "SocketSelect.h"
+#include "socket/Socket.h"
+#include "socket/SocketSelect.h"
 #include "uuid/UuidGenerator.h"
 #include <utility>
 
+#define RequestCodeSSL 80877103
+#define RequestCodeGSSENC 80877104
 /** @brief Reads specified number of bytes from socket
  *
  * Reads specified number of bytes from socket

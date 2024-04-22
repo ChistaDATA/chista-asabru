@@ -1,6 +1,6 @@
-#include "CProtocolSocket.h"
+#include "interface/CProtocolSocket.h"
 #include "../config/ConfigSingleton.h"
-#include "SocketSelect.h"
+#include "socket/SocketSelect.h"
 #include <utility>
 #include "Utils.h"
 #include "file_transfer/Payload.h"
