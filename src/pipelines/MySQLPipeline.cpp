@@ -1,19 +1,22 @@
 #include "../config/ConfigSingleton.h"
-#include "CClientSSLSocket.h"
-#include "CClientSocket.h"
+#include "socket/CClientSSLSocket.h"
+#include "socket/CClientSocket.h"
 #include "CHttpParser.h"
-#include "CMySQLHandler.h"
-#include "CProtocolSocket.h"
-#include "CProxySocket.h"
-#include "Logger.h"
+
+#include "interface/CProtocolSocket.h"
+#include "interface/CProxySocket.h"
+#include "logger/Logger.h"
 #include "Pipeline.h"
 #include "ProtocolHelper.h"
-#include "SSLSocket.h"
-#include "Socket.h"
-#include "SocketSelect.h"
+#include "socket/SSLSocket.h"
+#include "socket/Socket.h"
+#include "socket/SocketSelect.h"
 #include "uuid/UuidGenerator.h"
 #include <any>
 #include <string>
+
+#define CLIENT_PROTOCOL_41 1 << 9
+#define CLIENT_SSL 1 << 11
 
 /** @brief Reads a packet from the socket
  *

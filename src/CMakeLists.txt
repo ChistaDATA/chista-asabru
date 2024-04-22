@@ -16,6 +16,9 @@ add_definitions(-DCONFIG_FILE_URL= "$ENV{CONFIG_FILE_URL}")
 # Set DEBUG preprocessor flag
 add_compile_definitions(DEBUG)
 
+# add dependencies
+include(../cmake/CPM.cmake)
+
 # Find OpenSSL library
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL REQUIRED)
@@ -40,38 +43,65 @@ include_directories(${SQLite3_INCLUDE_DIRS})
 
 add_subdirectory(../lib/asabru-client/src ../lib/asabru-client)
 
-include_directories(../lib/tinyxml2)
-include_directories(../lib/stduuid/include)
-include_directories(../lib/jwt-cpp/include)
-include_directories(../lib/libuv/include)
-include_directories(../gzip-hpp/include)
-include_directories(../lib/asabru-parsers/src)
-include_directories(../lib/asabru-handlers/src)
-include_directories(../lib/nlohmann_json/single_include)
+if (ASABRU_COMMONS_BUILD STREQUAL "GIT_TAG")
+    CPMAddPackage(
+            NAME asabru_commons
+            GITHUB_REPOSITORY ChistaDATA/asabru-commons
+            GIT_TAG ${ASABRU_COMMONS_GIT_TAG}
+    )
+elseif (ASABRU_COMMONS_BUILD STREQUAL "LOCAL_DIR")
+    # For development purpose
+    CPMAddPackage(
+            NAME asabru_commons
+            SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../lib/asabru-commons/src
+    )
+else()
+    CPMAddPackage(
+            NAME asabru_commons
+            GITHUB_REPOSITORY ChistaDATA/asabru-commons
+            VERSION 0.0.2
+    )
+endif()
 
-MACRO(HEADER_DIRECTORIES search_path return_list)
-    FILE(GLOB_RECURSE new_list ${search_path})
-    SET(dir_list "")
-    FOREACH(file_path ${new_list})
-        GET_FILENAME_COMPONENT(dir_path ${file_path} PATH)
-        SET(dir_list ${dir_list} ${dir_path})
-    ENDFOREACH()
-    LIST(REMOVE_DUPLICATES dir_list)
-    SET(${return_list} ${dir_list})
-ENDMACRO()
+if (ASABRU_ENGINE_BUILD STREQUAL "GIT_TAG")
+    CPMAddPackage(
+            NAME asabru_engine
+            GITHUB_REPOSITORY ChistaDATA/asabru-engine
+            GIT_TAG ${ASABRU_ENGINE_GIT_TAG}
+    )
+elseif (ASABRU_ENGINE_BUILD STREQUAL "LOCAL_DIR")
+    # For development purpose
+    CPMAddPackage(
+            NAME asabru_engine
+            SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../lib/asabru-engine/src
+    )
+else()
+    CPMAddPackage(
+            NAME asabru_engine
+            GITHUB_REPOSITORY ChistaDATA/asabru-engine
+            VERSION 0.0.2
+    )
+endif()
 
-HEADER_DIRECTORIES("../lib/asabru-commons/*.h" header_dir_list)
-include_directories(${header_dir_list})
-HEADER_DIRECTORIES("../lib/asabru-engine/*.h" header_dir_list)
-include_directories(${header_dir_list})
-
-#For the shared library:
-set(PROJECT_LINK_LIBS
-        libtinyxml2.a
-        libasabru_commons.a
-        libasabru_parsers.a
-        libasabru_engine.a
-        )
+if (ASABRU_PARSERS_BUILD STREQUAL "GIT_TAG")
+    CPMAddPackage(
+            NAME asabru_parsers
+            GITHUB_REPOSITORY ChistaDATA/asabru-parsers
+            GIT_TAG ${ASABRU_PARSERS_GIT_TAG}
+    )
+elseif (ASABRU_PARSERS_BUILD STREQUAL "LOCAL_DIR")
+    # For development purpose
+    CPMAddPackage(
+            NAME asabru_parsers
+            SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../lib/asabru-parsers/src
+    )
+else()
+    CPMAddPackage(
+            NAME asabru_parsers
+            GITHUB_REPOSITORY ChistaDATA/asabru-parsers
+            VERSION 0.0.1
+    )
+endif()
 
 # Collect all source files
 file(GLOB_RECURSE PIPELINE_FILES "./pipelines/*.cpp")
@@ -94,10 +124,8 @@ target_link_libraries(
         OpenSSL::SSL
         ${Python_LIBRARIES}
         ${SQLite3_LIBRARIES}
-        ${CMAKE_SOURCE_DIR}/lib/tinyxml2/build/libtinyxml2.a
-        ${CMAKE_SOURCE_DIR}/lib/libuv/build/libuv.a
-        ${CMAKE_SOURCE_DIR}/lib/asabru-commons/build/lib/libasabru_commons.a
-        ${CMAKE_SOURCE_DIR}/lib/asabru-parsers/build/lib/libasabru_parsers.a
-        ${CMAKE_SOURCE_DIR}/lib/asabru-engine/build/lib/libasabru_engine.a
+        asabru_commons
+        asabru_engine
+        asabru_parsers
         ${CMAKE_DL_LIBS}
 )

@@ -1,8 +1,8 @@
 
-#include "CProtocolSocket.h"
-#include "CProxySocket.h"
+#include "interface/CProtocolSocket.h"
+#include "interface/CProxySocket.h"
 #include "../config/ConfigSingleton.h"
-#include "SocketSelect.h"
+#include "socket/SocketSelect.h"
 #include "Pipeline.h"
 #include <utility>
 #include "uuid/UuidGenerator.h"

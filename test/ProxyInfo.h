@@ -7,7 +7,7 @@
 #include <vector>
 #include <set>
 #include <cstring>
-#include "config_types.h"
+#include "config/config_types.h"
 #include "../src/config/ConfigTypes.h"
 
 ///////////////////////////////////////////////////

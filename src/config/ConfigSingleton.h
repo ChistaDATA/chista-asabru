@@ -7,11 +7,11 @@
 #include "tinyxml2.h"
 #include "CommonTypes.h"
 #include "ConfigTypes.h"
-#include "CProxyHandler.h"
+#include "interface/CProxyHandler.h"
 #include "PipelineFactory.h"
 #include "ConfigParser.h"
 #include "LoadBalancerFactory.h"
-#include "AuthenticationFactory.h"
+#include "authentication/AuthenticationFactory.h"
 
 using namespace tinyxml2;
 

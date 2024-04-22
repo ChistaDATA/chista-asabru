@@ -1,10 +1,10 @@
 
-#include "CProtocolSocket.h"
-#include "CProxySocket.h"
+#include "interface/CProtocolSocket.h"
+#include "interface/CProxySocket.h"
 #include "ProtocolHelper.h"
-#include "CClientSSLSocket.h"
+#include "socket/CClientSSLSocket.h"
 #include "Pipeline.h"
-#include "SocketSelect.h"
+#include "socket/SocketSelect.h"
 
 #include <openssl/bio.h>
 #include <openssl/ssl.h>

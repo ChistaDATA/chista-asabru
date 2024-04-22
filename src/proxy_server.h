@@ -2,8 +2,8 @@
 #include <string>
 #include <iostream>
 #include "config/ConfigSingleton.h"
-#include "CProxySocket.h"
-#include "LibuvServerSocket.h"
+#include "interface/CProxySocket.h"
+#include "libuv-socket/LibuvServerSocket.h"
 
 int updateProxyConfig(CProxySocket *socket, RESOLVED_PROXY_CONFIG configValue) {
     TARGET_ENDPOINT_CONFIG targetEndpointConfig = {

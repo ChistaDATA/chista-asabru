@@ -142,13 +142,18 @@ export NETWORK_LOGGER_PORT=5170
 [Fluent Bit](https://fluentbit.io/) is an open source network log processor. It can be started locally via the
 `docker compose up` command.
 
-##### Build the asabru app from  the root of the repository
+##### Build the asabru app from the root of the repository
 
 ```
 mkdir build
 cd build
 cmake ..
 make
+```
+
+To use local directory files , use the command 
+```
+cmake -DASABRU_COMMONS_BUILD=LOCAL_DIR -DASABRU_ENGINE_BUILD=LOCAL_DIR -DASABRU_PARSERS_BUILD=LOCAL_DIR ..
 ```
 
 ##### Build in Debug mode

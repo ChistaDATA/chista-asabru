@@ -5,7 +5,7 @@
 #include <set>
 #include <cstring>
 #include "ProxyInfo.h"
-#include "Logger.h"
+#include "logger/Logger.h"
 
 ///////////////////////////////////////////////
 //  Load Proxy map
