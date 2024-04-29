@@ -8,6 +8,103 @@
             <auth>
                 <strategy>basic</strategy>
                 <handler>HTTPBasicIsAuthenticatedCommand</handler>
+                <authorization>
+                    <strategy>afcas</strategy>
+                    <handler>HTTPAfcasIsAuthorizedCommand</handler>
+                    <data>
+                        <principals>
+                            <principal>
+                                <PrincipalType>User</PrincipalType>
+                                <Name>admin</Name>
+                                <Email>admin@localhost</Email>
+                                <DisplayName>Admin</DisplayName>
+                                <Description>Admin</Description>
+                                <DataSource>admin</DataSource>
+                            </principal>
+                        </principals>
+                        <operations>
+                            <operation>
+                                <Id>1</Id>
+                                <Name>login</Name>
+                                <Description>Login</Description>
+                            </operation>
+                            <operation>
+                                <Id>2</Id>
+                                <Name>logout</Name>
+                                <Description>Logout</Description>
+                            </operation>
+                            <operation>
+                                <Id>3</Id>
+                                <Name>update</Name>
+                                <Description>Update</Description>
+                            </operation>
+                            <operation>
+                                <Id>4</Id>
+                                <Name>upload</Name>
+                                <Description>Upload</Description>
+                            </operation>
+                            <operation>
+                                <Id>5</Id>
+                                <Name>python</Name>
+                                <Description>Python</Description>
+                            </operation>
+                        </operations>
+                        <resources>
+                            <resource>
+                                <Id>1</Id>
+                                <Name>auth</Name>
+                            </resource>
+                            <resource>
+                                <Id>2</Id>
+                                <Name>configuration</Name>
+                            </resource>
+                            <resource>
+                                <Id>3</Id>
+                                <Name>updateService</Name>
+                            </resource>
+                            <resource>
+                                <Id>4</Id>
+                                <Name>python</Name>
+                            </resource>
+                            <resource>
+                                <Id>5</Id>
+                                <Name>upload</Name>
+                            </resource>
+                        </resources>
+                        <predicates>
+                            <predicate>
+                                <resourceId>1</resourceId>
+                                <operationId>1</operationId>
+                                <principalName>admin</principalName>
+                                <predicateType>Grant</predicateType>
+                            </predicate>
+                            <predicate>
+                                <resourceId>1</resourceId>
+                                <operationId>2</operationId>
+                                <principalName>admin</principalName>
+                                <predicateType>Grant</predicateType>
+                            </predicate>
+                            <predicate>
+                                <resourceId>1</resourceId>
+                                <operationId>3</operationId>
+                                <principalName>admin</principalName>
+                                <predicateType>Grant</predicateType>
+                            </predicate>
+                            <predicate>
+                                <resourceId>1</resourceId>
+                                <operationId>4</operationId>
+                                <principalName>admin</principalName>
+                                <predicateType>Grant</predicateType>
+                            </predicate>
+                            <predicate>
+                                <resourceId>1</resourceId>
+                                <operationId>5</operationId>
+                                <principalName>admin</principalName>
+                                <predicateType>Grant</predicateType>
+                            </predicate>
+                        </predicates>
+                    </data>
+                </authorization>
             </auth>
             <routes>
                 <route>
@@ -22,6 +119,17 @@
                     <path>/auth/logout</path>
                     <method>POST</method>
                     <request_handler>HTTPBasicLogoutCommand</request_handler>
+                    <auth>
+                        <required>true</required>
+                        <authorization>
+                            <predicates>
+                                <predicate>
+                                    <resourceId>1</resourceId>
+                                    <operationId>1</operationId>
+                                </predicate>
+                            </predicates>
+                        </authorization>
+                    </auth>
                 </route>
                 <route>
                     <path>/configuration</path>

@@ -20,7 +20,8 @@ std::string updateEndPointService(std::string content) {
 
 int startProtocolServer(
         CProtocolSocket *socket,
-        RESOLVED_PROTOCOL_CONFIG configValue) {
+        RESOLVED_PROTOCOL_CONFIG configValue,
+        CProtocolHandler * protocolHandler) {
     // Create protocol
     std::string protocolName = configValue.protocol_name;
 
@@ -30,7 +31,8 @@ int startProtocolServer(
         LOG_ERROR("Failed to set " + protocolName + " Pipeline ..!");
         return -2;
     }
-    auto *protocolHandler = (CProtocolHandler *) configValue.handler;
+    // TEMP FIX, pass the protocol handler to the socket
+    // auto *protocolHandler = (CProtocolHandler *) configValue.handler;
     if (protocolHandler) {
         if (!(*socket).SetHandler(protocolHandler)) {
             LOG_ERROR("Failed to set " + protocolName + " Handler ..!");
@@ -48,8 +50,11 @@ int startProtocolServer(
 
 int initProtocolServers() {
     std::vector<RESOLVED_PROTOCOL_CONFIG> protocolServerConfigValues = configSingleton.ResolveProtocolServerConfigurations();
+            CHttpProtocolHandler *protocolHandler = nullptr;
+            protocolHandler = new CHttpProtocolHandler();
     for (const auto& value: protocolServerConfigValues) {
-        auto protocolHandler = (CHttpProtocolHandler *) value.handler;
+        // TEMP FIX, using the same protocol handler for all protocols
+        // auto protocolHandler = (CHttpProtocolHandler *) value.handler;
         if (protocolHandler) {
             for (const auto& route: value.routes) {
                 protocolHandler->RegisterHttpRequestHandler(
@@ -65,17 +70,31 @@ int initProtocolServers() {
                             context.Put("request", &request);
                             context.Put("update_configuration", updateConfiguration);
                             context.Put("update_endpoint_service",updateEndPointService);
-                            context.Put("authentication", value.auth->strategy);
+                            context.Put(AUTHENTICATION_KEY, value.auth->strategy);
 
                             if (route.auth.required) {
                                 LOG_INFO("Authenticating request :");
                                 CommandDispatcher::Dispatch(value.auth->handler, &context);
-                                if (!std::any_cast<bool>(context.Get("authenticated")))
+                                if (!std::any_cast<bool>(context.Get(AUTH_AUTHENTICATED_KEY)))
                                 {
                                     auto *response = new simple_http_server::HttpResponse(simple_http_server::HttpStatusCode::Unauthorized);
                                     response->SetHeader("Content-Type", "application/json");
                                     response->SetContent("Unauthorized");
                                     return *response;
+                                }
+
+                                if (route.auth.authorization != "") {
+                                    LOG_INFO("Authorizing request :");
+                                    context.Put(AUTHORIZATION_DATA_KEY, route.auth.authorization);
+                                    context.Put(AUTHORIZATION_KEY, value.auth->authorization->strategy);
+                                    CommandDispatcher::Dispatch(value.auth->authorization->handler, &context);
+                                    if (!std::any_cast<bool>(context.Get(AUTHORIZATION_AUTHORIZED_KEY)))
+                                    {
+                                        auto *response = new simple_http_server::HttpResponse(simple_http_server::HttpStatusCode::Forbidden);
+                                        response->SetHeader("Content-Type", "application/json");
+                                        response->SetContent("Forbidden");
+                                        return *response;
+                                    }
                                 }
                             }
 
@@ -90,7 +109,8 @@ int initProtocolServers() {
         configSingleton.protocolSocketsMap[value.protocol_name] = new CProtocolSocket(value.protocol_port);
         int protocolServer = startProtocolServer(
                 configSingleton.protocolSocketsMap[value.protocol_name],
-                value);
+                value,
+                protocolHandler);
         if (protocolServer < 0)
             return protocolServer;
     }

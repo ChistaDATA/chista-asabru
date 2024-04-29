@@ -6,6 +6,7 @@
 #include "interface/CProtocolSocket.h"
 #include "load_balancer/LoadBalancerStrategy.h"
 #include "authentication/AuthenticationStrategy.h"
+#include "authorization/AuthorizationStrategy.h"
 
 typedef struct {
     int port;
@@ -37,6 +38,7 @@ typedef struct {
 
 typedef struct {
     bool required;
+    std::string authorization;
 } ROUTE_AUTH_CONFIG;
 
 typedef struct {
@@ -45,9 +47,16 @@ typedef struct {
     std::string request_handler;
     ROUTE_AUTH_CONFIG auth;
 } Route;
+
 typedef struct {
     std::string strategy;
     std::string handler;
+    std::string data;
+} AUTHORIZATION_CONFIG;
+typedef struct {
+    std::string strategy;
+    std::string handler;
+    AUTHORIZATION_CONFIG *authorization;
 } AUTH_CONFIG;
 
 typedef struct {
@@ -60,8 +69,14 @@ typedef struct {
 } PROTOCOL_SERVER_CONFIG;
 
 typedef struct {
+    AuthorizationStrategy *strategy;
+    std::string handler;
+} RESOLVED_PROTOCOL_AUTHORIZATION_CONFIG;
+
+typedef struct {
     AuthenticationStrategy *strategy;
     std::string handler;
+    RESOLVED_PROTOCOL_AUTHORIZATION_CONFIG *authorization;
 } RESOLVED_PROTOCOL_AUTH_CONFIG;
 
 typedef struct {

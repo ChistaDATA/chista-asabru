@@ -12,6 +12,7 @@
 #include "ConfigParser.h"
 #include "LoadBalancerFactory.h"
 #include "authentication/AuthenticationFactory.h"
+#include "authorization/AuthorizationFactory.h"
 
 using namespace tinyxml2;
 
@@ -66,6 +67,7 @@ public:
     ProtocolSocketsMap protocolSocketsMap;
 
     AuthenticationFactory *authenticationFactory = new AuthenticationFactory();
+    AuthorizationFactory *authorizationFactory = new AuthorizationFactory();
 };
 
 static ConfigSingleton &configSingleton = ConfigSingleton::getInstance();
