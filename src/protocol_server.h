@@ -70,7 +70,7 @@ int initProtocolServers() {
                             context.Put("request", &request);
                             context.Put("update_configuration", updateConfiguration);
                             context.Put("update_endpoint_service",updateEndPointService);
-                            context.Put(AUTHENTICATION_KEY, value.auth->strategy);
+                            context.Put(AUTHENTICATION_STRATEGY_KEY, value.auth->strategy);
 
                             if (route.auth.required) {
                                 LOG_INFO("Authenticating request :");
@@ -86,7 +86,7 @@ int initProtocolServers() {
                                 if (route.auth.authorization != "") {
                                     LOG_INFO("Authorizing request :");
                                     context.Put(AUTHORIZATION_DATA_KEY, route.auth.authorization);
-                                    context.Put(AUTHORIZATION_KEY, value.auth->authorization->strategy);
+                                    context.Put(AUTHORIZATION_STRATEGY_KEY, value.auth->authorization->strategy);
                                     CommandDispatcher::Dispatch(value.auth->authorization->handler, &context);
                                     if (!std::any_cast<bool>(context.Get(AUTHORIZATION_AUTHORIZED_KEY)))
                                     {
