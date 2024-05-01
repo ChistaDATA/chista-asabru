@@ -85,7 +85,8 @@ std::vector<RESOLVED_PROXY_CONFIG> ConfigSingleton::ResolveProxyServerConfigurat
 
             // Resolve the Pipeline
             result.pipelineName = endpoint.pipeline;
-            result.pipeline = pipelineFactory->GetProxyPipeline(endpoint.pipeline);
+			pipelineFactory->registerPipeline<CProxySocket>(endpoint.pipeline);
+            result.pipeline = pipelineFactory->GetPipeline<CProxySocket>(endpoint.pipeline);
 
             // Resolve the Handler class
             CommandDispatcher::RegisterCommand<BaseHandler>(endpoint.handler);
@@ -105,7 +106,8 @@ std::vector<RESOLVED_PROTOCOL_CONFIG> ConfigSingleton::ResolveProtocolServerConf
         result.protocol_name = protocol_server.protocol_name;
         result.protocol_port = protocol_server.protocol_port;
         // Resolve the Pipeline
-        result.pipeline = pipelineFactory->GetProtocolPipeline(protocol_server.pipeline);
+		pipelineFactory->registerPipeline<CProtocolSocket>(protocol_server.pipeline);
+        result.pipeline = pipelineFactory->GetPipeline<CProtocolSocket>(protocol_server.pipeline);
         // Resolve the Handler class
         CommandDispatcher::RegisterCommand<BaseHandler>(protocol_server.handler);
         result.handler = CommandDispatcher::GetCommand<BaseHandler>(protocol_server.handler);

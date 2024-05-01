@@ -1,14 +1,29 @@
 #include "PipelineFactory.h"
 
-PipelineFunction<CProtocolSocket> PipelineFactory::GetProtocolPipeline(const std::string &pipelineName) {
-    return protocolPipelineFunctionMap[pipelineName];
-};
+void PipelineFactory::updateLibs() {
+	if (!std::getenv("PLUGINS_FOLDER_PATH")) {
+		throw std::runtime_error("PLUGINS_FOLDER_PATH environment variable is missing");
+	}
+	LOG_INFO("Checking for new libraries :");
+	std::string pluginsFolderPath = std::getenv("PLUGINS_FOLDER_PATH");
 
-PipelineFunction<CProxySocket> PipelineFactory::GetProxyPipeline(const std::string &pipelineName) {
-    return proxyPipelineFunctionMap[pipelineName];
+#if __APPLE__
+	const std::string libGlob(pluginsFolderPath + "/*.dylib");
+#else
+	const std::string libGlob(pluginsFolderPath + "/*.so");
+#endif
 
-};
+	std::vector<std::string> filenames = globothy(libGlob);
 
-PipelineFunction<LibuvProxySocket> PipelineFactory::GetLibuvProxyPipeline(const std::string &pipelineName) {
-    return libuvProxyPipelineFunctionMap[pipelineName];
+	size_t before = libNames.size();
+
+	for (std::string plugin : filenames) {
+		libNames.insert(plugin);
+	}
+	size_t after = libNames.size();
+
+	if (after - before > 0) {
+		LOG_INFO("Found " + std::to_string(after - before) + " new plugins");
+	}
 }
+

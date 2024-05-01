@@ -81,13 +81,13 @@
                 <END_POINT name="ch_wire_node1">
                     <READ_WRITE>yes</READ_WRITE>
                     <PROXY_PORT>9100</PROXY_PORT>
-                    <PIPELINE>ClickHouseTLSExchangePipeline</PIPELINE>
+                    <PIPELINE>ClickHousePipeline</PIPELINE>
                     <HANDLER>CHWirePTHandler</HANDLER>
                     <PROTOCOL>CH_WIRE</PROTOCOL>
                     <SERVICES>
                         <SERVICE name="ch_wire_service1" weight="2">
                             <HOST>localhost</HOST>
-                            <PORT>9440</PORT>
+                            <PORT>9000</PORT>
                         </SERVICE>
                     </SERVICES>
                 </END_POINT>
@@ -95,12 +95,12 @@
                     <READ_WRITE>yes</READ_WRITE>
                     <PROXY_PORT>9110</PROXY_PORT>
                     <PROTOCOL>CH_HTTP</PROTOCOL>
-                    <PIPELINE>ClickHouseTLSExchangePipeline</PIPELINE>
+                    <PIPELINE>DefaultProxyPipeline</PIPELINE>
                     <HANDLER>CSnowflakeHttpHandler</HANDLER>
                     <SERVICES>
                         <SERVICE name="ch_http_service1">
-                            <HOST>ip24827.ap-southeast-1.snowflakecomputing.com</HOST>
-                            <PORT>443</PORT>
+                            <HOST>localhost</HOST>
+                            <PORT>8123</PORT>
                         </SERVICE>
                     </SERVICES>
                 </END_POINT>
@@ -184,7 +184,6 @@
                 <!--				</END_POINT>-->
             </END_POINTS>
         </CLUSTER>
-
         <!--		<CLUSTER name ="cluster2">-->
         <!--			<END_POINTS>-->
         <!--				<END_POINT name="pg_wire_node1">-->

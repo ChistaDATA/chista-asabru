@@ -2,13 +2,14 @@
 #include <string>
 #include <unordered_map>
 
-#include <set>
-#include <dlfcn.h>
-#include "socket/Socket.h"
-#include "interface/CProxySocket.h"
 #include "interface/CProtocolSocket.h"
+#include "interface/CProxySocket.h"
 #include "interface/LibuvProxySocket.h"
-#include "../pipelines/Pipeline.h"
+#include "socket/Socket.h"
+#include <dlfcn.h>
+#include <set>
+#include "TypeFactory.h"
+#include <type_traits>
 
 typedef std::map<std::string, PipelineFunction<CProtocolSocket>> ProtocolPipelineFunctionMap;
 typedef std::map<std::string, PipelineFunction<CProxySocket>> ProxyPipelineFunctionMap;
@@ -20,24 +21,77 @@ private:
     ProtocolPipelineFunctionMap protocolPipelineFunctionMap;
     ProxyPipelineFunctionMap proxyPipelineFunctionMap;
     LibuvProxyPipelineFunctionMap libuvProxyPipelineFunctionMap;
+	std::set<std::string> libNames;
 public:
     PipelineFactory()
     {
-        // Create PipelineFunction mappings
-        proxyPipelineFunctionMap["ClickHousePipeline"] = ClickHousePipeline;
-        proxyPipelineFunctionMap["ClickHouseTLSStartPipeline"] = ClickHouseTLSStartPipeline;
-        proxyPipelineFunctionMap["ClickHouseTLSTerminatePipeline"] = ClickHouseTLSTerminatePipeline;
-        proxyPipelineFunctionMap["ClickHouseTLSExchangePipeline"] = ClickHouseTLSExchangePipeline;
-        proxyPipelineFunctionMap["PostgreSQLPipeline"] = PostgreSQLPipeline;
-        proxyPipelineFunctionMap["MySQLPipeline"] = MySQLPipeline;
-        proxyPipelineFunctionMap["PassthroughPipeline"] = PassthroughPipeline;
-
-        protocolPipelineFunctionMap["ProtocolPipeline"] = ProtocolPipeline;
-        protocolPipelineFunctionMap["CStreamPipeline"] = CStreamPipeline;
-
-        libuvProxyPipelineFunctionMap["ClickHouseLibuvPipeline"] = ClickHouseLibuvPipeline;
+		updateLibs();
     };
-    PipelineFunction<CProtocolSocket> GetProtocolPipeline(const std::string& pipelineName);
-    PipelineFunction<CProxySocket> GetProxyPipeline(const std::string& pipelineName);
-    PipelineFunction<LibuvProxySocket> GetLibuvProxyPipeline(const std::string& pipelineName);
+
+	void updateLibs();
+
+	template <typename T> PipelineFunction<T> GetPipeline(const std::string& pipelineName) {
+		if constexpr (std::is_same_v<T, CProxySocket>) {
+			// Get Proxy Pipeline
+			return proxyPipelineFunctionMap[pipelineName];
+		} else if constexpr (std::is_same_v<T, CProtocolSocket>)  {
+			// Get Protocol Pipeline
+			return protocolPipelineFunctionMap[pipelineName];
+		} else if constexpr (std::is_same_v<T, LibuvProxySocket>)  {
+			// Get Libuv Pipeline
+			return libuvProxyPipelineFunctionMap[pipelineName];
+		}
+	}
+	/**
+	 * Register Proxy Pipeline
+	 */
+	 template <class T>
+	 void registerPipeline(const std::string& pipelineName) {
+		 if (std::is_same<T, CProxySocket>::value) {
+			 // Load Proxy Pipelines
+			 loadPipeline<PipelineFunction<CProxySocket>>(pipelineName, proxyPipelineFunctionMap);
+		 } else if (std::is_same<T, CProtocolSocket>::value) {
+			 // Load Protocol Pipelines
+			 loadPipeline<PipelineFunction<CProtocolSocket>>(pipelineName, protocolPipelineFunctionMap);
+		 } else if (std::is_same<T, LibuvProxySocket>::value) {
+			 // Load Protocol Pipelines
+			 loadPipeline<PipelineFunction<LibuvProxySocket>>(pipelineName, libuvProxyPipelineFunctionMap);
+		 }
+	 }
+	/**
+	 * Loads the plugin into the program space
+	 */
+	template <class T> void loadPipeline(const std::string& pluginName, std::map<std::string, T> &functionMap) {
+		auto it = std::find_if(libNames.begin(), libNames.end(),
+							   [pluginName](const std::string &s) { return (s.find(pluginName) != std::string::npos); });
+		if (it == libNames.end()) {
+			throw std::runtime_error("Plugin is not available : " + pluginName);
+		}
+		std::string plugin = *it;
+		try {
+			std::pair<std::string, std::string> delibbed = libnameothy(plugin);
+			if (functionMap[delibbed.second] != nullptr) {
+				// Command already loaded
+				return;
+			}
+
+			void *dlhandle = dlopen(plugin.c_str(), RTLD_LAZY);
+
+			if (dlhandle == nullptr) {
+				printf("Error: %s\n", dlerror());
+				exit(1);
+			}
+
+			T pipelineFunc;
+
+			std::string cn = delibbed.second;
+			pipelineFunc = (T) dlsym(dlhandle, cn.c_str());
+
+			functionMap[delibbed.second] = pipelineFunc;
+
+		} catch (std::exception &e) {
+			LOG_ERROR(e.what());
+			LOG_ERROR("Error when trying to create dynamic pipeline instance")ß;
+		}
+	}
 };
