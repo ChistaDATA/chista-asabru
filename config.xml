@@ -10,7 +10,7 @@
                 <handler>HTTPBasicIsAuthenticatedCommand</handler>
                 <authorization>
                     <strategy>afcas</strategy>
-                    <handler>HTTPAfcasIsAuthorizedCommand</handler>
+                    <handler>IsAuthorizedCommand</handler>
                     <data>
                         <principals>
                             <principal>

@@ -1,8 +1,4 @@
 #include "ConfigParser.h"
-#include "afcas/Principal.h"
-#include "afcas/Resource.h"
-#include "afcas/Operation.h"
-#include "afcas/ResourceAccessPredicate.h"
 
 XMLError ConfigParser::ParseConfiguration(XMLDocument * xmlDoc, PROXY_CONFIG &m_ProxyConfig, std::vector<PROTOCOL_SERVER_CONFIG> &m_ProtocolConfig) {
     XMLNode *pRoot = xmlDoc->FirstChildElement("clickhouse-proxy-v2");
