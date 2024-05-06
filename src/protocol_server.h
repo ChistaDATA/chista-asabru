@@ -20,8 +20,7 @@ std::string updateEndPointService(std::string content) {
 
 int startProtocolServer(
         CProtocolSocket *socket,
-        RESOLVED_PROTOCOL_CONFIG configValue,
-        CProtocolHandler * protocolHandler) {
+        RESOLVED_PROTOCOL_CONFIG configValue) {
     // Create protocol
     std::string protocolName = configValue.protocol_name;
 
@@ -31,8 +30,7 @@ int startProtocolServer(
         LOG_ERROR("Failed to set " + protocolName + " Pipeline ..!");
         return -2;
     }
-    // TEMP FIX, pass the protocol handler to the socket
-    // auto *protocolHandler = (CProtocolHandler *) configValue.handler;
+    auto *protocolHandler = (CProtocolHandler *) configValue.handler;
     if (protocolHandler) {
         if (!(*socket).SetHandler(protocolHandler)) {
             LOG_ERROR("Failed to set " + protocolName + " Handler ..!");
@@ -50,11 +48,8 @@ int startProtocolServer(
 
 int initProtocolServers() {
     std::vector<RESOLVED_PROTOCOL_CONFIG> protocolServerConfigValues = configSingleton.ResolveProtocolServerConfigurations();
-            CHttpProtocolHandler *protocolHandler = nullptr;
-            protocolHandler = new CHttpProtocolHandler();
     for (const auto& value: protocolServerConfigValues) {
-        // TEMP FIX, using the same protocol handler for all protocols
-        // auto protocolHandler = (CHttpProtocolHandler *) value.handler;
+        auto protocolHandler = (CHttpProtocolHandler *) value.handler;
         if (protocolHandler) {
             for (const auto& route: value.routes) {
                 protocolHandler->RegisterHttpRequestHandler(
@@ -109,8 +104,7 @@ int initProtocolServers() {
         configSingleton.protocolSocketsMap[value.protocol_name] = new CProtocolSocket(value.protocol_port);
         int protocolServer = startProtocolServer(
                 configSingleton.protocolSocketsMap[value.protocol_name],
-                value,
-                protocolHandler);
+                value);
         if (protocolServer < 0)
             return protocolServer;
     }

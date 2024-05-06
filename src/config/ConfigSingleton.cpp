@@ -109,9 +109,8 @@ std::vector<RESOLVED_PROTOCOL_CONFIG> ConfigSingleton::ResolveProtocolServerConf
 		pipelineFactory->registerPipeline<CProtocolSocket>(protocol_server.pipeline);
         result.pipeline = pipelineFactory->GetPipeline<CProtocolSocket>(protocol_server.pipeline);
         // Resolve the Handler class
-        // TEMP FIX, using the same protocol handler for all protocols, removes plugins not exists error
-        // CommandDispatcher::RegisterCommand<BaseHandler>(protocol_server.handler);
-        // result.handler = CommandDispatcher::GetCommand<BaseHandler>(protocol_server.handler);
+        CommandDispatcher::RegisterCommand<BaseHandler>(protocol_server.handler);
+        result.handler = CommandDispatcher::GetCommand<BaseHandler>(protocol_server.handler);
 
         if (protocol_server.auth) {
             result.auth = new RESOLVED_PROTOCOL_AUTH_CONFIG();
