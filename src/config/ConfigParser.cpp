@@ -193,6 +193,31 @@ XMLError ConfigParser::LoadProtocolServerConfigurations(XMLNode *root, std::vect
             {
                 config.auth->handler = handlerElement->GetText();
             }
+
+            XMLElement *authorizationElement = authElement->FirstChildElement("authorization");
+            if (authorizationElement)
+            {
+                config.auth->authorization = new AUTHORIZATION_CONFIG();
+                XMLElement *strategyElement = authorizationElement->FirstChildElement("strategy");
+                if (NULL != strategyElement)
+                {
+                    config.auth->authorization->strategy = strategyElement->GetText();
+                }
+
+                XMLElement *handlerElement = authorizationElement->FirstChildElement("handler");
+                if (NULL != handlerElement)
+                {
+                    config.auth->authorization->handler = handlerElement->GetText();
+                }
+
+                XMLElement *dataElement = authorizationElement->FirstChildElement("data");
+                if (dataElement)
+                {
+                        XMLPrinter printer;
+                        dataElement->Accept(&printer);
+                        config.auth->authorization->data = printer.CStr();
+                }
+            }
         } else {
             config.auth = nullptr;
         }
@@ -246,6 +271,14 @@ XMLError ConfigParser::LoadProtocolServerConfigurations(XMLNode *root, std::vect
                             throw std::runtime_error("Invalid or undefined auth configuration ('" + requiredStr + "') for route: " + r.path);
                         }
                     }
+
+                        XMLElement *authorizationElement = authConfigElement->FirstChildElement("authorization");
+                        if (authorizationElement)
+                        {
+                            XMLPrinter printer;
+                            authorizationElement->Accept(&printer);
+                            r.auth.authorization = printer.CStr();
+                        }
                 }
 
                 routes.push_back(r);

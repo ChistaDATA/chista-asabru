@@ -41,7 +41,7 @@ include_directories(${Python_INCLUDE_DIRS})
 find_package (SQLite3 REQUIRED)
 include_directories(${SQLite3_INCLUDE_DIRS})
 
-add_subdirectory(../lib/asabru-client/src ../lib/asabru-client)
+#add_subdirectory(../lib/asabru-client/src ../lib/asabru-client)
 
 if (ASABRU_COMMONS_BUILD STREQUAL "GIT_TAG")
     CPMAddPackage(
@@ -59,7 +59,7 @@ else()
     CPMAddPackage(
             NAME asabru_commons
             GITHUB_REPOSITORY ChistaDATA/asabru-commons
-            VERSION 0.0.2
+            VERSION 0.0.3
     )
 endif()
 

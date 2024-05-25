@@ -46,7 +46,7 @@ This `chista-asabru` project consists of the following submodules :
 Clone the project using the following command. This will clone the submodules of the project and the external dependencies into the `lib` folder.
 ```
 git clone --recurse-submodules
-````
+```
 
 To initialize clickhouse cluster
 ```
@@ -114,6 +114,28 @@ variable
 ```
 export SSL_VERIFY_CERT=false
 ```
+
+Authentication
+* basic authentication
+
+    ```shell
+    export AUTH_BASIC_SECRET=secret
+    export AUTH_BASIC_USERNAME=admin
+    export AUTH_BASIC_PASSWORD=admin
+    export AUTH_BASIC_BLACKLIST_FILE_PATH=blacklist.txt
+    export AUTH_BASIC_EXPIRATION=3600
+    ```
+
+Authorization
+* afcas authorization
+
+    For afcas authorization, set the following environment variables
+    after running the afcas server at https://github.com/ChistaDATA/authorization-server
+
+    ```shell
+    export AFCAS_HOST=localhost
+    export AFCAS_PORT=3333
+    ```
 
 **Logging**
 

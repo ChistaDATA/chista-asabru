@@ -116,6 +116,16 @@ std::vector<RESOLVED_PROTOCOL_CONFIG> ConfigSingleton::ResolveProtocolServerConf
             result.auth = new RESOLVED_PROTOCOL_AUTH_CONFIG();
             result.auth->strategy = authenticationFactory->createAuthenticationStrategy(protocol_server.auth->strategy);
             result.auth->handler = protocol_server.auth->handler;
+            if (protocol_server.auth->authorization) {
+                result.auth->authorization = new RESOLVED_PROTOCOL_AUTHORIZATION_CONFIG();
+                ComputationContext context;
+                context.Put(AUTHORIZATION_TYPE_KEY, protocol_server.auth->authorization->strategy);
+                context.Put(AUTHORIZATION_DATA_KEY, protocol_server.auth->authorization->data);
+                result.auth->authorization->strategy = authorizationFactory->createAuthorizationStrategy(&context);
+                result.auth->authorization->handler = protocol_server.auth->authorization->handler;
+            } else {
+                result.auth->authorization = nullptr;
+            }
         } else {
             result.auth = nullptr;
         }
