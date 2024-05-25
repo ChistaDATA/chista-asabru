@@ -91,7 +91,7 @@ public:
 
 		} catch (std::exception &e) {
 			LOG_ERROR(e.what());
-			LOG_ERROR("Error when trying to create dynamic pipeline instance")ß;
+			LOG_ERROR("Error when trying to create dynamic pipeline instance");
 		}
 	}
 };
