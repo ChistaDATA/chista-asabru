@@ -6,11 +6,11 @@ root_dir=$(pwd)
 list_of_directories=(
   ./lib/tinyxml2
   ./lib/libuv
-  ./lib/asabru-commons
-  ./lib/asabru-engine
-  ./lib/asabru-parsers
+#  ./lib/asabru-commons
+#  ./lib/asabru-engine
+#  ./lib/asabru-parsers
   ./lib/asabru-handlers
-  ./lib/asabru-client
+#  ./lib/asabru-client
   ./lib/asabru-ui
 )
 # For each subdirectory
@@ -19,13 +19,13 @@ for dir in "${list_of_directories[@]}"; do
   # Avoid the root directory itself ('.').
   if [[ $dir != "./lib" ]]; then
     if [[ $dir == "./lib/asabru-ui" ]]; then
-      cd $dir
+      cd $dir || exit
       npm install
       npm run build
       # Go back to the root directory
       cd $root_dir || exit
     else
-      cd $dir
+      cd $dir || exit
       rm -rf ./build
       # If the build directory doesn't exist, create it.
       if [[ ! -d build ]]; then
@@ -38,6 +38,8 @@ for dir in "${list_of_directories[@]}"; do
 
       if [[ $dir == "./lib/libuv" ]]; then
         cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_TESTING=OFF # -DCMAKE_BUILD_TYPE=Debug
+      elif [[ $dir == "./lib/asabru-handlers" ]]; then
+        cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DASABRU_COMMONS_BUILD=LOCAL_DIR -DASABRU_ENGINE_BUILD=LOCAL_DIR -DASABRU_PARSERS_BUILD=LOCAL_DIR # -DCMAKE_BUILD_TYPE=Debug
       else
         cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON # -DCMAKE_BUILD_TYPE=Debug
       fi
