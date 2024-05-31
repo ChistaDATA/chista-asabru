@@ -1,7 +1,12 @@
 #include "ConfigParser.h"
+#include "ApiGatewayConfigParser.h"
 
-XMLError ConfigParser::ParseConfiguration(XMLDocument *xmlDoc, PROXY_CONFIG &m_ProxyConfig,
-										  std::vector<PROTOCOL_SERVER_CONFIG> &m_ProtocolConfig) {
+XMLError ConfigParser::ParseConfiguration(
+	XMLDocument *xmlDoc,
+	PROXY_CONFIG &m_ProxyConfig,
+	std::vector<PROTOCOL_SERVER_CONFIG> &m_ProtocolConfig,
+	API_GATEWAY_SERVER_CONFIG &m_ApiGatewayConfig
+	) {
 	XMLNode *pRoot = xmlDoc->FirstChildElement("clickhouse-proxy-v2");
 	if (pRoot == nullptr) {
 		return XML_ERROR_FILE_READ_ERROR;
@@ -16,6 +21,11 @@ XMLError ConfigParser::ParseConfiguration(XMLDocument *xmlDoc, PROXY_CONFIG &m_P
 	 * Get proxy configurations
 	 */
 	LoadProxyServerConfigurations(pRoot, m_ProxyConfig);
+
+	/**
+	 * Get API Gateway Configuration
+	 */
+	ApiGatewayConfigParser::ParseConfiguration(pRoot, m_ApiGatewayConfig);
 
 	LOG_INFO("Configuration parsed successfully!");
 	return XML_SUCCESS;

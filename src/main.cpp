@@ -27,7 +27,13 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    while (true);
+	returnValue = initApiGatewayServers();
+	if (returnValue < 0) {
+		LOG_ERROR("Error occurred during initializing api gateway server!");
+		exit(1);
+	}
+
+    pause();
     return 0;
 }
 
@@ -35,7 +41,7 @@ int main(int argc, char **argv) {
  * Error handler
  */
 void errorHandler(int sig) {
-    void *array[10];
+	void *array[10];
     size_t size;
 
     // get void*'s for all entries on the stack
@@ -44,13 +50,6 @@ void errorHandler(int sig) {
     // print out all the frames to stderr
     fprintf(stderr, "Error: signal %d:\n", sig);
 
-    pid_t myPid = getpid();
-    std::string pstackCommand = "pstack ";
-    std::stringstream ss;
-    ss << myPid;
-    pstackCommand += ss.str();
-    system(pstackCommand.c_str());
-    // backtrace_symbols_fd(array, size, STDERR_FILENO);
     exit(1);
 }
 

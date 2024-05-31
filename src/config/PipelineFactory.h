@@ -2,18 +2,20 @@
 #include <string>
 #include <unordered_map>
 
+#include "TypeFactory.h"
+#include "interface/CApiGatewaySocket.h"
 #include "interface/CProtocolSocket.h"
 #include "interface/CProxySocket.h"
 #include "interface/LibuvProxySocket.h"
 #include "socket/Socket.h"
 #include <dlfcn.h>
 #include <set>
-#include "TypeFactory.h"
 #include <type_traits>
 
 typedef std::map<std::string, PipelineFunction<CProtocolSocket>> ProtocolPipelineFunctionMap;
 typedef std::map<std::string, PipelineFunction<CProxySocket>> ProxyPipelineFunctionMap;
 typedef std::map<std::string, PipelineFunction<LibuvProxySocket>> LibuvProxyPipelineFunctionMap;
+typedef std::map<std::string, PipelineFunction<CApiGatewaySocket>> ApiGatewayPipelineFunctionMap;
 
 class PipelineFactory
 {
@@ -21,6 +23,7 @@ private:
     ProtocolPipelineFunctionMap protocolPipelineFunctionMap;
     ProxyPipelineFunctionMap proxyPipelineFunctionMap;
     LibuvProxyPipelineFunctionMap libuvProxyPipelineFunctionMap;
+	ApiGatewayPipelineFunctionMap apiGatewayPipelineFunctionMap;
 	std::set<std::string> libNames;
 public:
     PipelineFactory()
@@ -34,6 +37,9 @@ public:
 		if constexpr (std::is_same_v<T, CProxySocket>) {
 			// Get Proxy Pipeline
 			return proxyPipelineFunctionMap[pipelineName];
+		} else if constexpr (std::is_same_v<T, CApiGatewaySocket>) {
+			// Get Proxy Pipeline
+			return apiGatewayPipelineFunctionMap[pipelineName];
 		} else if constexpr (std::is_same_v<T, CProtocolSocket>)  {
 			// Get Protocol Pipeline
 			return protocolPipelineFunctionMap[pipelineName];
@@ -50,6 +56,9 @@ public:
 		 if (std::is_same<T, CProxySocket>::value) {
 			 // Load Proxy Pipelines
 			 loadPipeline<PipelineFunction<CProxySocket>>(pipelineName, proxyPipelineFunctionMap);
+		 } else if (std::is_same<T, CApiGatewaySocket>::value) {
+			 // Load Proxy Pipelines
+			 loadPipeline<PipelineFunction<CApiGatewaySocket>>(pipelineName, apiGatewayPipelineFunctionMap);
 		 } else if (std::is_same<T, CProtocolSocket>::value) {
 			 // Load Protocol Pipelines
 			 loadPipeline<PipelineFunction<CProtocolSocket>>(pipelineName, protocolPipelineFunctionMap);

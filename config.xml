@@ -2,7 +2,7 @@
 
     <protocol-server-config>
         <protocol-server protocol="HTTP">
-            <protocol-port>8080</protocol-port>
+            <protocol-port>8086</protocol-port>
             <pipeline>CProtocolPipeline</pipeline>
             <handler>CHttpProtocolHandler</handler>
             <auth>
@@ -194,11 +194,44 @@
                 </route>
             </routes>
         </protocol-server>
-<!--        <protocol-server protocol="HTTP">-->
-<!--            <protocol-port>8081</protocol-port>-->
-<!--            <pipeline>CStreamPipeline</pipeline>-->
-<!--        </protocol-server>-->
     </protocol-server-config>
+
+    <api-gateway-server-config>
+        <end-point name="api_gateway_node_1">
+            <port>80</port>
+            <pipeline>HttpRedirectPipeline</pipeline>
+            <services>
+                <service hostname="platform.local">
+                    <uri path="*">
+                        <host>localhost</host>
+                        <port>8081</port>
+                    </uri>
+                    <uri path="/api">
+                        <host>localhost</host>
+                        <port>8084</port>
+                    </uri>
+                </service>
+                <service hostname="metrics-ui.platform.local">
+                    <uri path="*">
+                        <host>localhost</host>
+                        <port>5001</port>
+                    </uri>
+                </service>
+                <service hostname="oltp-olap-ui.platform.local">
+                    <uri path="*">
+                        <host>localhost</host>
+                        <port>5002</port>
+                    </uri>
+                </service>
+                <service hostname="keycloak.platform.local">
+                    <uri path="*">
+                        <host>localhost</host>
+                        <port>8085</port>
+                    </uri>
+                </service>
+            </services>
+        </end-point>
+    </api-gateway-server-config>
 
     <CLUSTERS>
         <CLUSTER name="cluster1">
