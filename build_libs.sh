@@ -4,13 +4,13 @@
 root_dir=$(pwd)
 
 list_of_directories=(
-  ./lib/tinyxml2
-  ./lib/libuv
-#  ./lib/asabru-commons
-#  ./lib/asabru-engine
-#  ./lib/asabru-parsers
+  #  ./lib/tinyxml2
+  #  ./lib/libuv
+  # ./lib/asabru-commons
+  # ./lib/asabru-engine
+  # ./lib/asabru-parsers
   ./lib/asabru-handlers
-#  ./lib/asabru-client
+  #  ./lib/asabru-client
   ./lib/asabru-ui
 )
 # For each subdirectory
@@ -40,8 +40,6 @@ for dir in "${list_of_directories[@]}"; do
         cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_TESTING=OFF # -DCMAKE_BUILD_TYPE=Debug
       elif [[ $dir == "./lib/asabru-handlers" ]]; then
         cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DASABRU_COMMONS_BUILD=LOCAL_DIR -DASABRU_ENGINE_BUILD=LOCAL_DIR -DASABRU_PARSERS_BUILD=LOCAL_DIR # -DCMAKE_BUILD_TYPE=Debug
-      else
-        cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON # -DCMAKE_BUILD_TYPE=Debug
       fi
 
       make
