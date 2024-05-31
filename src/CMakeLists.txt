@@ -113,11 +113,13 @@ add_executable(Chista_Asabru
         main.cpp
 
         config/ConfigParser.cpp
+        config/ApiGatewayConfigParser.cpp
         config/ConfigSingleton.cpp
         config/PipelineFactory.cpp
         config/LoadBalancerFactory.cpp
 
-        ${PIPELINE_FILES})
+        ${PIPELINE_FILES}
+)
 
 target_link_libraries(
         Chista_Asabru

@@ -28,7 +28,7 @@ XMLError ConfigSingleton::LoadConfigurationsFromFile(std::string filePath) {
 	XMLError eResult = xmlDoc.LoadFile(filePath.c_str());
 	XMLCheckResult(eResult);
 
-	return ConfigParser::ParseConfiguration(&xmlDoc, m_ProxyConfig, m_ProtocolServerConfig);
+	return ConfigParser::ParseConfiguration(&xmlDoc, m_ProxyConfig, m_ProtocolServerConfig, m_ApiGatewayServerConfig);
 }
 
 /**
@@ -40,7 +40,7 @@ XMLError ConfigSingleton::LoadConfigurationsFromString(std::string xml_string) {
 	XMLError eResult = xmlDoc.Parse(xml_string.c_str());
 	XMLCheckResult(eResult);
 
-	return ConfigParser::ParseConfiguration(&xmlDoc, m_ProxyConfig, m_ProtocolServerConfig);
+	return ConfigParser::ParseConfiguration(&xmlDoc, m_ProxyConfig, m_ProtocolServerConfig, m_ApiGatewayServerConfig);
 }
 
 /**

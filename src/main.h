@@ -14,5 +14,6 @@
 #include <fcntl.h>
 #include "protocol_server.h"
 #include "proxy_server.h"
+#include "api_gateway_server.h"
 
 void errorHandler(int sig);
