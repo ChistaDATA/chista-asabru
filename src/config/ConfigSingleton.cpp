@@ -108,6 +108,10 @@ std::vector<RESOLVED_PROTOCOL_CONFIG> ConfigSingleton::ResolveProtocolServerConf
         // Resolve the Pipeline
 		pipelineFactory->registerPipeline<CProtocolSocket>(protocol_server.pipeline);
         result.pipeline = pipelineFactory->GetPipeline<CProtocolSocket>(protocol_server.pipeline);
+        if (result.pipeline == nullptr) {
+            throw std::runtime_error("Pipeline not found for " + protocol_server.pipeline);
+        }
+
         // Resolve the Handler class
         CommandDispatcher::RegisterCommand<BaseHandler>(protocol_server.handler);
         result.handler = CommandDispatcher::GetCommand<BaseHandler>(protocol_server.handler);
