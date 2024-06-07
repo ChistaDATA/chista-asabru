@@ -86,6 +86,10 @@ public:
 
 			std::string cn = delibbed.second;
 			pipelineFunc = (T) dlsym(dlhandle, cn.c_str());
+			if (pipelineFunc == nullptr) {
+				printf("Error: %s\n", dlerror());
+				exit(1);
+			}
 
 			functionMap[delibbed.second] = pipelineFunc;
 
