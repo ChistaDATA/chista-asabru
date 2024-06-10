@@ -62,8 +62,11 @@ public:
 	 * Loads the plugin into the program space
 	 */
 	template <class T> void loadPipeline(const std::string& pluginName, std::map<std::string, T> &functionMap) {
-		auto it = std::find_if(libNames.begin(), libNames.end(),
-							   [pluginName](const std::string &s) { return (s.find(pluginName) != std::string::npos); });
+		auto it = std::find_if(libNames.begin(), libNames.end(), [pluginName](const std::string &s) {
+			std::string pluginLibFile = s;
+			std::pair<std::string, std::string> delibbed = libnameothy(pluginLibFile);
+			return pluginName == delibbed.first;
+		});
 		if (it == libNames.end()) {
 			throw std::runtime_error("Plugin is not available : " + pluginName);
 		}
