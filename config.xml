@@ -3,7 +3,7 @@
     <protocol-server-config>
         <protocol-server protocol="HTTP">
             <protocol-port>8080</protocol-port>
-            <pipeline>ProtocolPipeline</pipeline>
+            <pipeline>CProtocolPipeline</pipeline>
             <handler>CHttpProtocolHandler</handler>
             <auth>
                 <strategy>basic</strategy>
@@ -21,7 +21,24 @@
                                 <Description>Admin</Description>
                                 <DataSource>admin</DataSource>
                             </principal>
+                            <principal>
+                                <PrincipalType>Group</PrincipalType>
+                                <Name>admin-group</Name>
+                                <Email>admin-group@localhost</Email>
+                                <DisplayName>Admin Group</DisplayName>
+                                <Description>Admin Group</Description>
+                                <DataSource>admin</DataSource>
+                            </principal>
                         </principals>
+                        <groups>
+                            <group>
+                                <Name>admin-group</Name>
+                                <Description>Admin Group</Description>
+                                <Members>
+                                    <Member>admin</Member>
+                                </Members>
+                            </group>
+                        </groups>
                         <operations>
                             <operation>
                                 <Id>1</Id>
@@ -75,31 +92,31 @@
                             <predicate>
                                 <resourceId>1</resourceId>
                                 <operationId>1</operationId>
-                                <principalName>admin</principalName>
+                                <principalName>admin-group</principalName>
                                 <predicateType>Grant</predicateType>
                             </predicate>
                             <predicate>
                                 <resourceId>1</resourceId>
                                 <operationId>2</operationId>
-                                <principalName>admin</principalName>
+                                <principalName>admin-group</principalName>
                                 <predicateType>Grant</predicateType>
                             </predicate>
                             <predicate>
                                 <resourceId>1</resourceId>
                                 <operationId>3</operationId>
-                                <principalName>admin</principalName>
+                                <principalName>admin-group</principalName>
                                 <predicateType>Grant</predicateType>
                             </predicate>
                             <predicate>
                                 <resourceId>1</resourceId>
                                 <operationId>4</operationId>
-                                <principalName>admin</principalName>
+                                <principalName>admin-group</principalName>
                                 <predicateType>Grant</predicateType>
                             </predicate>
                             <predicate>
                                 <resourceId>1</resourceId>
                                 <operationId>5</operationId>
-                                <principalName>admin</principalName>
+                                <principalName>admin-group</principalName>
                                 <predicateType>Grant</predicateType>
                             </predicate>
                         </predicates>
