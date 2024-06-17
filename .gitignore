@@ -22,3 +22,4 @@ obj/
 .cache/clangd
 external/grafana/plugins/snowflake-grafana-datasource
 external/grafana/plugins/grafana-clickhouse-datasource
+external/scheduler-sdk/.cache/clangd/index

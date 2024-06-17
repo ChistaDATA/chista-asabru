@@ -1,0 +1,6 @@
+add_library(scheduler_command SHARED SchedulerCommand.cpp SchedulerCommand.h)
+target_link_libraries(scheduler_command asabru_commons)
+# target_include_directories(scheduler_command PUBLIC ${asabru_commons_SOURCE_DIR}/src)
+# target_include_directories(scheduler_command PUBLIC ${asabru_commons_SOURCE_DIR}/src)
+include_directories(${asabru_commons_SOURCE_DIR}/src)
+add_subdirectory(rundeck)
