@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "Post-installation script running..."
+
+echo "Creating a script to set environment variables system-wide..."
+
+# Create a new script in /etc/profile.d/
+cat <<EOL > /etc/profile.d/asabru_env.sh
+export PLUGINS_FOLDER_PATH=/usr/local/bin/plugins
+export CONFIG_FILE_PATH=/usr/local/bin/
+EOL
+
+# Make the script executable
+chmod +x /etc/profile.d/asabru_env.sh
+
+echo "Environment variables set successfully."
