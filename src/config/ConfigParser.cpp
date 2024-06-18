@@ -102,7 +102,7 @@ XMLError ConfigParser::LoadProxyServerConfigurations(XMLNode *pRoot, PROXY_CONFI
 							}
 
 							XMLElement *pSourceHostName = pService->FirstChildElement("SOURCE_HOSTNAME");
-							if (NULL != pHost) {
+							if (NULL != pSourceHostName) {
 								auto sourceHostname = "";
 								sourceHostname = pSourceHostName->GetText();
 								service.source_hostname = sourceHostname;
