@@ -1,0 +1,5 @@
+Package: ${PACKAGE}
+Version: ${VERSION}
+Maintainer: ChistaDATA
+Architecture: ${ARCH}
+Description: Asabru Proxy
