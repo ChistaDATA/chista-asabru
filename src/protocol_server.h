@@ -72,10 +72,10 @@ int initProtocolServers() {
                                 CommandDispatcher::Dispatch(value.auth->handler, &context);
                                 if (!std::any_cast<bool>(context.Get(AUTH_AUTHENTICATED_KEY)))
                                 {
-                                    auto *response = new simple_http_server::HttpResponse(simple_http_server::HttpStatusCode::Unauthorized);
-                                    response->SetHeader("Content-Type", "application/json");
-                                    response->SetContent("Unauthorized");
-                                    return *response;
+                                    simple_http_server::HttpResponse response(simple_http_server::HttpStatusCode::Unauthorized);
+                                    response.SetHeader("Content-Type", "application/json");
+                                    response.SetContent("Unauthorized");
+                                    return response;
                                 }
 
                                 if (route.auth.authorization != "") {
@@ -85,17 +85,17 @@ int initProtocolServers() {
                                     CommandDispatcher::Dispatch(value.auth->authorization->handler, &context);
                                     if (!std::any_cast<bool>(context.Get(AUTHORIZATION_AUTHORIZED_KEY)))
                                     {
-                                        auto *response = new simple_http_server::HttpResponse(simple_http_server::HttpStatusCode::Forbidden);
-                                        response->SetHeader("Content-Type", "application/json");
-                                        response->SetContent("Forbidden");
-                                        return *response;
+                                        simple_http_server::HttpResponse response(simple_http_server::HttpStatusCode::Forbidden);
+                                        response.SetHeader("Content-Type", "application/json");
+                                        response.SetContent("Forbidden");
+                                        return response;
                                     }
                                 }
                             }
 
                             CommandDispatcher::Dispatch(route.request_handler, &context);
-                            auto response = std::any_cast<simple_http_server::HttpResponse *>(context.Get("response"));
-                            return *response;
+                            auto response = std::any_cast<simple_http_server::HttpResponse>(context.Get("response"));
+                            return response;
                         }
                 );
             }
