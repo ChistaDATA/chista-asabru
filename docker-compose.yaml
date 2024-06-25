@@ -201,6 +201,41 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
 
+  rundeck:
+    build:
+      context: ./external/rundeck
+      dockerfile: ./Dockerfile
+    links:
+      - mysql
+    environment:
+      RUNDECK_GRAILS_URL: http://localhost:4440
+      RUNDECK_DATABASE_DRIVER: org.mariadb.jdbc.Driver
+      RUNDECK_DATABASE_USERNAME: rundeck
+      RUNDECK_DATABASE_PASSWORD: rundeck
+      RUNDECK_DATABASE_URL: jdbc:mariadb://mysql/rundeck?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+      RUNDECK_SERVER_ADDRESS: 0.0.0.0
+      RUNDECK_FEATURE_UINEXT_NAME: uiNext
+      RUNDECK_FEATURE_UINEXT_ENABLED: 'true'
+    ports:
+      - 4440:4440
+    networks:
+      - backend
+
+  mysql:
+    container_name: mysql
+    image: mysql:8
+    expose:
+      - 3306
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE reduces error messages in console
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=rundeck
+      - MYSQL_USER=rundeck
+      - MYSQL_PASSWORD=rundeck
+    networks:
+      - backend
+
 #  intercepting-proxy:
 #    # platform: linux/amd64
 #    build:
