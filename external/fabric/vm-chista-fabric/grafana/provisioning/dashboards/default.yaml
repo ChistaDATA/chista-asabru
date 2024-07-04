@@ -1,0 +1,13 @@
+apiVersion: 1
+
+providers:
+  - name: Postgres
+    folder: Postgres
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards/postgres
+  - name: Comparison
+    folder: Comparison
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards/comparison

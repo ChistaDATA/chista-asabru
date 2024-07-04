@@ -1,0 +1,67 @@
+apiVersion: 1
+
+datasources:
+  - name: grafana-clickhouse-datasource
+    id: 1
+    uid: c9c503e4-59fe-48cf-bcdd-fdf4600d4a6f
+    orgId: 1
+    type: grafana-clickhouse-datasource
+    typeLogoUrl: /public/plugins/grafana-clickhouse-datasource/img/logo.svg
+    access: proxy
+    url: ""
+    user: ""
+    database: ""
+    basicAuth: false
+    basicAuthUser: ""
+    withCredentials: false
+    isDefault: false
+    jsonData:
+      host: 34.42.214.61
+      port: 9000
+      protocol: native
+      username: default
+      version: 4.0.3
+    secureJsonFields:
+      password: true
+    secureJsonData:
+      password: chistadatademo2024
+    version: 5
+    readOnly: false
+  - name: prometheus
+    id: 2
+    typeLogoUrl: /public/app/plugins/datasource/prometheus/img/prometheus_logo.svg
+    uid: d89f135e-821f-40bf-9bdb-0faf835e6d5b
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    user: ""
+    database: ""
+    basicAuth: false
+    basicAuthUser: ""
+    withCredentials: false
+    isDefault: true
+    jsonData:
+      httpMethod: POST
+    secureJsonFields: {}
+    version: 3
+    readOnly: false
+  - name: postgres
+    id: 3
+    type: postgres
+    url: 34.42.2.181:5432
+    user: postgres
+    password: chistadatademo2024
+    isDefault: false
+    secureJsonData:
+      password: 'chistadatademo2024'
+    jsonData:
+      database: postgres
+      sslmode: 'disable' # disable/require/verify-ca/verify-full
+      maxOpenConns: 100 # Grafana v5.4+
+      maxIdleConns: 100 # Grafana v5.4+
+      maxIdleConnsAuto: true # Grafana v9.5.1+
+      connMaxLifetime: 14400 # Grafana v5.4+
+      postgresVersion: 1000 # 903=9.3, 904=9.4, 905=9.5, 906=9.6, 1000=10
+      timescaledb: false
+    access: proxy
+    editable: true

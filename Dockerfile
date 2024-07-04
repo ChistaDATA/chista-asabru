@@ -1,4 +1,4 @@
-FROM arm64v8/ubuntu:latest AS builder
+FROM ubuntu:latest AS builder
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update -y \
   && apt-get upgrade -y \
@@ -48,7 +48,7 @@ RUN cd build && cmake -DASABRU_COMMONS_BUILD=LOCAL_DIR -DASABRU_ENGINE_BUILD=LOC
 # The second stage will install the runtime dependencies only and copy
 # the compiled executables
 
-FROM arm64v8/ubuntu:latest AS runner
+FROM ubuntu:latest AS runner
 
 RUN apt-get update -y \
   && apt-get upgrade -y \
