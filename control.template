@@ -2,4 +2,5 @@ Package: ${PACKAGE}
 Version: ${VERSION}
 Maintainer: ChistaDATA
 Architecture: ${ARCH}
+Depends: libsqlite3-dev (>= 3.42.0-1)
 Description: Asabru Proxy

@@ -3,6 +3,13 @@
 # Getting the root directory of your project
 root_dir=$(pwd)
 
+TOOLCHAIN_ARG=""
+
+if [ "$1" = "amd64" ]; then
+  TOOLCHAIN_ARG="-DCMAKE_TOOLCHAIN_FILE=$root_dir/dist/ubuntu/amd64/toolchain-amd64.cmake"
+fi
+echo "Toolchain ARG : ${TOOLCHAIN_ARG}"
+
 list_of_directories=(
   #  ./lib/tinyxml2
   #  ./lib/libuv
@@ -37,9 +44,9 @@ for dir in "${list_of_directories[@]}"; do
       make clean
 
       if [[ $dir == "./lib/libuv" ]]; then
-        cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_TESTING=OFF # -DCMAKE_BUILD_TYPE=Debug
+        cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_TESTING=OFF ${TOOLCHAIN_ARG} # -DCMAKE_BUILD_TYPE=Debug
       elif [[ $dir == "./lib/asabru-handlers" ]]; then
-        cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DASABRU_COMMONS_BUILD=LOCAL_DIR -DASABRU_ENGINE_BUILD=LOCAL_DIR -DASABRU_PARSERS_BUILD=LOCAL_DIR # -DCMAKE_BUILD_TYPE=Debug
+        cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DASABRU_COMMONS_BUILD=LOCAL_DIR -DASABRU_ENGINE_BUILD=LOCAL_DIR -DASABRU_PARSERS_BUILD=LOCAL_DIR ${TOOLCHAIN_ARG} # -DCMAKE_BUILD_TYPE=Debug
       fi
 
       make
