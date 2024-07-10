@@ -43,7 +43,7 @@ RUN ./build_libs.sh
 # Build the CMake project
 RUN rm -rf build 
 RUN mkdir build 
-RUN cd build && cmake -DASABRU_COMMONS_BUILD=LOCAL_DIR -DASABRU_ENGINE_BUILD=LOCAL_DIR -DASABRU_PARSERS_BUILD=LOCAL_DIR .. && make
+RUN cd build && cmake -DASABRU_COMMONS_BUILD=LOCAL_DIR -DASABRU_ENGINE_BUILD=LOCAL_DIR -DASABRU_PARSERS_BUILD=LOCAL_DIR -DGTEST_ENABLED:BOOL=ON.. && make
 
 # The second stage will install the runtime dependencies only and copy
 # the compiled executables
