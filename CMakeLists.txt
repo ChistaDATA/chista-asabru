@@ -17,5 +17,6 @@ add_subdirectory(src)
 
 enable_testing()
 
-add_subdirectory(test)
-
+if(GTEST_ENABLED)
+    add_subdirectory(test)
+endif()
