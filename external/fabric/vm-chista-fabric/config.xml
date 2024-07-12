@@ -1,0 +1,118 @@
+<clickhouse-proxy-v2>
+
+    <protocol-server-config>
+        <protocol-server protocol="HTTP">
+            <protocol-port>8080</protocol-port>
+            <pipeline>CProtocolPipeline</pipeline>
+            <handler>CHttpProtocolHandler</handler>
+            <auth>
+                <strategy>basic</strategy>
+                <handler>HTTPBasicIsAuthenticatedCommand</handler>
+            </auth>
+            <routes>
+                <route>
+                    <path>/auth/login</path>
+                    <method>POST</method>
+                    <request_handler>HTTPBasicLoginCommand</request_handler>
+                    <auth>
+                        <required>false</required> <!-- No authentication required default is true -->
+                    </auth>
+                </route>
+                <route>
+                    <path>/auth/logout</path>
+                    <method>POST</method>
+                    <request_handler>HTTPBasicLogoutCommand</request_handler>
+                    <auth>
+                        <required>true</required>
+                        <authorization>
+                            <predicates>
+                                <predicate>
+                                    <resourceId>1</resourceId>
+                                    <operationId>1</operationId>
+                                </predicate>
+                            </predicates>
+                        </authorization>
+                    </auth>
+                </route>
+                <route>
+                    <path>/configuration</path>
+                    <method>POST</method>
+                    <request_handler>UpdateConfigurationCommand</request_handler>
+                </route>
+                <route>
+                    <path>/updateService</path>
+                    <method>POST</method>
+                    <request_handler>UpdateEndPointServiceCommand</request_handler>
+                </route>
+                <route>
+                    <path>/</path>
+                    <method>GET</method>
+                    <request_handler>SendFileCommand</request_handler>
+                    <auth>
+                        <required>false</required>
+                    </auth>
+                </route>
+                <route>
+                    <path>^/env.js</path>
+                    <method>GET</method>
+                    <request_handler>SendFileCommand</request_handler>
+                    <auth>
+                        <required>false</required>
+                    </auth>
+                </route>
+                <route>
+                    <path>^/assets.*</path>
+                    <method>GET</method>
+                    <request_handler>SendFileCommand</request_handler>
+                    <auth>
+                        <required>false</required>
+                    </auth>
+                </route>
+                <route>
+                    <path>/python</path>
+                    <method>POST</method>
+                    <request_handler>PythonCommand</request_handler>
+                </route>
+                <route>
+                    <path>/upload</path>
+                    <method>POST</method>
+                    <request_handler>HttpFileUploadCommand</request_handler>
+                </route>
+            </routes>
+        </protocol-server>
+    </protocol-server-config>
+
+    <CLUSTERS>
+        <CLUSTER name="cluster1">
+            <END_POINTS>
+                <END_POINT name="pg_wire_node1">
+                    <READ_WRITE>no</READ_WRITE>
+                    <PROXY_PORT>9140</PROXY_PORT>
+                    <PROTOCOL>PG_WIRE</PROTOCOL>
+                    <PIPELINE>PostgreSQLPipeline</PIPELINE>
+                    <HANDLER>CPostgreSQLHandler</HANDLER>
+                    <SERVICES>
+                        <SERVICE name="pg_wire_service1">
+                            <HOST>34.42.2.181</HOST>
+                            <PORT>5432</PORT>
+                        </SERVICE>
+                    </SERVICES>
+                </END_POINT>
+                <END_POINT name="mysql_wire_node1">
+                    <READ_WRITE>no</READ_WRITE>
+                    <PROXY_PORT>9160</PROXY_PORT>
+                    <PROTOCOL>MYSQL_WIRE</PROTOCOL>
+                    <PIPELINE>MySQLPipeline</PIPELINE>
+                    <HANDLER>CMySQLHandler</HANDLER>
+                    <SERVICES>
+                        <SERVICE name="pg_wire_service1">
+                            <HOST>34.42.2.181</HOST>
+                            <PORT>3306</PORT>
+                        </SERVICE>
+                    </SERVICES>
+                </END_POINT>
+            </END_POINTS>
+        </CLUSTER>
+
+    </CLUSTERS>
+</clickhouse-proxy-v2>

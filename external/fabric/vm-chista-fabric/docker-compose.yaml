@@ -1,0 +1,71 @@
+version: "3.8"
+services:
+  fluent-bit:
+    image: fluent/fluent-bit:latest
+    restart: always
+    volumes:
+      - ./fluent-bit/functions.lua:/fluent-bit/scripts/functions.lua
+      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./fluent-bit/parser.conf:/fluent-bit/etc/parser.conf
+    ports:
+      - "5170:5170"
+    #    depends_on:
+    #      - intercepting-proxy
+    networks:
+      - backend
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prom_data:/prometheus
+    networks:
+      - backend
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      SNOWFLAKE_ACCOUNT: ${SNOWFLAKE_EXPORTER_ACCOUNT:-}
+      SNOWFLAKE_USERNAME: ${SNOWFLAKE_EXPORTER_USERNAME:-}
+      SNOWFLAKE_PASSWORD: ${SNOWFLAKE_EXPORTER_PASSWORD:-}
+      SNOWFLAKE_ROLE: ${SNOWFLAKE_EXPORTER_ROLE:-}
+      SNOWFLAKE_WAREHOUSE: ${SNOWFLAKE_EXPORTER_WAREHOUSE:-}
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: grafana
+      GF_INSTALL_PLUGINS: grafana-clickhouse-datasource
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: michelin-snowflake-datasource
+    volumes:
+      - source: ./grafana/provisioning
+        target: /etc/grafana/provisioning
+        type: bind
+      - source: ./grafana/dashboards
+        target: /var/lib/grafana/dashboards
+        type: bind
+    #      - source: ../grafana/plugins
+    #        target: /var/lib/grafana/plugins
+    #        type: bind
+    networks:
+      - backend
+
+volumes:
+  pg_data:
+  mysql_data:
+  parseable_data:
+  prom_data:
+  grafana_storage:
+networks:
+  backend:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1400

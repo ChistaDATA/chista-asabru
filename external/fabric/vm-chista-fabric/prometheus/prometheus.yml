@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: [ ]
+      scheme: http
+      timeout: 10s
+      api_version: v1
+scrape_configs:
+  - job_name: 'postgres'
+    metrics_path: /metrics
+    params:
+      auth_module: [ foo ]
+    static_configs:
+      - targets: [ "34.42.2.181:9187" ]
+
