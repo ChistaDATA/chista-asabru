@@ -2,14 +2,14 @@
 
     <protocol-server-config>
         <protocol-server protocol="HTTP">
-            <protocol-port>8086</protocol-port>
+            <protocol-port>8080</protocol-port>
             <pipeline>CProtocolPipeline</pipeline>
             <handler>CHttpProtocolHandler</handler>
             <auth>
                 <strategy>basic</strategy>
                 <handler>HTTPBasicIsAuthenticatedCommand</handler>
                 <authorization>
-                    <strategy>afcas</strategy>
+                    <strategy>none</strategy>
                     <handler>IsAuthorizedCommand</handler>
                     <data>
                         <principals>
@@ -236,58 +236,6 @@
     <CLUSTERS>
         <CLUSTER name="cluster1">
             <END_POINTS>
-                <END_POINT name="ch_wire_node1">
-                    <READ_WRITE>yes</READ_WRITE>
-                    <PROXY_PORT>9100</PROXY_PORT>
-                    <PIPELINE>ClickHousePipeline</PIPELINE>
-                    <HANDLER>CHWirePTHandler</HANDLER>
-                    <PROTOCOL>CH_WIRE</PROTOCOL>
-                    <SERVICES>
-                        <SERVICE name="ch_wire_service1" weight="2">
-                            <HOST>localhost</HOST>
-                            <PORT>9000</PORT>
-                        </SERVICE>
-                    </SERVICES>
-                </END_POINT>
-                <END_POINT name="ch_http_node1">
-                    <READ_WRITE>yes</READ_WRITE>
-                    <PROXY_PORT>9110</PROXY_PORT>
-                    <PROTOCOL>CH_HTTP</PROTOCOL>
-                    <PIPELINE>DefaultProxyPipeline</PIPELINE>
-                    <HANDLER>CSnowflakeHttpHandler</HANDLER>
-                    <SERVICES>
-                        <SERVICE name="ch_http_service1">
-                            <HOST>localhost</HOST>
-                            <PORT>8123</PORT>
-                        </SERVICE>
-                    </SERVICES>
-                </END_POINT>
-                <END_POINT name="mongo_wire_node1">
-                    <READ_WRITE>yes</READ_WRITE>
-                    <PROXY_PORT>9120</PROXY_PORT>
-                    <PROTOCOL>MONGO_WIRE</PROTOCOL>
-                    <PIPELINE>ClickHousePipeline</PIPELINE>
-                    <HANDLER>CMongoDBHandler</HANDLER>
-                    <SERVICES>
-                        <SERVICE name="ch_https_service1">
-                            <HOST>localhost</HOST>
-                            <PORT>27017</PORT>
-                        </SERVICE>
-                    </SERVICES>
-                </END_POINT>
-                <END_POINT name="mysql_wire_node1">
-                    <READ_WRITE>yes</READ_WRITE>
-                    <PROXY_PORT>9160</PROXY_PORT>
-                    <PROTOCOL>MYSQL_WIRE</PROTOCOL>
-                    <PIPELINE>MySQLPipeline</PIPELINE>
-                    <HANDLER>CMySQLHandler</HANDLER>
-                    <SERVICES>
-                        <SERVICE name="mysql_wire_service1">
-                            <HOST>localhost</HOST>
-                            <PORT>3306</PORT>
-                        </SERVICE>
-                    </SERVICES>
-                </END_POINT>
                 <END_POINT name="pg_wire_node1">
                     <READ_WRITE>no</READ_WRITE>
                     <PROXY_PORT>9140</PROXY_PORT>
@@ -296,9 +244,13 @@
                     <HANDLER>CPostgreSQLHandler</HANDLER>
                     <SERVICES>
                         <SERVICE name="pg_wire_service1">
-                            <HOST>localhost</HOST>
+                            <HOST>34.42.2.181</HOST>
                             <PORT>5432</PORT>
                         </SERVICE>
+<!--                        <SERVICE name="pg_wire_service1">-->
+<!--                            <HOST>localhost</HOST>-->
+<!--                            <PORT>5432</PORT>-->
+<!--                        </SERVICE>-->
                     </SERVICES>
                 </END_POINT>
                 <!--				<END_POINT name="ch_http_node1">-->
